@@ -1,19 +1,18 @@
-package io.github.scopetech.mc2d.client;
+package io.github.overrun.mc2d.client;
 
-import io.github.scopetech.mc2d.Mc2D;
-import io.github.scopetech.mc2d.api.mod.Mod;
-import io.github.scopetech.mc2d.api.util.UtilSystem;
-import io.github.scopetech.mc2d.engine.RenderThread;
-import io.github.scopetech.mc2d.input.Input;
-import io.github.scopetech.mc2d.input.Mouse;
+import io.github.overrun.mc2d.api.util.UtilSystem;
+import io.github.overrun.mc2d.input.Input;
+import io.github.overrun.mc2d.Mc2D;
+import io.github.overrun.mc2d.engine.RenderThread;
+import io.github.overrun.mc2d.input.Mouse;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import java.awt.Graphics;
+import java.awt.Image;
 
 /**
  * @author Administrator
  */
-@Mod(modid = Mc2D.NAMESPACE)
 public class Client extends JFrame {
     private static boolean initialized;
 
@@ -39,7 +38,7 @@ public class Client extends JFrame {
     public void paint(Graphics g) {
         Image buf = createImage(getWidth(), getHeight());
         Graphics gg = buf.getGraphics();
-
+        //////////////////////////////
         drawImage(g, buf, 0, 0);
     }
 }

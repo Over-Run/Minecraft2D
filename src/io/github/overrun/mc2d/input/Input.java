@@ -1,4 +1,4 @@
-package io.github.scopetech.mc2d.input;
+package io.github.overrun.mc2d.input;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;

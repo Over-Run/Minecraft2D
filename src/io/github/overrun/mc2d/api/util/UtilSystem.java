@@ -1,4 +1,4 @@
-package io.github.scopetech.mc2d.api.util;
+package io.github.overrun.mc2d.api.util;
 
 /**
  * @author squid233

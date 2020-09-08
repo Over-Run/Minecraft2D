@@ -1,7 +1,7 @@
-package io.github.scopetech.mc2d.engine;
+package io.github.overrun.mc2d.engine;
 
-import io.github.scopetech.mc2d.Mc2D;
-import io.github.scopetech.mc2d.api.util.UtilSystem;
+import io.github.overrun.mc2d.Mc2D;
+import io.github.overrun.mc2d.api.util.UtilSystem;
 
 /**
  * @author squid233
