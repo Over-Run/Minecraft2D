@@ -17,8 +17,27 @@ Welcome to Minecraft 2D. This is a sandplay. **(Not sandbox game!!!)**
 欢迎来到Minecraft 2D的世界！这是一个**沙盘**游戏。**（不是沙盒游戏！！！）**
 
 ## 运行时环境 Runtime Environment
-JRE 11 
+JRE 11  
 最低要求JRE11，低于此版本可能会导致不能正常启动
+
+## 展示图 Exhibition
+200912-pa-build.1  
+![200912-build1-0](/img/200912-1-0.png)![200912-build1-1](img/200912-1-1.png)
+
+## 使用方法 Use Guide
+1. go [here](/archives) or [Releases](https://github.com/Over-Run/Minecraft2D/releases) to download。  
+首先，到[此处](/archives)或 [Releases](https://github.com/Over-Run/Minecraft2D/releases) 下载。
+2. Unzip to any directories.  
+将其解压到任意文件夹下。
+3. Write a startup script and put in your directory.  
+编写一个启动脚本并放到文件夹下。
+
+### The startup script
+```batch
+@echo off
+java -jar *.jar
+pause
+```
 
 ## 初代设计图（结构树） Primary design drawing (structure tree)
 | Type  | Description  |

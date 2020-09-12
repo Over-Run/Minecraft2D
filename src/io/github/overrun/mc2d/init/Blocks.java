@@ -22,15 +22,21 @@ public class Blocks {
     public static final BlockAir AIR;
     public static final Block DIRT;
     public static final Block GRASS_BLOCK;
+    public static final Block COBBLESTONE;
 
     static {
         AIR = (BlockAir) register(0, "air", new BlockAir(new Block.Settings()));
         DIRT = register(1, "dirt", new Block(new Block.Settings()));
         GRASS_BLOCK = register(2, "grass_block", new Block(new Block.Settings()));
+        COBBLESTONE = register(3, "cobblestone", new Block(new Block.Settings()));
     }
 
     public static Block getByRawId(int rawId) {
-        return BLOCKS.get(rawId);
+        try {
+            return BLOCKS.get(rawId);
+        } catch (Exception e) {
+            return AIR;
+        }
     }
 
     public static Block getById(Identifier id) {
