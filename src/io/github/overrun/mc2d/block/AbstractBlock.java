@@ -14,8 +14,9 @@ public abstract class AbstractBlock implements ItemConvertible {
      * draw block to screen
      *
      * @param g target graphics
+     * @param pos block pos
      */
-    public abstract void draw(Graphics g);
+    public abstract void draw(Graphics g, BlockPos pos);
 
     /**
      * 比较两个方块是否相同

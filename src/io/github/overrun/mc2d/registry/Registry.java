@@ -20,7 +20,7 @@ public class Registry {
             if (entry instanceof Block) {
                 Properties m = new Properties();
                 ((Block) entry).setModel(m);
-                try (Reader reader = new FileReader(AssetManager.getAsString(id.getPath(), "model", id.getPath()))) {
+                try (Reader reader = new FileReader(AssetManager.getAsString(id.getNamespace(), "models", "block", id.getPath() + ".properties"))) {
                     m.load(reader);
                 } catch (IOException e) {
                     e.printStackTrace();

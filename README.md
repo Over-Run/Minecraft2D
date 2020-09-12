@@ -16,6 +16,10 @@
 Welcome to Minecraft 2D. This is a sandplay. **(Not sandbox game!!!)**  
 欢迎来到Minecraft 2D的世界！这是一个**沙盘**游戏。**（不是沙盒游戏！！！）**
 
+## 运行时环境 Runtime Environment
+JRE 11 
+最低要求JRE11，低于此版本可能会导致不能正常启动
+
 ## 初代设计图（结构树） Primary design drawing (structure tree)
 | Type  | Description  |
 | ----- | ------------ |

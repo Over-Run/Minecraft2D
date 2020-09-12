@@ -15,7 +15,15 @@ public class Identifier {
     }
 
     public Identifier(String path) {
-        this(Mc2D.NAMESPACE, path);
+        int l = 2;
+        String[] spl = path.split(":");
+        if (spl.length == l) {
+            this.namespace = spl[0];
+            this.path = spl[1];
+        } else {
+            this.namespace = Mc2D.NAMESPACE;
+            this.path = path;
+        }
     }
 
     public String getNamespace() {
@@ -28,7 +36,7 @@ public class Identifier {
 
     @Override
     public int hashCode() {
-        return Integer.parseInt(namespace.hashCode() + "" + path.hashCode());
+        return namespace.hashCode() + path.hashCode();
     }
 
     @Override

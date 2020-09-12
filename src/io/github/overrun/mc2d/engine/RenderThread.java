@@ -10,10 +10,16 @@ public class RenderThread implements Runnable {
     private Thread thread;
     private boolean exited = false;
     private final int interval;
+    public int fps;
 
     public RenderThread() {
-        interval = 1000 / UtilSystem.getPropertyInt("fps", 30);
+        fps = UtilSystem.getPropertyInt("fps", 40, () -> {
+            System.out.println("Tips: You can set the fps.");
+            return this;
+        });
+        interval = 1000 / fps;
         System.out.println("[RenderThread]Created");
+        System.out.println("[RenderThread]FPS: " + fps);
         System.out.println("[RenderThread]Render interval: " + interval + "ms");
     }
 
