@@ -16,7 +16,7 @@ public class Highlight {
                     && Mc2D.getClient().getMousePosition().y >= prevY
                     && Mc2D.getClient().getMousePosition().y <= prevY + 15
             ) {
-                g.draw3DRect(prevX, prevY, 15, 15, true);
+                g.drawRect(prevX, prevY, 15, 15);
             }
         } catch (NullPointerException ignored) { }
     }

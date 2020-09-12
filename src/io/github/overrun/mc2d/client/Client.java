@@ -10,6 +10,7 @@ import io.github.overrun.mc2d.input.Mouse;
 import io.github.overrun.mc2d.screen.Screen;
 import io.github.overrun.mc2d.world.Dimensions;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -28,6 +29,7 @@ public class Client extends JFrame implements Screen {
             setSize(UtilSystem.getPropertyInt("width", 864), UtilSystem.getPropertyInt("height", 486));
             setLocationRelativeTo(null);
             setDefaultCloseOperation(EXIT_ON_CLOSE);
+            setIconImage(new ImageIcon("icon.png").getImage());
             addKeyListener(new Input());
             addMouseListener(new Mouse());
             //////////
