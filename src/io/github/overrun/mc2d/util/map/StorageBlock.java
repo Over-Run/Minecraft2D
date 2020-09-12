@@ -14,7 +14,7 @@ public class StorageBlock {
     /**
      * blocks[y][x]
      */
-    public final Block[][] blocks = new Block[28][53];
+    public final Block[][] blocks = new Block[29][54];
 
     private StorageBlock() {
         for (Block[] block : blocks) {
