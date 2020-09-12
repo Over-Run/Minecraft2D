@@ -18,7 +18,7 @@ Welcome to Minecraft 2D. This is a sandplay. **(Not sandbox game!!!)**
 
 ## 运行时环境 Runtime Environment
 JRE 11  
-最低要求JRE11，低于此版本可能会导致不能正常启动
+最低要求JRE11，低于此版本会导致不能正常启动
 
 ## 展示图 Exhibition
 200912-pa-build.1  
