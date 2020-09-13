@@ -2,10 +2,13 @@ package io.github.overrun.mc2d.util;
 
 import io.github.overrun.mc2d.Mc2D;
 
+import java.io.Serializable;
+
 /**
  * @author squid233
  */
-public class Identifier {
+public class Identifier implements Serializable {
+    private static final long serialVersionUID = -7043644142868474131L;
     private final String namespace;
     private final String path;
 

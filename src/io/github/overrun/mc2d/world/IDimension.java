@@ -17,6 +17,13 @@ public interface IDimension {
     Identifier getId();
 
     /**
+     * set storage block
+     *
+     * @param storageBlock storage blocks
+     */
+    void setStorageBlocks(StorageBlock storageBlock);
+
+    /**
      * return storage blocks
      *
      * @return storage blocks

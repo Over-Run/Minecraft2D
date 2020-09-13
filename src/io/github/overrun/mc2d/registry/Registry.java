@@ -25,6 +25,7 @@ public class Registry {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                ((Block) entry).setRegistryName(id);
             }
             return entry;
         });

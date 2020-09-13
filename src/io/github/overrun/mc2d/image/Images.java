@@ -31,7 +31,7 @@ public class Images {
     }
 
     public static Image getAsciiPart(int x, int y) {
-        return getImagePart(new ImageIcon(AssetManager.getAsString(Mc2D.NAMESPACE, "textures", "font", "ascii.png")).getImage(), x, y, 7, 7);
+        return getImagePart(new ImageIcon(AssetManager.getAsString(Mc2D.NAMESPACE, "textures", "font", "ascii.png")).getImage(), x, y, 6, 8);
     }
 
     public static Image getAsciiInMap(char symbol) {

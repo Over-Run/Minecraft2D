@@ -10,6 +10,8 @@ import java.awt.Graphics;
  * @author squid233
  */
 public class BlockAir extends Block {
+    private static final long serialVersionUID = -813371971086081139L;
+
     public BlockAir(Settings settings) {
         super(settings);
     }

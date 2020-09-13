@@ -5,6 +5,7 @@ import io.github.overrun.mc2d.engine.ITickable;
 import io.github.overrun.mc2d.image.Images;
 import io.github.overrun.mc2d.registry.IRegistrable;
 import io.github.overrun.mc2d.util.Highlight;
+import io.github.overrun.mc2d.util.Identifier;
 
 import java.awt.Graphics;
 import java.util.Properties;
@@ -13,8 +14,10 @@ import java.util.Properties;
  * @author squid233
  */
 public class Block extends AbstractBlock implements IRegistrable, ITickable {
+    private static final long serialVersionUID = 7302443671729377473L;
     public int x = 0;
     public int y = 0;
+    private Identifier registryName;
     protected Properties model;
 
     public Block(Settings settings) {
@@ -36,6 +39,14 @@ public class Block extends AbstractBlock implements IRegistrable, ITickable {
 
     public BlockPos getPos() {
         return new BlockPos(x, y);
+    }
+
+    public void setRegistryName(Identifier registryName) {
+        this.registryName = registryName;
+    }
+
+    public Identifier getRegistryName() {
+        return registryName;
     }
 
     @Override

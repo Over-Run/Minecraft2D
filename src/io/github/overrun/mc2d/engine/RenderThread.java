@@ -1,7 +1,7 @@
 package io.github.overrun.mc2d.engine;
 
 import io.github.overrun.mc2d.Mc2D;
-import io.github.overrun.mc2d.api.util.UtilSystem;
+import io.github.overrun.mc2d.option.Options;
 
 /**
  * @author squid233
@@ -13,10 +13,7 @@ public class RenderThread implements Runnable {
     public int fps;
 
     public RenderThread() {
-        fps = UtilSystem.getPropertyInt("fps", 40, () -> {
-            System.out.println("Tips: You can set the fps.");
-            return this;
-        });
+        fps = Options.getI(Options.FPS_OPT);
         interval = 1000 / fps;
         System.out.println("[RenderThread]Created");
         System.out.println("[RenderThread]FPS: " + fps);

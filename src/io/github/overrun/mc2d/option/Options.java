@@ -11,6 +11,7 @@ public class Options {
     public static final Properties OPTIONS = new Properties(1);
 
     public static final String POS_GRID_OPT = "pos_grid";
+    public static final String FPS_OPT = "fps";
 
     static {
         try {
@@ -22,6 +23,10 @@ public class Options {
 
     public static String get(String key) {
         return OPTIONS.getProperty(key);
+    }
+
+    public static int getI(String key) {
+        return Integer.parseInt(get(key));
     }
 
     public static boolean getB(String key) {

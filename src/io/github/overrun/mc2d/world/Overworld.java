@@ -7,7 +7,7 @@ import io.github.overrun.mc2d.util.map.StorageBlock;
  * @author squid233
  */
 public class Overworld implements IDimension {
-    private static final StorageBlock STORAGE_BLOCKS = StorageBlock.of();
+    private static StorageBlock storageBlock = StorageBlock.of();
 
     @Override
     public Identifier getId() {
@@ -15,7 +15,12 @@ public class Overworld implements IDimension {
     }
 
     @Override
+    public void setStorageBlocks(StorageBlock storageBlock) {
+        Overworld.storageBlock = storageBlock;
+    }
+
+    @Override
     public StorageBlock getStorageBlocks() {
-        return STORAGE_BLOCKS;
+        return storageBlock;
     }
 }

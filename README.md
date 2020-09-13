@@ -21,8 +21,8 @@ JRE 11
 最低要求JRE11，低于此版本会导致不能正常启动
 
 ## 展示图 Exhibition
-200912-pa-build.1  
-![200912-build1-0](/img/200912-1-0.png)![200912-build1-1](img/200912-1-1.png)
+200913-pa-build.0  
+![200913-build0-0](/img/200913-0-0.png)
 
 ## 使用方法 Use Guide
 1. go [here](/archives) or [Releases](https://github.com/Over-Run/Minecraft2D/releases) to download。  
@@ -119,10 +119,10 @@ class Identifier {
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)
 
-> Here is the Contribute Value Table.
+> Here is the Contributing Value Table.
 
 ```mermaid
-pie title Contribute Value Table
+pie title Contributing Value Table
 "squid233": 1
 ```
 
@@ -133,3 +133,4 @@ Join our Discord channel just time! [![discord](https://img.shields.io/discord/7
 
 现在就加入我们的QQ<span class="mask" title="你知道的太多了"><s>吹水</s></span>群！<a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=efwa2cjVSs-S_UorWELGd45SPTJBTGV6&jump_from=webapi"><img border="0" src="//pub.idqqimg.com/wpa/images/group.png" alt="Java 开发交流群" title="Java 开发交流群"></a>
 
+看看[Fandom Wiki](https://minecraft2d.fandom.com/zh/wiki/)!

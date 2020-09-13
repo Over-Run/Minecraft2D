@@ -1,5 +1,6 @@
 package io.github.overrun.mc2d;
 
+///import io.github.overrun.mc2d.savesmodifier.SavesModifier;
 import io.github.overrun.mc2d.util.JavaVersion;
 
 import javax.swing.JOptionPane;
@@ -21,6 +22,11 @@ public class Main {
                     "Warning", JOptionPane.WARNING_MESSAGE);
             System.exit(0);
         }
-        Mc2D.getClient();
+        ///int opt = JOptionPane.showConfirmDialog(null, "Do you want to open the saves modifier?(Don't click yes!)");
+        ///if (opt == JOptionPane.YES_OPTION) {
+        ///    SavesModifier.main(null);
+        ///} else if (opt == JOptionPane.NO_OPTION) {
+            Mc2D.getClient();
+        //}
     }
 }

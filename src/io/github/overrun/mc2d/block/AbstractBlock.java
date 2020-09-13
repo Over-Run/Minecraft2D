@@ -3,11 +3,14 @@ package io.github.overrun.mc2d.block;
 import io.github.overrun.mc2d.item.ItemConvertible;
 
 import java.awt.*;
+import java.io.Serializable;
 
 /**
  * @author squid233
  */
-public abstract class AbstractBlock implements ItemConvertible {
+public abstract class AbstractBlock implements ItemConvertible, Serializable {
+    private static final long serialVersionUID = 5705287045260471081L;
+
     public AbstractBlock(Settings settings) { }
 
     /**

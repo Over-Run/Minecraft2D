@@ -42,4 +42,8 @@ public class Blocks {
     public static Block getById(Identifier id) {
         return RegistryStorage.BLOCKS.get(id);
     }
+
+    public static int size() {
+        return BLOCKS.size();
+    }
 }

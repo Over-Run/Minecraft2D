@@ -5,16 +5,19 @@ import io.github.overrun.mc2d.block.BlockPos;
 import io.github.overrun.mc2d.init.Blocks;
 
 import java.awt.Graphics;
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  * @author squid233
  */
-public class StorageBlock {
+public class StorageBlock implements Serializable {
+    private static final long serialVersionUID = -3271922479732447666L;
+
     /**
      * blocks[y][x]
      */
-    public final Block[][] blocks = new Block[29][54];
+    public Block[][] blocks = new Block[64][256];
 
     private StorageBlock() {
         for (Block[] block : blocks) {
@@ -71,5 +74,10 @@ public class StorageBlock {
         for (int i = 0; i < blocks.length; i++) {
             drawLayer(g, i);
         }
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.deepToString(blocks);
     }
 }
