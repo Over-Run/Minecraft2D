@@ -22,28 +22,36 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.registry;
+package io.github.overrun.mc2d.logger;
 
-import io.github.overrun.mc2d.util.Identifier;
-import org.intellij.lang.annotations.MagicConstant;
+import io.github.overrun.mc2d.option.Options;
 
-import java.util.Hashtable;
-import java.util.function.Supplier;
+import java.time.LocalTime;
 
 /**
  * @author squid233
- * @date 2020/9/14
+ * @date 2020/9/15
  */
-public class DeferredRegistry<T extends IRegistrable> {
-    private final Hashtable<String, T> registries;
+public class Logger {
+    private final String name;
+    public static final String L_DEBUG = "DEBUG";
 
-    public DeferredRegistry(@MagicConstant(flagsFromClass = Mc2dRegistries.class) Hashtable<String, T> registries) {
-        this.registries = registries;
+    public Logger() {
+        String[] s = new Throwable().getStackTrace()[1].getClassName().split("\\.");
+        this.name = s[s.length - 1];
     }
 
-    public T register(Identifier id, Supplier<T> supplier) {
-        T t = supplier.get();
-        registries.put(t.setRegistryName(id).getRegistryName().toString(), t);
-        return t;
+    public Logger(Class<?> clazz) {
+        this.name = clazz.getSimpleName();
+    }
+
+    public void msg(String msg, String level) {
+        System.out.println("[" + LocalTime.now().toString().split("\\.")[0] + "][" + Thread.currentThread().getName() + "/" + level + "](" + name + ") " + msg);
+    }
+
+    public void debug(String msg) {
+        if (Options.getB(Options.DEBUGGING)) {
+            msg(msg, L_DEBUG);
+        }
     }
 }

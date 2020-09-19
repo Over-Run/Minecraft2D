@@ -22,28 +22,16 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.registry;
+package io.github.overrun.mc2d;
 
-import io.github.overrun.mc2d.util.Identifier;
-import org.intellij.lang.annotations.MagicConstant;
-
-import java.util.Hashtable;
-import java.util.function.Supplier;
+import io.github.overrun.mc2d.logger.Logger;
 
 /**
  * @author squid233
  * @date 2020/9/14
  */
-public class DeferredRegistry<T extends IRegistrable> {
-    private final Hashtable<String, T> registries;
-
-    public DeferredRegistry(@MagicConstant(flagsFromClass = Mc2dRegistries.class) Hashtable<String, T> registries) {
-        this.registries = registries;
-    }
-
-    public T register(Identifier id, Supplier<T> supplier) {
-        T t = supplier.get();
-        registries.put(t.setRegistryName(id).getRegistryName().toString(), t);
-        return t;
-    }
+public class Minecraft2D {
+    public static final String VERSION = "200919-pa-build.0";
+    public static final String NAMESPACE = "minecraft2d";
+    public static final Logger LOGGER = new Logger();
 }

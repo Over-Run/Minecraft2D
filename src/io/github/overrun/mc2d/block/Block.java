@@ -1,80 +1,100 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 Over-Run
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package io.github.overrun.mc2d.block;
 
-import io.github.overrun.mc2d.Mc2D;
-import io.github.overrun.mc2d.engine.ITickable;
+import io.github.overrun.mc2d.asset.AssetManager;
 import io.github.overrun.mc2d.image.Images;
-import io.github.overrun.mc2d.registry.IRegistrable;
 import io.github.overrun.mc2d.util.Highlight;
 import io.github.overrun.mc2d.util.Identifier;
 
 import java.awt.Graphics;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Properties;
 
 /**
  * @author squid233
+ * @date 2020/9/14
  */
-public class Block extends AbstractBlock implements IRegistrable, ITickable {
-    private static final long serialVersionUID = 7302443671729377473L;
-    public int x = 0;
-    public int y = 0;
-    private Identifier registryName;
-    protected Properties model;
+public class Block extends AbstractBlock {
+    private static final long serialVersionUID = 4041316942709149977L;
+    private Identifier regName;
+    private final Properties model = new Properties();
+    private boolean loadedModel;
 
-    public Block(Settings settings) {
-        super(settings);
+    public Block(Settings settings) { }
+
+    @Override
+    public void draw(Graphics g, int x) {
+        g.drawImage(Images.getBlockTexture(this), getPreviewX(x), getPreviewY(), 16, 16, null);
+        Highlight.block(g, getPreviewX(x), getPreviewY());
     }
 
+    @Override
+    public Block setRegistryName(Identifier registryName) {
+        if (regName != null) {
+            throw new IllegalStateException("Registry name is already exist. Old: " + regName + ", New: " + registryName);
+        }
+        regName = registryName;
+        return this;
+    }
+
+    @Override
+    public Identifier getRegistryName() {
+        try {
+            return regName;
+        } catch (Exception e) {
+            return new Identifier("air");
+        }
+    }
+
+    @Override
+    public void draw(Graphics g) {
+        draw(g, x);
+    }
+
+    @Override
+    public AbstractBlock setPos(BlockPos pos) {
+        this.x = pos.getX();
+        this.y = pos.getY();
+        return this;
+    }
+
+    @Override
     public Properties getModel() {
+        if (!loadedModel) {
+            try (FileReader fr =
+                         new FileReader(AssetManager.getAsString(getRegistryName().getNamespace(), "models", "block", getRegistryName().getPath() + ".mc2dm"))) {
+                model.load(fr);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            loadedModel = true;
+        }
         return model;
     }
 
-    public void setModel(Properties model) {
-        this.model = model;
-    }
-
-    public void setPos(BlockPos pos) {
-        x = pos.getX();
-        y = pos.getY();
-    }
-
-    public BlockPos getPos() {
-        return new BlockPos(x, y);
-    }
-
-    public void setRegistryName(Identifier registryName) {
-        this.registryName = registryName;
-    }
-
-    public Identifier getRegistryName() {
-        return registryName;
-    }
-
-    @Override
-    public void draw(Graphics g, BlockPos pos) {
-        int prevX = (pos.getX() << 4) + 8;
-        int prevY = Mc2D.getClient().getHeight() - ((pos.getY() << 4) + 24);
-        g.drawImage(Images.getBlockTexture(this), prevX, prevY, 16, 16, null);
-        Highlight.block(g, prevX, prevY);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        Block b;
-        if (obj instanceof Block) {
-            b = (Block) obj;
-        } else {
-            return false;
-        }
-        return b.model.equals(model);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
-    public void onTick() { }
-
-    public static class Settings extends AbstractBlock.Settings { }
+    public static class Settings { }
 }

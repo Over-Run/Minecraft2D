@@ -22,28 +22,30 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.registry;
+package io.github.overrun.mc2d.game;
 
-import io.github.overrun.mc2d.util.Identifier;
-import org.intellij.lang.annotations.MagicConstant;
-
-import java.util.Hashtable;
-import java.util.function.Supplier;
+import io.github.overrun.mc2d.registry.Mc2dRegistries;
 
 /**
  * @author squid233
- * @date 2020/9/14
+ * @date 2020/9/17
  */
-public class DeferredRegistry<T extends IRegistrable> {
-    private final Hashtable<String, T> registries;
+public class Player {
+    public static int handledBlock = 1;
 
-    public DeferredRegistry(@MagicConstant(flagsFromClass = Mc2dRegistries.class) Hashtable<String, T> registries) {
-        this.registries = registries;
+    public static void plusHandledBlock() {
+        if (handledBlock < Mc2dRegistries.BLOCKS.size() - 1) {
+            handledBlock++;
+        } else {
+            handledBlock = 1;
+        }
     }
 
-    public T register(Identifier id, Supplier<T> supplier) {
-        T t = supplier.get();
-        registries.put(t.setRegistryName(id).getRegistryName().toString(), t);
-        return t;
+    public static void reduceHandledBlock() {
+        if (handledBlock > 1) {
+            handledBlock--;
+        } else {
+            handledBlock = Mc2dRegistries.BLOCKS.size() - 1;
+        }
     }
 }

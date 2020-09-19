@@ -24,21 +24,48 @@
 
 package io.github.overrun.mc2d.world;
 
+import io.github.overrun.mc2d.game.Camera;
+import io.github.overrun.mc2d.option.Options;
+import io.github.overrun.mc2d.world.chunk.Chunk;
+
+import java.awt.Graphics;
+import java.io.Serializable;
+import java.util.ArrayList;
+
 /**
  * @author squid233
  * @date 2020/9/15
  */
-public class Overworld implements IWorld {
-    private static final long serialVersionUID = -465355383687602998L;
-    private static StorageBlock storageBlock = new StorageBlock();
+public class StorageBlock implements Serializable {
+    public static final transient int INITIAL_CAPACITY = 16;
+    private static final long serialVersionUID = -259645709641585372L;
+    public final ArrayList<Chunk> chunks = new ArrayList<>(INITIAL_CAPACITY);
 
-    @Override
-    public StorageBlock getStorageBlock() {
-        return storageBlock;
+    public StorageBlock() {
+        for (int i = 0; i < INITIAL_CAPACITY; i++) {
+            chunks.add(i, new Chunk());
+        }
     }
 
-    public Overworld setStorageBlock(StorageBlock sb) {
-        storageBlock = sb;
-        return this;
+    public void draw(Graphics g) {
+        for (int i = Camera.view; i < Camera.view + Options.getI(Options.VIEW_DISTANCE, 1); i++) {
+            chunks.get(i).draw(g, i - Camera.view);
+        }
+    }
+
+    public Chunk getChunk(int x) {
+        try {
+            return chunks.get(x);
+        } catch (Exception e) {
+            for (int i = chunks.size(); i < x; i++) {
+                chunks.add(new Chunk());
+            }
+           return chunks.get(x);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return chunks.toString();
     }
 }

@@ -1,18 +1,35 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 Over-Run
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package io.github.overrun.mc2d.asset;
 
-import io.github.overrun.mc2d.api.io.ReadFile;
-
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 /**
  * @author squid233
+ * @date 2020/9/15
  */
 public class AssetManager {
     public static Path getAssets(String namespace, String... more) {
@@ -21,30 +38,5 @@ public class AssetManager {
 
     public static String getAsString(String namespace, String... more) {
         return getAssets(namespace, more).toString();
-    }
-
-    public static void copyToFile(Path source, Path target, boolean overwrite, boolean ifAbsent) {
-        if (overwrite) {
-            copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-        } else {
-            if (ifAbsent && !source.toFile().exists()) {
-                copy(source, target);
-            } else {
-                try (Writer w = new FileWriter(target.toFile(), true)) {
-                    w.write(ReadFile.readFile(source.toFile()));
-                    w.flush();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    public static void copy(Path source, Path target, CopyOption... copyOptions) {
-        try {
-            Files.copy(source, target, copyOptions);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

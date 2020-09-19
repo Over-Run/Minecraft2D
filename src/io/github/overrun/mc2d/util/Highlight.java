@@ -1,23 +1,45 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020 Over-Run
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package io.github.overrun.mc2d.util;
 
-import io.github.overrun.mc2d.Mc2D;
+import io.github.overrun.mc2d.client.Mc2dClient;
 
 import java.awt.Graphics;
 
 /**
  * @author squid233
+ * @date 2020/9/15
  */
 public class Highlight {
     public static void block(Graphics g, int prevX, int prevY) {
-        try {
-            if (Mc2D.getClient().getMousePosition() != null
-                    && Mc2D.getClient().getMousePosition().x >= prevX
-                    && Mc2D.getClient().getMousePosition().x <= prevX + 15
-                    && Mc2D.getClient().getMousePosition().y >= prevY
-                    && Mc2D.getClient().getMousePosition().y <= prevY + 15
-            ) {
-                g.drawRect(prevX, prevY, 15, 15);
-            }
-        } catch (NullPointerException ignored) { }
+        if (Mc2dClient.getInstance().getMousePosition().x >= prevX
+                && Mc2dClient.getInstance().getMousePosition().x <= prevX + 15
+                && Mc2dClient.getInstance().getMousePosition().y >= prevY
+                && Mc2dClient.getInstance().getMousePosition().y <= prevY + 15
+        ) {
+            g.drawRect(prevX, prevY, 15, 15);
+        }
     }
 }

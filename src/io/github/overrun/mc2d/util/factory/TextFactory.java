@@ -22,28 +22,32 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.registry;
+package io.github.overrun.mc2d.util.factory;
 
-import io.github.overrun.mc2d.util.Identifier;
-import org.intellij.lang.annotations.MagicConstant;
+import io.github.overrun.mc2d.text.LiteralText;
 
-import java.util.Hashtable;
-import java.util.function.Supplier;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * @author squid233
- * @date 2020/9/14
+ * @date 2020/9/18
  */
-public class DeferredRegistry<T extends IRegistrable> {
-    private final Hashtable<String, T> registries;
+public class TextFactory {
+    private static final HashMap<ArrayList<Object>, LiteralText> LITERAL_TEXT_MAP = new HashMap<>();
+    private static final ArrayList<Object> TEXT_AND_ARGS = new ArrayList<>(2);
 
-    public DeferredRegistry(@MagicConstant(flagsFromClass = Mc2dRegistries.class) Hashtable<String, T> registries) {
-        this.registries = registries;
+    TextFactory() {
+        TEXT_AND_ARGS.add("");
+        TEXT_AND_ARGS.add(new Object[0]);
     }
 
-    public T register(Identifier id, Supplier<T> supplier) {
-        T t = supplier.get();
-        registries.put(t.setRegistryName(id).getRegistryName().toString(), t);
-        return t;
+    public LiteralText getLiteralText(String text, Object... args) {
+        TEXT_AND_ARGS.set(0, text);
+        TEXT_AND_ARGS.set(1, args);
+        if (LITERAL_TEXT_MAP.get(TEXT_AND_ARGS) == null || !LITERAL_TEXT_MAP.containsKey(TEXT_AND_ARGS)) {
+            LITERAL_TEXT_MAP.put(TEXT_AND_ARGS, new LiteralText(text, args));
+        }
+        return LITERAL_TEXT_MAP.get(TEXT_AND_ARGS);
     }
 }

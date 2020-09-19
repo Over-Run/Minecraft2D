@@ -22,28 +22,19 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.registry;
+package io.github.overrun.mc2d.world;
 
-import io.github.overrun.mc2d.util.Identifier;
-import org.intellij.lang.annotations.MagicConstant;
-
-import java.util.Hashtable;
-import java.util.function.Supplier;
+import java.io.Serializable;
 
 /**
  * @author squid233
- * @date 2020/9/14
+ * @date 2020/9/15
  */
-public class DeferredRegistry<T extends IRegistrable> {
-    private final Hashtable<String, T> registries;
-
-    public DeferredRegistry(@MagicConstant(flagsFromClass = Mc2dRegistries.class) Hashtable<String, T> registries) {
-        this.registries = registries;
-    }
-
-    public T register(Identifier id, Supplier<T> supplier) {
-        T t = supplier.get();
-        registries.put(t.setRegistryName(id).getRegistryName().toString(), t);
-        return t;
-    }
+public interface IWorld extends Serializable {
+    /**
+     * return storage block
+     *
+     * @return storage block
+     */
+    StorageBlock getStorageBlock();
 }
