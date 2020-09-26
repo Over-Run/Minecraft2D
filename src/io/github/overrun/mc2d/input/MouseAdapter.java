@@ -28,36 +28,34 @@ import io.github.overrun.mc2d.block.AbstractBlock;
 import io.github.overrun.mc2d.block.BlockPos;
 import io.github.overrun.mc2d.block.Blocks;
 import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.game.Camera;
 import io.github.overrun.mc2d.game.Player;
-import io.github.overrun.mc2d.util.factory.Mc2dFactories;
 import io.github.overrun.mc2d.world.Worlds;
+import io.github.overrun.mc2d.world.chunk.Chunk;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.util.Objects;
 
 /**
  * @author squid233
- * @date 2020/9/16
+ * @since 2020/09/16
  */
 public class MouseAdapter extends java.awt.event.MouseAdapter {
     public static final int W_P_UP = 1;
     public static final int W_P_DOWN = -1;
 
     @Override
-    public void mouseClicked(MouseEvent e) {
+    public void mouseReleased(MouseEvent e) {
         int clickedX = ((e.getX() + 8) >> 4) - 1;
-        BlockPos clickedBlockPos = Mc2dFactories.getBlockPos().get(clickedX % 16,
-                (Mc2dClient.getInstance().getHeight() - 8 - e.getY() - 1) >> 4);
-        AbstractBlock block = Worlds.OVERWORLD.getStorageBlock().getChunk(clickedX >> 4).getBlock(clickedBlockPos);
+        BlockPos clickedBlockPos = BlockPos.of(clickedX % 16, (Mc2dClient.getInstance().getHeight() - 8 - e.getY() - 1) >> 4);
+        Chunk chunk = Worlds.overworld.getStorageBlock().getChunk((clickedX >> 4) + Camera.view);
+        AbstractBlock block = chunk.getBlock(clickedBlockPos);
         if (e.getButton() == MouseEvent.BUTTON1) {
-            if (!Objects.equals(block, Blocks.AIR)) {
-                Worlds.OVERWORLD.getStorageBlock().getChunk(clickedX >> 4).setBlock(clickedBlockPos, Blocks.AIR);
-            }
+            chunk.setBlock(clickedBlockPos, Blocks.AIR);
         }
         if (e.getButton() == MouseEvent.BUTTON3) {
             if (block.equals(Blocks.AIR)) {
-                Worlds.OVERWORLD.getStorageBlock().getChunk(clickedX >> 4).setBlock(clickedBlockPos, Blocks.getByRawId(Player.handledBlock));
+                chunk.setBlock(clickedBlockPos, Blocks.getByRawId(Player.handledBlock));
             }
         }
     }

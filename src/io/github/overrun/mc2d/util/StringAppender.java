@@ -22,34 +22,30 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.util.factory;
-
-import io.github.overrun.mc2d.block.BlockPos;
-
-import java.util.ArrayList;
-import java.util.HashMap;
+package io.github.overrun.mc2d.util;
 
 /**
- * Use {@link Mc2dFactories#getBlockPos()}
- *
  * @author squid233
- * @date 2020/9/16
+ * @since 2020/09/23
  */
-public class BlockPosFactory {
-    private static final HashMap<ArrayList<Integer>, BlockPos> BLOCK_POS_MAP = new HashMap<>();
-    private static final ArrayList<Integer> X_AND_Y = new ArrayList<>(2);
+public class StringAppender {
+    private final StringBuilder sb;
 
-    BlockPosFactory() {
-        X_AND_Y.add(0);
-        X_AND_Y.add(0);
+    public StringAppender(Object... objects) {
+        sb = new StringBuilder();
+        if (objects != null) {
+            for (Object o : objects) {
+                sb.append(o);
+            }
+        }
     }
 
-    public BlockPos get(int x, int y) {
-        X_AND_Y.set(0, x);
-        X_AND_Y.set(1, y);
-        if (BLOCK_POS_MAP.get(X_AND_Y) == null || !BLOCK_POS_MAP.containsKey(X_AND_Y)) {
-            BLOCK_POS_MAP.put(X_AND_Y, new BlockPos(x, y));
-        }
-        return BLOCK_POS_MAP.get(X_AND_Y);
+    public StringBuilder getStringBuilder() {
+        return sb;
+    }
+
+    @Override
+    public String toString() {
+        return sb.toString();
     }
 }

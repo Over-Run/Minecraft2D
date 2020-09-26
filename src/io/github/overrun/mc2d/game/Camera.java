@@ -26,13 +26,13 @@ package io.github.overrun.mc2d.game;
 
 /**
  * @author squid233
- * @date 2020/9/15
+ * @since 2020/09/15
  */
 public class Camera {
-    public static int view = 0;
+    public static byte view = 0;
 
     public static void plus() {
-        if (view < Integer.MAX_VALUE) {
+        if (view < Byte.MAX_VALUE) {
             view++;
         }
     }

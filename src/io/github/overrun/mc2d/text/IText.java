@@ -26,7 +26,7 @@ package io.github.overrun.mc2d.text;
 
 /**
  * @author squid233
- * @date 2020/9/18
+ * @since 2020/09/18
  */
 public interface IText {
     /**

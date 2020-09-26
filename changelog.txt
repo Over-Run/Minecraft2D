@@ -1,0 +1,7 @@
+...
+
+200926-pa-build.0 2020/09/20~2020/09/26 (a week)
+1. Improve performance
+2. press 'a' to move left (world move right)
+3. press 'd' to move right (world move left)
+4. 'Identifier' class now can construct by a string array

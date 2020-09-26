@@ -34,7 +34,7 @@ import java.util.ArrayList;
 
 /**
  * @author squid233
- * @date 2020/9/15
+ * @since 2020/09/15
  */
 public class StorageBlock implements Serializable {
     public static final transient int INITIAL_CAPACITY = 16;
@@ -49,7 +49,7 @@ public class StorageBlock implements Serializable {
 
     public void draw(Graphics g) {
         for (int i = Camera.view; i < Camera.view + Options.getI(Options.VIEW_DISTANCE, 1); i++) {
-            chunks.get(i).draw(g, i - Camera.view);
+            getChunk(i).draw(g, i - Camera.view);
         }
     }
 
@@ -57,7 +57,7 @@ public class StorageBlock implements Serializable {
         try {
             return chunks.get(x);
         } catch (Exception e) {
-            for (int i = chunks.size(); i < x; i++) {
+            for (int i = chunks.size(); i < x + 1; i++) {
                 chunks.add(new Chunk());
             }
            return chunks.get(x);

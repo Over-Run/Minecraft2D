@@ -30,7 +30,7 @@ import java.awt.Graphics;
 
 /**
  * @author squid233
- * @date 2020/9/15
+ * @since 2020/09/15
  */
 public class Highlight {
     public static void block(Graphics g, int prevX, int prevY) {

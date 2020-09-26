@@ -30,26 +30,31 @@ import java.util.Objects;
 
 /**
  * @author squid233
- * @date 2020/9/14
+ * @since 2020/09/14
  */
 public class Identifier {
     private final String namespace;
     private final String path;
 
+    public Identifier(String[] id) {
+        if (id.length == 1) {
+            this.namespace = Minecraft2D.NAMESPACE;
+            this.path = id[0].toLowerCase();
+        } else if (id.length == 0) {
+            this.namespace = Minecraft2D.NAMESPACE;
+            this.path = "air";
+        } else {
+            this.namespace = id[0].toLowerCase().replaceAll("\\W", "");
+            this.path = id[1].toLowerCase();
+        }
+    }
+
     public Identifier(String namespace, String path) {
-        this.namespace = namespace.toLowerCase().replaceAll("\\W", "");
-        this.path = path.toLowerCase();
+        this(new String[]{namespace, path});
     }
 
     public Identifier(String id) {
-        String[] s = id.split(":");
-        if (s.length == 1) {
-            this.namespace = Minecraft2D.NAMESPACE;
-            this.path = id.toLowerCase();
-        } else {
-            this.namespace = s[0].toLowerCase().replaceAll("\\W", "");
-            this.path = s[1].toLowerCase();
-        }
+        this(id.split(":"));
     }
 
     public String getNamespace() {
@@ -62,15 +67,7 @@ public class Identifier {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Identifier that = (Identifier) o;
-        return Objects.equals(namespace, that.namespace) &&
-                Objects.equals(path, that.path);
+        return o instanceof Identifier && ((Identifier) o).namespace.equals(namespace) && ((Identifier) o).path.equals(path);
     }
 
     @Override

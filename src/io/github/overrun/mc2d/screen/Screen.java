@@ -33,7 +33,7 @@ import java.awt.Image;
 
 /**
  * @author squid233
- * @date 2020/9/15
+ * @since 2020/09/15
  */
 public interface Screen {
     /**

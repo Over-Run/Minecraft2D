@@ -30,10 +30,10 @@ import java.util.Properties;
 
 /**
  * @author squid233
- * @date 2020/9/15
+ * @since 2020/09/15
  */
 public class Options {
-    public static final Properties OPTIONS = new Properties(2);
+    public static final Properties OPTIONS = new Properties(5);
 
     public static final String FPS_OPT = "fps";
     public static final String VIEW_DISTANCE = "view_distance";

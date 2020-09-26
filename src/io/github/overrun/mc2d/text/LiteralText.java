@@ -30,7 +30,7 @@ import java.util.Objects;
 
 /**
  * @author squid233
- * @date 2020/9/18
+ * @since 2020/09/18
  */
 public class LiteralText implements IText {
     private final String text;

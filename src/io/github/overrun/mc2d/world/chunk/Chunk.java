@@ -27,7 +27,6 @@ package io.github.overrun.mc2d.world.chunk;
 import io.github.overrun.mc2d.block.AbstractBlock;
 import io.github.overrun.mc2d.block.BlockPos;
 import io.github.overrun.mc2d.block.Blocks;
-import io.github.overrun.mc2d.util.factory.Mc2dFactories;
 
 import java.awt.Graphics;
 import java.io.Serializable;
@@ -35,7 +34,7 @@ import java.util.HashMap;
 
 /**
  * @author squid233
- * @date 2020/9/15
+ * @since 2020/09/15
  */
 public class Chunk implements Serializable {
     public static final transient int WORLD_HEIGHT = 64;
@@ -51,9 +50,9 @@ public class Chunk implements Serializable {
         }
     }
 
-    public void draw(Graphics g, int chunkIndex) {
+    public void draw(Graphics g, int x) {
         for (BlockPos pos : blocks.keySet()) {
-            blocks.get(pos).setPos(pos).draw(g, blocks.get(pos).x + (chunkIndex * 16));
+            blocks.get(pos).setPos(pos).draw(g, blocks.get(pos).x + (x << 4));
         }
     }
 
@@ -62,7 +61,7 @@ public class Chunk implements Serializable {
     }
 
     public void setBlock(int x, int y, AbstractBlock block) {
-        setBlock(Mc2dFactories.getBlockPos().get(x, y), block);
+        setBlock(BlockPos.of(x, y), block);
     }
 
     public AbstractBlock getBlock(BlockPos pos) {
@@ -70,12 +69,12 @@ public class Chunk implements Serializable {
             return blocks.get(pos);
         } catch (Exception e) {
             blocks.put(pos, Blocks.AIR);
-            return blocks.get(pos);
+            return Blocks.AIR;
         }
     }
 
     public AbstractBlock getBlock(int x, int y) {
-        return getBlock(Mc2dFactories.getBlockPos().get(x, y));
+        return getBlock(BlockPos.of(x, y));
     }
 
     @Override

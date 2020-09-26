@@ -24,46 +24,49 @@
 
 package io.github.overrun.mc2d.client;
 
+import io.github.overrun.mc2d.Minecraft2D;
 import io.github.overrun.mc2d.option.Options;
 
 /**
  * @author squid233
- * @date 2020/9/15
+ * @since 2020/09/15
  */
 public class RenderThread implements Runnable {
     private Thread thread;
     private boolean exited = false;
     private final int interval;
+    private final Mc2dClient client;
     public int fps;
 
-    public RenderThread() {
+    public RenderThread(Mc2dClient client) {
+        this.client = client;
         fps = Options.getI(Options.FPS_OPT);
         interval = 1000 / fps;
-        System.out.println("[RenderThread]Created");
-        System.out.println("[RenderThread]FPS: " + fps);
-        System.out.println("[RenderThread]Render interval: " + interval + "ms");
+        Minecraft2D.LOGGER.debug("Created render thread");
+        Minecraft2D.LOGGER.debug("FPS: " + fps);
+        Minecraft2D.LOGGER.debug("Render interval: " + interval + "ms");
     }
 
     @Override
     public void run() {
-        System.out.println(thread.getName() + "Start rendering");
+        Minecraft2D.LOGGER.info("Start rendering");
         while (!exited) {
-            Mc2dClient.getInstance().repaint();
+            client.repaint();
             try {
                 //noinspection BusyWait
                 Thread.sleep(interval);
             } catch (InterruptedException e) {
-                System.out.println(thread.getName() + "Error: " + e.toString());
+                Minecraft2D.LOGGER.error(thread.getName() + "Error: " + e.toString());
                 exited = true;
             }
         }
-        System.out.println(thread.getName() + "Stop rendering");
+        Minecraft2D.LOGGER.info(thread.getName() + "Stop rendering");
         System.exit(0);
     }
 
     public void start() {
         if (thread == null) {
-            thread = new Thread(this, "[RenderThread]");
+            thread = new Thread(this, "RenderThread");
             thread.start();
         }
     }

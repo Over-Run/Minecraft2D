@@ -33,10 +33,10 @@ import java.util.ArrayList;
 
 /**
  * @author squid233
- * @date 2020/9/15
+ * @since 2020/09/15
  */
 public class Blocks {
-    private static final ArrayList<AbstractBlock> BLOCKS = new ArrayList<>(5);
+    private static final ArrayList<AbstractBlock> BLOCKS = new ArrayList<>(6);
 
     private static Block register(String name, Block block) {
         Minecraft2D.LOGGER.debug("Registered block: " + Registry.register(Registry.BLOCK, name, block));

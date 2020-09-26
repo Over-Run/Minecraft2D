@@ -26,18 +26,10 @@ package io.github.overrun.mc2d.util.factory;
 
 /**
  * @author squid233
- * @date 2020/9/16
+ * @since 2020/09/16
  */
 public class Mc2dFactories {
-    private static BlockPosFactory blockPosFactory;
     private static TextFactory textFactory;
-
-    public static BlockPosFactory getBlockPos() {
-        if (blockPosFactory == null) {
-            blockPosFactory = new BlockPosFactory();
-        }
-        return blockPosFactory;
-    }
 
     public static TextFactory getText() {
         if (textFactory == null) {

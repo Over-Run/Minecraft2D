@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 
 /**
  * @author squid233
- * @date 2020/9/14
+ * @since 2020/09/14
  */
 public class DeferredRegistry<T extends IRegistrable> {
     private final Hashtable<String, T> registries;

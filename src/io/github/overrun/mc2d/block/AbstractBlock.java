@@ -26,7 +26,6 @@ package io.github.overrun.mc2d.block;
 
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.registry.IRegistrable;
-import io.github.overrun.mc2d.util.factory.Mc2dFactories;
 
 import java.awt.Graphics;
 import java.io.Serializable;
@@ -34,10 +33,10 @@ import java.util.Properties;
 
 /**
  * @author squid233
- * @date 2020/9/14
+ * @since 2020/09/14
  */
 public abstract class AbstractBlock implements IRegistrable, Serializable {
-    ///private static final long serialVersionUID = -4198693747044134268L;
+    private static final long serialVersionUID = 3268494809155234202L;
     public int x;
     public int y;
 
@@ -77,12 +76,12 @@ public abstract class AbstractBlock implements IRegistrable, Serializable {
     public abstract AbstractBlock setPos(BlockPos pos);
 
     public AbstractBlock setPos(int x, int y) {
-        setPos(Mc2dFactories.getBlockPos().get(x, y));
+        setPos(BlockPos.of(x, y));
         return this;
     }
 
     public BlockPos getPos() {
-        return Mc2dFactories.getBlockPos().get(x, y);
+        return BlockPos.of(x, y);
     }
 
     public int getPreviewX(int x) {

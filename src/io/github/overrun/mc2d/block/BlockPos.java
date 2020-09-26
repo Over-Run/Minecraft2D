@@ -24,28 +24,34 @@
 
 package io.github.overrun.mc2d.block;
 
+import io.github.overrun.mc2d.util.StringAppender;
+
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.StringJoiner;
 
 /**
  * @author squid233
- * @date 2020/9/15
+ * @since 2020/09/15
  */
 public class BlockPos implements Serializable {
-    private static final long serialVersionUID = -805306762075532340L;
+    private static final long serialVersionUID = -2544644015817653957L;
     private final int x;
     private final int y;
+    private static final HashMap<String, BlockPos> CACHE = new HashMap<>();
 
-    /**
-     * Use {@linkplain io.github.overrun.mc2d.util.factory.BlockPosFactory#get(int, int) BlockPosFactory.get(int, int)}
-     *
-     * @param x pos x
-     * @param y pos y
-     */
-    public BlockPos(int x, int y) {
+    private BlockPos(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public static BlockPos of(int x, int y) {
+        String st = new StringAppender(x, ", ", y).toString();
+        if (!CACHE.containsKey(st)) {
+            CACHE.put(st, new BlockPos(x, y));
+        }
+        return CACHE.get(st);
     }
 
     public int getX() {
@@ -58,7 +64,7 @@ public class BlockPos implements Serializable {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", BlockPos.class.getSimpleName() + "[", "]")
+        return new StringJoiner(", ", "{", "}")
                 .add("x=" + x)
                 .add("y=" + y)
                 .toString();
@@ -66,15 +72,7 @@ public class BlockPos implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        BlockPos blockPos = (BlockPos) o;
-        return getX() == blockPos.getX() &&
-                getY() == blockPos.getY();
+        return o instanceof BlockPos && ((BlockPos) o).x == x && ((BlockPos) o).y == y;
     }
 
     @Override

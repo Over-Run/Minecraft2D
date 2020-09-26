@@ -29,7 +29,7 @@ import java.nio.file.Paths;
 
 /**
  * @author squid233
- * @date 2020/9/15
+ * @since 2020/09/15
  */
 public class AssetManager {
     public static Path getAssets(String namespace, String... more) {

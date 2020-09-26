@@ -1,3 +1,7 @@
+# idea
 .idea/
 out/
 *.iml
+
+# vscode
+.vscode/

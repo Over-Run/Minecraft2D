@@ -28,7 +28,7 @@ import java.awt.Color;
 
 /**
  * @author squid233
- * @date 2020/9/15
+ * @since 2020/09/15
  */
 @SuppressWarnings("all")
 public interface Colors {

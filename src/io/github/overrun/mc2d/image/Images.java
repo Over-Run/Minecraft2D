@@ -38,11 +38,12 @@ import java.util.HashMap;
 
 /**
  * @author squid233
- * @date 2020/9/15
+ * @since 2020/09/15
  */
 public class Images {
     public static final HashMap<Character, Image> ASCII_IMAGE_MAP = new HashMap<>(95);
     public static final HashMap<Character, Integer> ASCII_IMAGE_WIDTH = new HashMap<>(95);
+    public static final HashMap<String, Image> BLOCK_IMG_MAP = new HashMap<>(5);
 
     static {
         putsAscii();
@@ -50,7 +51,11 @@ public class Images {
 
     public static Image getBlockTexture(AbstractBlock block) {
         var id = new Identifier(block.getModel().getProperty("texture"));
-        return new ImageIcon(AssetManager.getAsString(id.getNamespace(), "textures", id.getPath() + ".png")).getImage();
+        if (!BLOCK_IMG_MAP.containsKey(block.getRegistryName().toString())) {
+            BLOCK_IMG_MAP.put(block.getRegistryName().toString(),
+                    new ImageIcon(AssetManager.getAsString(id.getNamespace(), "textures", id.getPath() + ".png")).getImage());
+        }
+        return BLOCK_IMG_MAP.get(block.getRegistryName().toString());
     }
 
     public static Image getImagePart(Image img, int x, int y, int width, int height) {
@@ -83,7 +88,7 @@ public class Images {
     }
 
     private static void put128asciiU() {
-        putAscii(' ', 0, 16, 1);
+        putAscii(' ', 0, 16, 6);
         putAscii('!', 8, 16, 2);
         putAscii('"', 16, 16, 4);
         // ascii #, $, %, &

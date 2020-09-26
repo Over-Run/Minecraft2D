@@ -28,10 +28,10 @@ import io.github.overrun.mc2d.logger.Logger;
 
 /**
  * @author squid233
- * @date 2020/9/14
+ * @since 2020/09/14
  */
 public class Minecraft2D {
-    public static final String VERSION = "200919-pa-build.0";
+    public static final String VERSION = "200926-pa-build.0";
     public static final String NAMESPACE = "minecraft2d";
     public static final Logger LOGGER = new Logger();
 }

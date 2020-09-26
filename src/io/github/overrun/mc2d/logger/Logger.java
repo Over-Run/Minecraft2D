@@ -30,10 +30,12 @@ import java.time.LocalTime;
 
 /**
  * @author squid233
- * @date 2020/9/15
+ * @since 2020/09/15
  */
 public class Logger {
     private final String name;
+    public static final String L_INFO = "INFO";
+    public static final String L_ERROR = "ERROR";
     public static final String L_DEBUG = "DEBUG";
 
     public Logger() {
@@ -47,6 +49,14 @@ public class Logger {
 
     public void msg(String msg, String level) {
         System.out.println("[" + LocalTime.now().toString().split("\\.")[0] + "][" + Thread.currentThread().getName() + "/" + level + "](" + name + ") " + msg);
+    }
+
+    public void info(String msg) {
+        msg(msg, L_INFO);
+    }
+
+    public void error(String msg) {
+        msg(msg, L_ERROR);
     }
 
     public void debug(String msg) {

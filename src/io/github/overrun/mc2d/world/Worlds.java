@@ -26,8 +26,8 @@ package io.github.overrun.mc2d.world;
 
 /**
  * @author squid233
- * @date 2020/9/15
+ * @since 2020/09/15
  */
 public class Worlds {
-    public static final Overworld OVERWORLD = new Overworld();
+    public static Overworld overworld = new Overworld();
 }

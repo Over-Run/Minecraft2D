@@ -28,7 +28,7 @@ import io.github.overrun.mc2d.util.Identifier;
 
 /**
  * @author squid233
- * @date 2020/9/14
+ * @since 2020/09/14
  */
 public interface IRegistrable {
     /**

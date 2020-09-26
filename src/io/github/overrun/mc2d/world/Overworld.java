@@ -26,19 +26,14 @@ package io.github.overrun.mc2d.world;
 
 /**
  * @author squid233
- * @date 2020/9/15
+ * @since 2020/09/15
  */
 public class Overworld implements IWorld {
-    private static final long serialVersionUID = -465355383687602998L;
-    private static StorageBlock storageBlock = new StorageBlock();
+    private static final StorageBlock STORAGE_BLOCK = new StorageBlock();
+    private static final long serialVersionUID = 1359564638753160278L;
 
     @Override
     public StorageBlock getStorageBlock() {
-        return storageBlock;
-    }
-
-    public Overworld setStorageBlock(StorageBlock sb) {
-        storageBlock = sb;
-        return this;
+        return STORAGE_BLOCK;
     }
 }

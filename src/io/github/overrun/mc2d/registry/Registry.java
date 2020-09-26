@@ -30,7 +30,7 @@ import io.github.overrun.mc2d.util.Identifier;
 
 /**
  * @author squid233
- * @date 2020/9/15
+ * @since 2020/09/15
  */
 public class Registry {
     public static final DeferredRegistry<AbstractBlock> BLOCK = new DeferredRegistry<>(Mc2dRegistries.BLOCKS);

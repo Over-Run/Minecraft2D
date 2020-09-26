@@ -31,7 +31,7 @@ import java.util.HashMap;
 
 /**
  * @author squid233
- * @date 2020/9/18
+ * @since 2020/09/18
  */
 public class TextFactory {
     private static final HashMap<ArrayList<Object>, LiteralText> LITERAL_TEXT_MAP = new HashMap<>();

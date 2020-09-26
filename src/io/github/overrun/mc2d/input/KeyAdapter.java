@@ -26,6 +26,7 @@ package io.github.overrun.mc2d.input;
 
 import io.github.overrun.mc2d.block.Blocks;
 import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.game.Camera;
 import io.github.overrun.mc2d.util.MapFilter;
 import io.github.overrun.mc2d.world.Worlds;
 import io.github.overrun.mc2d.world.chunk.Chunk;
@@ -38,13 +39,21 @@ import java.io.ObjectOutputStream;
 
 /**
  * @author squid233
- * @date 2020/9/14
+ * @since 2020/09/14
  */
 public class KeyAdapter extends java.awt.event.KeyAdapter {
     public static final char K_ESC = '\u001B';
+    public static final char K_A = 'a';
+    public static final char K_D = 'd';
 
     @Override
     public void keyTyped(KeyEvent e) {
+        if (e.getKeyChar() == K_A) {
+            Camera.reduce();
+        }
+        if (e.getKeyChar() == K_D) {
+            Camera.plus();
+        }
         if (e.getKeyChar() == K_ESC) {
             int opt = JOptionPane.showConfirmDialog(Mc2dClient.getInstance(), "Are you sure want to save?", "Pausing", JOptionPane.YES_NO_CANCEL_OPTION);
             if (opt == JOptionPane.CANCEL_OPTION) {
@@ -52,10 +61,10 @@ public class KeyAdapter extends java.awt.event.KeyAdapter {
             }
             if (opt == JOptionPane.YES_OPTION) {
                 try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("saves/save.dat"))) {
-                    for (Chunk c : Worlds.OVERWORLD.getStorageBlock().chunks) {
+                    for (Chunk c : Worlds.overworld.getStorageBlock().chunks) {
                         MapFilter.filterValue(c.blocks, Blocks.AIR);
                     }
-                    oos.writeObject(Worlds.OVERWORLD);
+                    oos.writeObject(Worlds.overworld);
                 } catch (IOException ee) {
                     ee.printStackTrace();
                 }

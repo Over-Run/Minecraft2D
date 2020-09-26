@@ -45,30 +45,34 @@ import java.awt.Point;
 
 /**
  * @author squid233
- * @date 2020/9/14
+ * @since 2020/09/14
  */
 public class Mc2dClient extends JFrame implements Screen {
     private static Mc2dClient instance;
     public static final Point NULL_POINT = new Point();
+    private static boolean initialized = false;
 
     private Mc2dClient() {
         super("Minecraft 2D " + Minecraft2D.VERSION + " [Esc:Quit Game] - Made by OverRun Organization");
-        setSize(Options.getI(Options.WIDTH, 1296), Options.getI(Options.HEIGHT, 486));
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setIconImage(new ImageIcon("icon.png").getImage());
-        addKeyListener(new KeyAdapter());
-        var mouse = new MouseAdapter();
-        addMouseListener(mouse);
-        addMouseWheelListener(mouse);
-        System.out.println("Max memory: " + ((Runtime.getRuntime().maxMemory() >> 10 >> 10) >= 1024
-                ? (Runtime.getRuntime().maxMemory() >> 10 >> 10 >> 10) + "GB"
-                : (Runtime.getRuntime().maxMemory() >> 10 >> 10) + "MB"));
-        new RenderThread().start();
-        setVisible(true);
+        if (!initialized) {
+            initialized = true;
+            setSize(Options.getI(Options.WIDTH, 1296), Options.getI(Options.HEIGHT, 486));
+            setLocationRelativeTo(null);
+            setDefaultCloseOperation(EXIT_ON_CLOSE);
+            setIconImage(new ImageIcon("icon.png").getImage());
+            addKeyListener(new KeyAdapter());
+            var mouse = new MouseAdapter();
+            addMouseListener(mouse);
+            addMouseWheelListener(mouse);
+            Minecraft2D.LOGGER.debug("Max memory: " + ((Runtime.getRuntime().maxMemory() >> 10 >> 10) >= 1024
+                    ? (Runtime.getRuntime().maxMemory() >> 10 >> 10 >> 10) + "GB"
+                    : (Runtime.getRuntime().maxMemory() >> 10 >> 10) + "MB"));
+            new RenderThread(this).start();
+            setVisible(true);
+        }
     }
 
-    public static synchronized Mc2dClient getInstance() {
+    public static Mc2dClient getInstance() {
         if (instance == null) {
             instance = new Mc2dClient();
         }
@@ -82,7 +86,7 @@ public class Mc2dClient extends JFrame implements Screen {
         /////
         drawBackground(gg, Colors.decode(Colors.skyBlue));
         /////
-        Worlds.OVERWORLD.getStorageBlock().draw(gg);
+        Worlds.overworld.getStorageBlock().draw(gg);
         /////
         drawImage(gg, Images.getBlockTexture(Blocks.getByRawId(Player.handledBlock)), getWidth() - 49, 1, 32, 32);
         LiteralText handledBlockId = Mc2dFactories.getText().getLiteralText(Blocks.getByRawId(Player.handledBlock).getRegistryName().toString());

@@ -30,8 +30,8 @@ import java.util.Hashtable;
 
 /**
  * @author squid233
- * @date 2020/9/14
+ * @since 2020/09/14
  */
 public class Mc2dRegistries {
-    public static final Hashtable<String, AbstractBlock> BLOCKS = new Hashtable<>(5);
+    public static final Hashtable<String, AbstractBlock> BLOCKS = new Hashtable<>(6);
 }

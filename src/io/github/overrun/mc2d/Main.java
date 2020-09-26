@@ -38,7 +38,7 @@ import java.io.ObjectInputStream;
 
 /**
  * @author squid233
- * @date 2020/9/14
+ * @since 2020/09/14
  */
 public class Main {
     public static void main(String[] args) {
@@ -49,9 +49,9 @@ public class Main {
         }
         /////
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("saves/save.dat"))) {
-            Worlds.OVERWORLD.setStorageBlock(((Overworld) ois.readObject()).getStorageBlock());
+            Worlds.overworld = (Overworld) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            for (Chunk chunk : Worlds.OVERWORLD.getStorageBlock().chunks) {
+            for (Chunk chunk : Worlds.overworld.getStorageBlock().chunks) {
                 for (int i = 0; i < 16; i++) {
                     chunk.setBlock(i, 0, Blocks.BEDROCK);
                     for (int j = 0; j < 4; j++) {

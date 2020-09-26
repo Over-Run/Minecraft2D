@@ -28,7 +28,7 @@ import io.github.overrun.mc2d.registry.Mc2dRegistries;
 
 /**
  * @author squid233
- * @date 2020/9/17
+ * @since 2020/09/17
  */
 public class Player {
     public static int handledBlock = 1;
