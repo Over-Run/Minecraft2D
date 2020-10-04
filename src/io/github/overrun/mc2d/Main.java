@@ -26,6 +26,7 @@ package io.github.overrun.mc2d;
 
 import io.github.overrun.mc2d.block.Blocks;
 import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.item.Items;
 import io.github.overrun.mc2d.world.Overworld;
 import io.github.overrun.mc2d.world.Worlds;
 import io.github.overrun.mc2d.world.chunk.Chunk;
@@ -67,6 +68,7 @@ public class Main {
                 }
             }
         }
+        new Items();
         /////
         Mc2dClient.getInstance();
     }

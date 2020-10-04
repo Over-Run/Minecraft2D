@@ -30,26 +30,13 @@ import io.github.overrun.mc2d.text.IText;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.util.function.Consumer;
 
 /**
  * @author squid233
  * @since 2020/09/15
  */
 public interface Screen {
-    /**
-     * get screen width
-     *
-     * @return width
-     */
-    int getWidth();
-
-    /**
-     * get screen height
-     *
-     * @return height
-     */
-    int getHeight();
-
     /**
      * draw image to screen
      *
@@ -58,7 +45,7 @@ public interface Screen {
      * @param x pos x
      * @param y pos y
      */
-    default void drawImage(Graphics g, Image img, int x, int y) {
+    static void drawImage(Graphics g, Image img, int x, int y) {
         g.drawImage(img, x + 8, y + 30, null);
     }
 
@@ -72,7 +59,7 @@ public interface Screen {
      * @param width img width
      * @param height img height
      */
-    default void drawImage(Graphics g, Image img, int x, int y, int width, int height) {
+    static void drawImage(Graphics g, Image img, int x, int y, int width, int height) {
         g.drawImage(img, x + 8, y + 30, width, height, null);
     }
 
@@ -86,21 +73,11 @@ public interface Screen {
      * @param height rect height
      * @param color color
      */
-    default void drawRect(Graphics g, int x, int y, int width, int height, Color color) {
+    static void drawRect(Graphics g, int x, int y, int width, int height, Color color) {
         Color c = g.getColor();
         g.setColor(color);
         g.fillRect(x, y, width, height);
         g.setColor(c);
-    }
-
-    /**
-     * draw background
-     *
-     * @param g graphics
-     * @param color color
-     */
-    default void drawBackground(Graphics g, Color color) {
-        drawRect(g, 0, 0, getWidth(), getHeight(), color);
     }
 
     /**
@@ -111,12 +88,19 @@ public interface Screen {
      * @param y pos y
      * @param text text
      */
-    default void drawText(Graphics g, int x, int y, IText text) {
+    static void drawText(Graphics g, int x, int y, IText text) {
         char[] chars = text.asFormattedString().toCharArray();
         int pos = 0;
         for (char c : chars) {
-            drawImage(g, Images.getAsciiInMap(c), x + pos, y);
-            pos += Images.ASCII_IMAGE_WIDTH.get(c);
+            drawImage(g, Images.getCharInMap(c), x + pos, y, Images.CHAR_IMAGE_WIDTH.get(c) << 1, 16);
+            pos += Images.CHAR_IMAGE_WIDTH.get(c) << 1;
         }
+    }
+
+    static void operationWithColor(Graphics g, Color c, Consumer<Graphics> consumer) {
+        Color cc = g.getColor();
+        g.setColor(c);
+        consumer.accept(g);
+        g.setColor(cc);
     }
 }

@@ -25,7 +25,7 @@
 package io.github.overrun.mc2d.block;
 
 import io.github.overrun.mc2d.client.Mc2dClient;
-import io.github.overrun.mc2d.registry.IRegistrable;
+import io.github.overrun.mc2d.item.ItemConvertible;
 
 import java.awt.Graphics;
 import java.io.Serializable;
@@ -35,8 +35,8 @@ import java.util.Properties;
  * @author squid233
  * @since 2020/09/14
  */
-public abstract class AbstractBlock implements IRegistrable, Serializable {
-    private static final long serialVersionUID = 3268494809155234202L;
+public abstract class AbstractBlock implements IRegistrable, Serializable, ItemConvertible {
+    private static final long serialVersionUID = 343678850109664782L;
     public int x;
     public int y;
 
@@ -67,13 +67,17 @@ public abstract class AbstractBlock implements IRegistrable, Serializable {
         return this;
     }
 
+    public AbstractBlock setPos(BlockPos pos) {
+        return setPos(pos.toString());
+    }
+
     /**
      * set pos
      *
      * @param pos pos
      * @return this
      */
-    public abstract AbstractBlock setPos(BlockPos pos);
+    public abstract AbstractBlock setPos(String pos);
 
     public AbstractBlock setPos(int x, int y) {
         setPos(BlockPos.of(x, y));
@@ -107,4 +111,23 @@ public abstract class AbstractBlock implements IRegistrable, Serializable {
     public String toString() {
         return getRegistryName().toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AbstractBlock block = (AbstractBlock) o;
+        return getRegistryName() == block.getRegistryName();
+    }
+
+    @Override
+    public int hashCode() {
+        return getRegistryName().hashCode();
+    }
+
+    public static class Settings { }
 }

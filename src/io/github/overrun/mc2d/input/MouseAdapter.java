@@ -30,6 +30,7 @@ import io.github.overrun.mc2d.block.Blocks;
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.game.Camera;
 import io.github.overrun.mc2d.game.Player;
+import io.github.overrun.mc2d.screen.Screens;
 import io.github.overrun.mc2d.world.Worlds;
 import io.github.overrun.mc2d.world.chunk.Chunk;
 
@@ -46,27 +47,36 @@ public class MouseAdapter extends java.awt.event.MouseAdapter {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        int clickedX = ((e.getX() + 8) >> 4) - 1;
-        BlockPos clickedBlockPos = BlockPos.of(clickedX % 16, (Mc2dClient.getInstance().getHeight() - 8 - e.getY() - 1) >> 4);
-        Chunk chunk = Worlds.overworld.getStorageBlock().getChunk((clickedX >> 4) + Camera.view);
-        AbstractBlock block = chunk.getBlock(clickedBlockPos);
-        if (e.getButton() == MouseEvent.BUTTON1) {
-            chunk.setBlock(clickedBlockPos, Blocks.AIR);
-        }
-        if (e.getButton() == MouseEvent.BUTTON3) {
-            if (block.equals(Blocks.AIR)) {
-                chunk.setBlock(clickedBlockPos, Blocks.getByRawId(Player.handledBlock));
+        if (!Screens.isOpeningAnyScreen) {
+            int clickedX = ((e.getX() + 8) >> 4) - 1;
+            BlockPos clickedBlockPos = BlockPos.of(clickedX % 16, (Mc2dClient.getInstance().getHeight() - 8 - e.getY() - 1) >> 4);
+            Chunk chunk = Worlds.overworld.getStorageBlock().getChunk((clickedX >> 4) + Camera.view);
+            AbstractBlock block = chunk.getBlock(clickedBlockPos);
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                chunk.setBlock(clickedBlockPos, Blocks.AIR);
+            }
+            if (e.getButton() == MouseEvent.BUTTON3) {
+                if (block.equals(Blocks.AIR)) {
+                    chunk.setBlock(clickedBlockPos, Blocks.getByRawId(Player.handledBlock));
+                }
             }
         }
     }
 
     @Override
+    public void mousePressed(MouseEvent e) {
+        Screens.getOpeningScreenHandler().onMousePressed(e);
+    }
+
+    @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        if (e.getWheelRotation() == W_P_UP) {
-            Player.plusHandledBlock();
-        }
-        if (e.getWheelRotation() == W_P_DOWN) {
-            Player.reduceHandledBlock();
+        if (!Screens.isOpeningAnyScreen) {
+            if (e.getWheelRotation() == W_P_UP) {
+                Player.plusHandledBlock();
+            }
+            if (e.getWheelRotation() == W_P_DOWN) {
+                Player.reduceHandledBlock();
+            }
         }
     }
 }

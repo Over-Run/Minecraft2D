@@ -24,15 +24,18 @@
 
 package io.github.overrun.mc2d.block;
 
-import io.github.overrun.mc2d.asset.AssetManager;
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.image.Images;
+import io.github.overrun.mc2d.item.Item;
+import io.github.overrun.mc2d.screen.Screens;
 import io.github.overrun.mc2d.util.Highlight;
 import io.github.overrun.mc2d.util.Identifier;
+import io.github.overrun.mc2d.util.ResourceLocation;
 
 import java.awt.Graphics;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -40,10 +43,11 @@ import java.util.Properties;
  * @since 2020/09/14
  */
 public class Block extends AbstractBlock {
-    private static final long serialVersionUID = 4041316942709149977L;
+    private static final long serialVersionUID = 6678903782835480065L;
     private Identifier regName;
     private final Properties model = new Properties();
     private boolean loadedModel;
+    private Item cache;
 
     public Block(Settings settings) { }
 
@@ -54,7 +58,9 @@ public class Block extends AbstractBlock {
                 && getPreviewY() > 14 && getPreviewY() < Mc2dClient.getInstance().getHeight()
         ) {
             g.drawImage(Images.getBlockTexture(this), getPreviewX(x), getPreviewY(), 16, 16, null);
-            Highlight.block(g, getPreviewX(x), getPreviewY());
+            if (!Screens.isOpeningAnyScreen) {
+                Highlight.block(g, getPreviewX(x), getPreviewY());
+            }
         }
     }
 
@@ -82,9 +88,10 @@ public class Block extends AbstractBlock {
     }
 
     @Override
-    public AbstractBlock setPos(BlockPos pos) {
-        this.x = pos.getX();
-        this.y = pos.getY();
+    public AbstractBlock setPos(String pos) {
+        BlockPos p = BlockPos.of(pos);
+        this.x = p.getX();
+        this.y = p.getY();
         return this;
     }
 
@@ -92,7 +99,7 @@ public class Block extends AbstractBlock {
     public Properties getModel() {
         if (!loadedModel) {
             try (FileReader fr =
-                         new FileReader(AssetManager.getAsString(getRegistryName().getNamespace(), "models", "block", getRegistryName().getPath() + ".mc2dm"))) {
+                         new FileReader(new ResourceLocation(getRegistryName().getNamespace(), "models/block/" + getRegistryName().getPath() + ".mc2dm").toString())) {
                 model.load(fr);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -102,5 +109,24 @@ public class Block extends AbstractBlock {
         return model;
     }
 
-    public static class Settings { }
+    @Override
+    public Item asItem() {
+        if (cache == null) {
+            cache = Item.getItemByBlock(this);
+        }
+        return cache;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Block)) {
+            return false;
+        }
+        return Objects.equals(regName, ((Block) o).regName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(regName);
+    }
 }

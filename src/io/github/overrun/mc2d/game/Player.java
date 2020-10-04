@@ -24,8 +24,6 @@
 
 package io.github.overrun.mc2d.game;
 
-import io.github.overrun.mc2d.registry.Mc2dRegistries;
-
 /**
  * @author squid233
  * @since 2020/09/17
@@ -34,7 +32,7 @@ public class Player {
     public static int handledBlock = 1;
 
     public static void plusHandledBlock() {
-        if (handledBlock < Mc2dRegistries.BLOCKS.size() - 1) {
+        if (handledBlock < Registry.BLOCK.size() - 1) {
             handledBlock++;
         } else {
             handledBlock = 1;
@@ -45,7 +43,7 @@ public class Player {
         if (handledBlock > 1) {
             handledBlock--;
         } else {
-            handledBlock = Mc2dRegistries.BLOCKS.size() - 1;
+            handledBlock = Registry.BLOCK.size() - 1;
         }
     }
 }

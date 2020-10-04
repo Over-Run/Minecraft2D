@@ -32,15 +32,17 @@ import io.github.overrun.mc2d.input.KeyAdapter;
 import io.github.overrun.mc2d.input.MouseAdapter;
 import io.github.overrun.mc2d.option.Options;
 import io.github.overrun.mc2d.screen.Screen;
+import io.github.overrun.mc2d.screen.Screens;
 import io.github.overrun.mc2d.text.LiteralText;
 import io.github.overrun.mc2d.util.Colors;
-import io.github.overrun.mc2d.util.factory.Mc2dFactories;
 import io.github.overrun.mc2d.world.Worlds;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.HeadlessException;
+import java.awt.Image;
 import java.awt.Point;
 
 /**
@@ -50,29 +52,25 @@ import java.awt.Point;
 public class Mc2dClient extends JFrame implements Screen {
     private static Mc2dClient instance;
     public static final Point NULL_POINT = new Point();
-    private static boolean initialized = false;
 
     private Mc2dClient() {
         super("Minecraft 2D " + Minecraft2D.VERSION + " [Esc:Quit Game] - Made by OverRun Organization");
-        if (!initialized) {
-            initialized = true;
-            setSize(Options.getI(Options.WIDTH, 1296), Options.getI(Options.HEIGHT, 486));
-            setLocationRelativeTo(null);
-            setDefaultCloseOperation(EXIT_ON_CLOSE);
-            setIconImage(new ImageIcon("icon.png").getImage());
-            addKeyListener(new KeyAdapter());
-            var mouse = new MouseAdapter();
-            addMouseListener(mouse);
-            addMouseWheelListener(mouse);
-            Minecraft2D.LOGGER.debug("Max memory: " + ((Runtime.getRuntime().maxMemory() >> 10 >> 10) >= 1024
-                    ? (Runtime.getRuntime().maxMemory() >> 10 >> 10 >> 10) + "GB"
-                    : (Runtime.getRuntime().maxMemory() >> 10 >> 10) + "MB"));
-            new RenderThread(this).start();
-            setVisible(true);
-        }
+        setSize(Options.getI(Options.WIDTH, 1296), Options.getI(Options.HEIGHT, 486));
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setIconImage(new ImageIcon("icon.png").getImage());
+        addKeyListener(new KeyAdapter());
+        var mouse = new MouseAdapter();
+        addMouseListener(mouse);
+        addMouseWheelListener(mouse);
+        Minecraft2D.LOGGER.debug("Max memory: " + ((Runtime.getRuntime().maxMemory() >> 10 >> 10) >= 1024
+                ? (Runtime.getRuntime().maxMemory() >> 10 >> 10 >> 10) + "GB"
+                : (Runtime.getRuntime().maxMemory() >> 10 >> 10) + "MB"));
+        new RenderThread(this).start();
+        setVisible(true);
     }
 
-    public static Mc2dClient getInstance() {
+    public static synchronized Mc2dClient getInstance() {
         if (instance == null) {
             instance = new Mc2dClient();
         }
@@ -81,18 +79,27 @@ public class Mc2dClient extends JFrame implements Screen {
 
     @Override
     public void paint(Graphics g) {
-        var buf = createImage(getWidth(), getHeight());
-        var gg = buf.getGraphics();
+        Image buf = createImage(getWidth(), getHeight());
+        Graphics gg = buf.getGraphics();
         /////
         drawBackground(gg, Colors.decode(Colors.skyBlue));
         /////
         Worlds.overworld.getStorageBlock().draw(gg);
         /////
-        drawImage(gg, Images.getBlockTexture(Blocks.getByRawId(Player.handledBlock)), getWidth() - 49, 1, 32, 32);
-        LiteralText handledBlockId = Mc2dFactories.getText().getLiteralText(Blocks.getByRawId(Player.handledBlock).getRegistryName().toString());
-        drawText(gg, getWidth() - 16 - handledBlockId.getDisplayLength(), 34, handledBlockId);
+        Screen.drawImage(gg, Images.getBlockTexture(Blocks.getByRawId(Player.handledBlock)), getWidth() - 49, 1, 32, 32);
+        LiteralText handledBlockId = LiteralText.of(Blocks.getByRawId(Player.handledBlock).getRegistryName().toString());
+        Screen.drawText(gg, getWidth() - 16 - handledBlockId.getDisplayLength(), 34, handledBlockId);
+        /////
+        if (Screens.isOpeningAnyScreen) {
+            Screens.getOpeningScreenHandler().render(gg);
+            Screens.getOpeningScreenHandler().onMouseMoved(gg);
+        }
         /////
         g.drawImage(buf, 0, 0, null);
+    }
+
+    private void drawBackground(Graphics g, Color color) {
+        Screen.drawRect(g, 0, 0, getWidth(), getHeight(), color);
     }
 
     @Override

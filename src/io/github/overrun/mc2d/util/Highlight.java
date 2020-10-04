@@ -25,6 +25,8 @@
 package io.github.overrun.mc2d.util;
 
 import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.screen.Screen;
+import io.github.overrun.mc2d.screen.ScreenHandler;
 
 import java.awt.Graphics;
 
@@ -33,13 +35,29 @@ import java.awt.Graphics;
  * @since 2020/09/15
  */
 public class Highlight {
-    public static void block(Graphics g, int prevX, int prevY) {
-        if (Mc2dClient.getInstance().getMousePosition().x >= prevX
-                && Mc2dClient.getInstance().getMousePosition().x <= prevX + 15
+    public static void black(Graphics g, int prevX, int prevY, int width, int height) {
+        if (
+                Mc2dClient.getInstance().getMousePosition().x >= prevX
+                && Mc2dClient.getInstance().getMousePosition().x <= prevX + (width - 1)
                 && Mc2dClient.getInstance().getMousePosition().y >= prevY
-                && Mc2dClient.getInstance().getMousePosition().y <= prevY + 15
+                && Mc2dClient.getInstance().getMousePosition().y <= prevY + (height - 1)
         ) {
             g.drawRect(prevX, prevY, 15, 15);
+        }
+    }
+
+    public static void block(Graphics g, int prevX, int prevY) {
+        black(g, prevX, prevY, 16, 16);
+    }
+
+    public static void slot(Graphics g, int prevX, int prevY, int width, int height) {
+        if (
+                Mc2dClient.getInstance().getMousePosition().x >= prevX
+                && Mc2dClient.getInstance().getMousePosition().x <= prevX + (width - 1)
+                && Mc2dClient.getInstance().getMousePosition().y >= prevY
+                && Mc2dClient.getInstance().getMousePosition().y <= prevY + (height - 1)
+        ) {
+            Screen.operationWithColor(g, ScreenHandler.SLOT_HIGHLIGHT, (gg) -> gg.fillRect(prevX, prevY, width, height));
         }
     }
 }

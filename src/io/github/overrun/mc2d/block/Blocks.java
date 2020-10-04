@@ -25,11 +25,11 @@
 package io.github.overrun.mc2d.block;
 
 import io.github.overrun.mc2d.Minecraft2D;
-import io.github.overrun.mc2d.registry.Mc2dRegistries;
-import io.github.overrun.mc2d.registry.Registry;
+import io.github.overrun.mc2d.block.AbstractBlock.Settings;
 import io.github.overrun.mc2d.util.Identifier;
 
 import java.util.ArrayList;
+
 
 /**
  * @author squid233
@@ -56,24 +56,30 @@ public class Blocks {
     public static final Block BEDROCK;
     public static final Block STONE;
 
-    public static AbstractBlock getById(Identifier id) {
-        return Mc2dRegistries.BLOCKS.get(id.toString());
+
+    static {
+        AIR = (BlockAir) register("air", new BlockAir(new Settings()));
+        DIRT = register("dirt", new Block(new Settings()));
+        GRASS_BLOCK = register("grass_block", new Block(new Settings()));
+        COBBLESTONE = register("cobblestone", new Block(new Settings()));
+        BEDROCK = register("bedrock", new Block(new Settings()));
+        STONE = register("stone", new Block(new Settings()));
     }
 
+    public static AbstractBlock getById(Identifier id) {
+        return Registry.BLOCK.get(id.toString());
+    }
+
+    /**
+     * @param rawId The raw number.
+     * @return The block.
+     * @deprecated Raw id may be changing.
+     */
     public static AbstractBlock getByRawId(int rawId) {
         try {
             return BLOCKS.get(rawId);
         } catch (Exception e) {
             return AIR;
         }
-    }
-
-    static {
-        AIR = (BlockAir) register("air", new BlockAir(new Block.Settings()));
-        DIRT = register("dirt", new Block(new Block.Settings()));
-        GRASS_BLOCK = register("grass_block", new Block(new Block.Settings()));
-        COBBLESTONE = register("cobblestone", new Block(new Block.Settings()));
-        BEDROCK = register("bedrock", new Block(new Block.Settings()));
-        STONE = register("stone", new Block(new Block.Settings()));
     }
 }

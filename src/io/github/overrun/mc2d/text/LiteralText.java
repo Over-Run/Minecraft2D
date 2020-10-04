@@ -26,6 +26,8 @@ package io.github.overrun.mc2d.text;
 
 import io.github.overrun.mc2d.image.Images;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -33,12 +35,28 @@ import java.util.Objects;
  * @since 2020/09/18
  */
 public class LiteralText implements IText {
+    private static final HashMap<String, LiteralText> INSTANCES = new HashMap<>();
     private final String text;
     private final Object[] args;
 
-    public LiteralText(String text, Object... args) {
+    /**
+     * Construct a text.<br>
+     * Use {@link LiteralText#of(String, Object...)}.
+     *
+     * @param text The text.
+     * @param args Args for format.
+     */
+    private LiteralText(String text, Object... args) {
         this.text = text;
         this.args = Objects.requireNonNullElseGet(args, () -> new Object[0]);
+    }
+
+    public static LiteralText of(String text, Object... args) {
+        String s = text + Arrays.deepToString(args);
+        if (!INSTANCES.containsKey(s)) {
+            INSTANCES.put(s, new LiteralText(text, args));
+        }
+        return INSTANCES.get(s);
     }
 
     @Override
@@ -55,7 +73,7 @@ public class LiteralText implements IText {
         char[] chars = asFormattedString().toCharArray();
         int l = 0;
         for (char c : chars) {
-            l += Images.ASCII_IMAGE_WIDTH.get(c);
+            l += Images.CHAR_IMAGE_WIDTH.get(c) << 1;
         }
         return l;
     }

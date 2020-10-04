@@ -24,9 +24,11 @@
 
 package io.github.overrun.mc2d.input;
 
+import io.github.overrun.mc2d.block.AbstractBlock;
 import io.github.overrun.mc2d.block.Blocks;
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.game.Camera;
+import io.github.overrun.mc2d.screen.Screens;
 import io.github.overrun.mc2d.util.MapFilter;
 import io.github.overrun.mc2d.world.Worlds;
 import io.github.overrun.mc2d.world.chunk.Chunk;
@@ -36,6 +38,7 @@ import java.awt.event.KeyEvent;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
 
 /**
  * @author squid233
@@ -45,14 +48,39 @@ public class KeyAdapter extends java.awt.event.KeyAdapter {
     public static final char K_ESC = '\u001B';
     public static final char K_A = 'a';
     public static final char K_D = 'd';
+    public static final char K_E = 'e';
+    public static final int KEY_COUNT = 300;
+
+    private static final HashMap<Integer, Boolean> KEY_DOWN = new HashMap<>(KEY_COUNT);
+
+    public KeyAdapter() {
+        for (int i = 0; i < KEY_COUNT; i++) {
+            KEY_DOWN.put(i, false);
+        }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        KEY_DOWN.put(e.getKeyCode(), true);
+        /////
+        if (getKeyDown(KeyEvent.VK_A)) {
+            Camera.reduce();
+        }
+        if (getKeyDown(KeyEvent.VK_D)) {
+            Camera.plus();
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        KEY_DOWN.put(e.getKeyCode(), false);
+        /////
+    }
 
     @Override
     public void keyTyped(KeyEvent e) {
-        if (e.getKeyChar() == K_A) {
-            Camera.reduce();
-        }
-        if (e.getKeyChar() == K_D) {
-            Camera.plus();
+        if (e.getKeyChar() == K_E) {
+            Screens.setOpening(Screens.CREATIVE_TAB);
         }
         if (e.getKeyChar() == K_ESC) {
             int opt = JOptionPane.showConfirmDialog(Mc2dClient.getInstance(), "Are you sure want to save?", "Pausing", JOptionPane.YES_NO_CANCEL_OPTION);
@@ -62,7 +90,7 @@ public class KeyAdapter extends java.awt.event.KeyAdapter {
             if (opt == JOptionPane.YES_OPTION) {
                 try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("saves/save.dat"))) {
                     for (Chunk c : Worlds.overworld.getStorageBlock().chunks) {
-                        MapFilter.filterValue(c.blocks, Blocks.AIR);
+                        c.setBlocks((HashMap<String, AbstractBlock>) MapFilter.filterValue(c.getBlocks(), Blocks.AIR));
                     }
                     oos.writeObject(Worlds.overworld);
                 } catch (IOException ee) {
@@ -71,5 +99,9 @@ public class KeyAdapter extends java.awt.event.KeyAdapter {
             }
             System.exit(0);
         }
+    }
+
+    public static boolean getKeyDown(int keyCode) {
+        return KEY_DOWN.get(keyCode);
     }
 }

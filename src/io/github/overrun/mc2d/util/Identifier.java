@@ -37,15 +37,12 @@ public class Identifier {
     private final String path;
 
     public Identifier(String[] id) {
-        if (id.length == 1) {
-            this.namespace = Minecraft2D.NAMESPACE;
-            this.path = id[0].toLowerCase();
-        } else if (id.length == 0) {
-            this.namespace = Minecraft2D.NAMESPACE;
-            this.path = "air";
-        } else {
-            this.namespace = id[0].toLowerCase().replaceAll("\\W", "");
-            this.path = id[1].toLowerCase();
+        this.namespace = StringHelper.isEmpty(id[0]) ? Minecraft2D.NAMESPACE : id[0];
+        this.path = id[1];
+        if (!isNamespaceValid(this.namespace)) {
+            throw new InvalidIdentifierException("Non [a-z0-9_.-] character in namespace of location: " + this.namespace + ':' + this.path);
+        } else if (!isPathValid(this.path)) {
+            throw new InvalidIdentifierException("Non [a-z0-9/._-] character in path of location: " + this.namespace + ':' + this.path);
         }
     }
 
@@ -55,6 +52,32 @@ public class Identifier {
 
     public Identifier(String id) {
         this(id.split(":"));
+    }
+
+    private static boolean isNamespaceValid(String namespace) {
+        for (int i = 0; i < namespace.length(); ++i) {
+            if (!isNamespaceCharacterValid(namespace.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isNamespaceCharacterValid(char c) {
+        return c == '_' || c == '-' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '.';
+    }
+
+    private static boolean isPathValid(String path) {
+        for (int i = 0; i < path.length(); ++i) {
+            if (!isPathCharacterValid(path.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isPathCharacterValid(char c) {
+        return c == '_' || c == '-' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '/' || c == '.';
     }
 
     public String getNamespace() {
@@ -67,16 +90,16 @@ public class Identifier {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof Identifier && ((Identifier) o).namespace.equals(namespace) && ((Identifier) o).path.equals(path);
+        return o instanceof Identifier && ((Identifier) o).getNamespace().equals(getNamespace()) && ((Identifier) o).getPath().equals(getPath());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(namespace, path);
+        return Objects.hash(getNamespace(), getPath());
     }
 
     @Override
     public String toString() {
-        return namespace + ':' + path;
+        return getNamespace() + ':' + getPath();
     }
 }

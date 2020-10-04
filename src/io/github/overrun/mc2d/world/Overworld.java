@@ -30,7 +30,7 @@ package io.github.overrun.mc2d.world;
  */
 public class Overworld implements IWorld {
     private static final StorageBlock STORAGE_BLOCK = new StorageBlock();
-    private static final long serialVersionUID = 1359564638753160278L;
+    private static final long serialVersionUID = 1L;
 
     @Override
     public StorageBlock getStorageBlock() {

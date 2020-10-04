@@ -24,16 +24,19 @@
 
 package io.github.overrun.mc2d.image;
 
-import io.github.overrun.mc2d.Minecraft2D;
-import io.github.overrun.mc2d.asset.AssetManager;
 import io.github.overrun.mc2d.block.AbstractBlock;
 import io.github.overrun.mc2d.client.Mc2dClient;
-import io.github.overrun.mc2d.util.Identifier;
+import io.github.overrun.mc2d.item.Item;
+import io.github.overrun.mc2d.util.ResourceLocation;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.awt.image.CropImageFilter;
 import java.awt.image.FilteredImageSource;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 /**
@@ -41,42 +44,72 @@ import java.util.HashMap;
  * @since 2020/09/15
  */
 public class Images {
-    public static final HashMap<Character, Image> ASCII_IMAGE_MAP = new HashMap<>(95);
-    public static final HashMap<Character, Integer> ASCII_IMAGE_WIDTH = new HashMap<>(95);
-    public static final HashMap<String, Image> BLOCK_IMG_MAP = new HashMap<>(5);
+    public static BufferedImage FONT_ASCII_IMG;
+
+    public static final HashMap<Character, Image> CHAR_IMAGE_MAP = new HashMap<>(95);
+    public static final HashMap<Character, Integer> CHAR_IMAGE_WIDTH = new HashMap<>(95);
+    public static final HashMap<String, Image> BLOCK_IMG_MAP = new HashMap<>(6);
+    public static final HashMap<String, Image> ITEM_IMG_MAP = new HashMap<>(6);
 
     static {
+        try {
+            FONT_ASCII_IMG = ImageIO.read(new File(new ResourceLocation("textures/font/ascii.png").toString()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         putsAscii();
     }
 
     public static Image getBlockTexture(AbstractBlock block) {
-        var id = new Identifier(block.getModel().getProperty("texture"));
         if (!BLOCK_IMG_MAP.containsKey(block.getRegistryName().toString())) {
-            BLOCK_IMG_MAP.put(block.getRegistryName().toString(),
-                    new ImageIcon(AssetManager.getAsString(id.getNamespace(), "textures", id.getPath() + ".png")).getImage());
+            try {
+                BLOCK_IMG_MAP.put(block.getRegistryName().toString(),
+                        ImageIO.read(new File(new ResourceLocation("textures/" + block.getModel().getProperty("texture") + ".png").toString())));
+            } catch (IOException e) {
+                e.printStackTrace();
+                BLOCK_IMG_MAP.put(block.getRegistryName().toString(), new ImageIcon(new ResourceLocation("textures/gui/missingo.png").toString()).getImage());
+            }
         }
         return BLOCK_IMG_MAP.get(block.getRegistryName().toString());
+    }
+
+    public static Image getItemTexture(Item item) {
+        if (!ITEM_IMG_MAP.containsKey(item.getRegistryName().toString())) {
+            try {
+                ITEM_IMG_MAP.put(item.getRegistryName().toString(),
+                        ImageIO.read(new File(new ResourceLocation("textures/item/" + item.getRegistryName().getPath() + ".png").toString())));
+            } catch (IOException e) {
+                try {
+                    ITEM_IMG_MAP.put(item.getRegistryName().toString(),
+                            ImageIO.read(new File(new ResourceLocation("textures/block/" + item.getRegistryName().getPath() + ".png").toString())));
+                } catch (IOException ee) {
+                    ee.printStackTrace();
+                    ITEM_IMG_MAP.put(item.getRegistryName().toString(), new ImageIcon(new ResourceLocation("textures/gui/missingo.png").toString()).getImage());
+                }
+            }
+        }
+        return ITEM_IMG_MAP.get(item.getRegistryName().toString());
     }
 
     public static Image getImagePart(Image img, int x, int y, int width, int height) {
         return Mc2dClient.getInstance().createImage(new FilteredImageSource(img.getSource(), new CropImageFilter(x, y, width, height)));
     }
 
-    public static Image getAsciiPart(int x, int y, int width) {
-        return getImagePart(new ImageIcon(AssetManager.getAsString(Minecraft2D.NAMESPACE, "textures", "font", "ascii.png")).getImage(), x, y, width, 8);
+    private static Image getAsciiPart(int x, int y, int width) {
+        return getImagePart(new ImageIcon(FONT_ASCII_IMG).getImage(), x, y, width, 8);
     }
 
-    public static Image getAsciiInMap(char c) {
+    public static Image getCharInMap(char c) {
         try {
-            return ASCII_IMAGE_MAP.get(c);
+            return CHAR_IMAGE_MAP.get(c);
         } catch (Exception e) {
-            return ASCII_IMAGE_MAP.get(' ');
+            return CHAR_IMAGE_MAP.get(' ');
         }
     }
 
     private static void putAscii(char c, int x, int y, int width) {
-        ASCII_IMAGE_MAP.put(c, getAsciiPart(x, y, width));
-        ASCII_IMAGE_WIDTH.put(c, width);
+        CHAR_IMAGE_MAP.put(c, getAsciiPart(x, y, width));
+        CHAR_IMAGE_WIDTH.put(c, width);
     }
 
     private static void putAscii(int c, int x, int y, int width) {

@@ -39,8 +39,8 @@ import java.util.HashMap;
 public class Chunk implements Serializable {
     public static final transient int WORLD_HEIGHT = 64;
     public static final transient int CHUNK_SIZE = 16;
-    private static final long serialVersionUID = -6474694478994007562L;
-    public final HashMap<BlockPos, AbstractBlock> blocks = new HashMap<>();
+    private static final long serialVersionUID = 7972509854794260022L;
+    private HashMap<String, AbstractBlock> blocks = new HashMap<>();
 
     public Chunk() {
         for (int i = 0; i < WORLD_HEIGHT; i++) {
@@ -51,12 +51,16 @@ public class Chunk implements Serializable {
     }
 
     public void draw(Graphics g, int x) {
-        for (BlockPos pos : blocks.keySet()) {
+        for (String pos :  blocks.keySet()) {
             blocks.get(pos).setPos(pos).draw(g, blocks.get(pos).x + (x << 4));
         }
     }
 
     public void setBlock(BlockPos pos, AbstractBlock block) {
+        blocks.put(pos.toString(), Blocks.getById(block.getRegistryName()).setPos(pos));
+    }
+
+    public void setBlock(String pos, AbstractBlock block) {
         blocks.put(pos, Blocks.getById(block.getRegistryName()).setPos(pos));
     }
 
@@ -66,15 +70,24 @@ public class Chunk implements Serializable {
 
     public AbstractBlock getBlock(BlockPos pos) {
         try {
-            return blocks.get(pos);
+            return blocks.get(pos.toString());
         } catch (Exception e) {
-            blocks.put(pos, Blocks.AIR);
+            blocks.put(pos.toString(), Blocks.AIR);
             return Blocks.AIR;
         }
     }
 
+    public Chunk setBlocks(HashMap<String, AbstractBlock> blocks) {
+        this.blocks = blocks;
+        return this;
+    }
+
     public AbstractBlock getBlock(int x, int y) {
         return getBlock(BlockPos.of(x, y));
+    }
+
+    public HashMap<String, AbstractBlock> getBlocks() {
+        return blocks;
     }
 
     @Override

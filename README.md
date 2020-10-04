@@ -4,13 +4,15 @@
 Welcome to Minecraft 2D. This is a sandplay. **(Not sandbox game!!!)**  
 欢迎来到Minecraft 2D的世界！这是一个**沙盘**游戏。**（不是沙盒游戏！！！）**
 
+This game is published on [itch.io](https://squid33.itch.io/minecraft2d), too.
+
 ## 运行时环境 Runtime Environment
 JRE 11  
 最低要求JRE11，低于此版本会导致不能正常启动
 
 ## 展示图 Exhibition
-200919-pa-build.0  
-![200919-build0-0](/img/200919-0-0.png)
+200926-pa-build.0  
+![200926-build0-0](/img/200926-0-0.png)![200926-build0-1](/img/200926-0-1.png)![200926-build0-2](/img/200926-0-2.png)
 
 ## 使用方法 Use Guide
 1. go [here](/archives) or [Releases](https://github.com/Over-Run/Minecraft2D/releases) to download。  
