@@ -46,7 +46,9 @@ https://discord.com/widget?id=751804389718753421&theme=dark
 
 Join our Discord channel just time! [![discord](https://img.shields.io/discord/751804389718753421)](https://discord.gg/ydYzTKV)
 
-现在就加入我们的QQ<span class="mask" title="你知道的太多了"><s>吹水</s></span>群！[![Java 开发交流群](https://pub.idqqimg.com/wpa/images/group.png)](https://qm.qq.com/cgi-bin/qm/qr?k=efwa2cjVSs-S_UorWELGd45SPTJBTGV6&jump_from=webapi)
+现在就加入我们的QQ<span class="mask" title="你知道的太多了"><s>吹水</s></span>群！[![Java 开发交流群](https://pub.idqqimg.com/wpa/images/group.png)](https://qm.qq.com/cgi-bin/qm/qr?k=efwa2cjVSs-S_UorWELGd45SPTJBTGV6&jump_from=webapi) ← 这个是Java开发群
+
+[![Minecraft2D官方交流群](https://pub.idqqimg.com/wpa/images/group.png)](https://qm.qq.com/cgi-bin/qm/qr?k=Nnh75LW0PJysy9rHMF6EOxAwBBjBN6mt&jump_from=webapi) ← 这个才是官方群
 
 看看[Fandom Wiki](https://minecraft2d.fandom.com/zh/wiki/)!
 

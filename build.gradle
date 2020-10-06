@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+    id 'idea'
+}
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+group 'io.github.overrun.mc2d'
+version project.mcversion
+archivesBaseName = "Minecraft2D-$project.mcversion"
+
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly "org.jetbrains:annotations:$annotations"
+    compile "org.apache.commons:commons-lang3:$lang3"
+    compile "it.unimi.dsi:fastutil:$fastutil"
+    compile "com.google.code.gson:gson:$gson"
+    compile "com.google.guava:guava:$guava-jre"
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+jar {
+    from 'LICENSE'
+}
+
+idea {
+    project {
+        languageLevel.level = 'JDK_11'
+    }
+    module {
+        inheritOutputDirs = true
+    }
+}
