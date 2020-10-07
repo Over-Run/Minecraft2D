@@ -74,27 +74,29 @@ public interface Screen {
      * @param color color
      */
     static void drawRect(Graphics g, int x, int y, int width, int height, Color color) {
-        Color c = g.getColor();
-        g.setColor(color);
-        g.fillRect(x, y, width, height);
-        g.setColor(c);
+        operationWithColor(g, color, (gg) -> gg.fillRect(x, y, width, height));
+    }
+
+    static void drawText(Graphics g, int x, int y, IText text, int size) {
+        char[] chars = text.asFormattedString().toCharArray();
+        int pos = 0;
+        for (char c : chars) {
+            int width = Images.CHAR_IMAGE_WIDTH.get(c) + (size - 1);
+            drawImage(g, Images.getCharInMap(c), x + pos, y, width, 8 + (size - 1) * 3);
+            pos += width + 2;
+        }
     }
 
     /**
-     * draw text to screen
+     * Draw text to screen.
      *
      * @param g graphics
      * @param x pos x
      * @param y pos y
-     * @param text text
+     * @param text The text. It can {@link io.github.overrun.mc2d.text.LiteralText LiteralText} now.
      */
     static void drawText(Graphics g, int x, int y, IText text) {
-        char[] chars = text.asFormattedString().toCharArray();
-        int pos = 0;
-        for (char c : chars) {
-            drawImage(g, Images.getCharInMap(c), x + pos, y, Images.CHAR_IMAGE_WIDTH.get(c) + 1, 10);
-            pos += Images.CHAR_IMAGE_WIDTH.get(c) + 1;
-        }
+        drawText(g, x, y, text, 1);
     }
 
     static void operationWithColor(Graphics g, Color c, Consumer<Graphics> consumer) {

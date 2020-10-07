@@ -73,11 +73,11 @@ public class ItemGroupBuilder {
             }
 
             @Override
-            public void appendStacks(DefaultedList<ItemStack> stacks) {
+            public void appendStacks() {
                 if (ItemGroupBuilder.this.stacks != null) {
-                    ItemGroupBuilder.this.stacks.accept(stacks);
+                    ItemGroupBuilder.this.stacks.accept(super.getStacks());
                 } else {
-                    super.appendStacks(stacks);
+                    super.appendStacks();
                 }
             }
         };

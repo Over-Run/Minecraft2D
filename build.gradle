@@ -7,8 +7,8 @@ sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
 group 'io.github.overrun.mc2d'
+archivesBaseName = "minecraft2d"
 version project.mcversion
-archivesBaseName = "Minecraft2D-$project.mcversion"
 
 apply plugin: 'java'
 
@@ -30,6 +30,29 @@ tasks.withType(JavaCompile) {
 
 jar {
     from 'LICENSE'
+    manifest {
+        attributes 'Main-Class': 'io.github.overrun.mc2d.Main'
+    }
+}
+
+task addDependToManifest {
+    if (!configurations.runtime.isEmpty()) {
+        jar.manifest.attributes 'Class-Path': ". game_libs/${configurations.runtime.collect { it.name }.join(' game_libs/')}"
+    }
+}
+
+jar.dependsOn += addDependToManifest
+
+task copyDependencies(type: Copy) {
+    from configurations.runtime
+    destinationDir = file('build/libs/game_libs')
+}
+
+jar.dependsOn += copyDependencies
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier.set 'sources'
+    from sourceSets.main.allSource
 }
 
 idea {

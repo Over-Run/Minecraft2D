@@ -25,7 +25,6 @@
 package io.github.overrun.mc2d.client;
 
 import io.github.overrun.mc2d.Minecraft2D;
-import io.github.overrun.mc2d.block.Blocks;
 import io.github.overrun.mc2d.game.Player;
 import io.github.overrun.mc2d.image.Images;
 import io.github.overrun.mc2d.input.KeyAdapter;
@@ -89,7 +88,7 @@ public class Mc2dClient extends JFrame implements Screen {
         /////
         Screen.drawImage(gg, Images.getBlockTexture(Registry.BLOCK.get(Player.handledBlock)), getWidth() - 49, 1, 32, 32);
         LiteralText handledBlockId = LiteralText.of(Registry.BLOCK.get(Player.handledBlock).getRegistryName().toString());
-        Screen.drawText(gg, getWidth() - 16 - handledBlockId.getDisplayLength(), 34, handledBlockId);
+        Screen.drawText(gg, getWidth() - 16 - handledBlockId.getDisplayLength(2), 34, handledBlockId, 2);
         /////
         if (Screens.isOpeningAnyScreen) {
             Screens.getOpeningScreenHandler().render(gg);

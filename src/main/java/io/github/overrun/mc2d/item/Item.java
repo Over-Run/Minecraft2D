@@ -58,6 +58,7 @@ public class Item implements ItemConvertible {
     }
 
     public void appendStacks(ItemGroup group, DefaultedList<ItemStack> stacks) {
+        System.out.println(isIn(group));
         if (isIn(group)) {
             stacks.add(new ItemStack(this));
         }

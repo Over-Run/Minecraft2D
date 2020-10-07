@@ -39,6 +39,7 @@ public abstract class ItemGroup {
     public static final ItemGroup BUILDING_BLOCKS = ItemGroupBuilder.build(new Identifier("building_block"), new ItemStack(Blocks.STONE));
 
     private final Identifier id;
+    private final DefaultedList<ItemStack> stacks = new DefaultedList<>();
     private ItemStack icon;
 
     public ItemGroup(int index, Identifier id) {
@@ -53,7 +54,7 @@ public abstract class ItemGroup {
      */
     public abstract ItemStack createIcon();
 
-    public void appendStacks(DefaultedList<ItemStack> stacks) {
+    public void appendStacks() {
         for (Item item : Registry.ITEM) {
             item.appendStacks(this, stacks);
         }
@@ -68,6 +69,18 @@ public abstract class ItemGroup {
 
     public Identifier getId() {
         return id;
+    }
+
+    public DefaultedList<ItemStack> getStacks() {
+        return stacks;
+    }
+
+    public ItemStack get(int index) {
+        return stacks.get(index);
+    }
+
+    public int size() {
+        return stacks.size();
     }
 
     public static void expandGroups() {

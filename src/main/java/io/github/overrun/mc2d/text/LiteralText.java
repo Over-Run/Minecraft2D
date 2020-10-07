@@ -26,6 +26,7 @@ package io.github.overrun.mc2d.text;
 
 import io.github.overrun.mc2d.image.Images;
 
+import java.awt.Graphics;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
@@ -69,11 +70,17 @@ public class LiteralText implements IText {
         return String.format(text, args);
     }
 
-    public int getDisplayLength() {
+    /**
+     * <b>NOTE:</b> This method is linked to {@link io.github.overrun.mc2d.screen.Screen#drawText(Graphics, int, int, IText) Screen#drawText}.
+     *
+     * @param size The font size.
+     * @return The <b>formatted</b> text display length.
+     */
+    public int getDisplayLength(int size) {
         char[] chars = asFormattedString().toCharArray();
         int l = 0;
         for (char c : chars) {
-            l += Images.CHAR_IMAGE_WIDTH.get(c) << 1;
+            l += Images.CHAR_IMAGE_WIDTH.get(c) + 3;
         }
         return l;
     }

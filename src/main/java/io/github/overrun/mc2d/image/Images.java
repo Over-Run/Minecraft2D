@@ -32,7 +32,6 @@ import io.github.overrun.mc2d.util.ResourceLocation;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.awt.image.CropImageFilter;
 import java.awt.image.FilteredImageSource;
 import java.io.File;
@@ -44,7 +43,7 @@ import java.util.HashMap;
  * @since 2020/09/15
  */
 public class Images {
-    public static BufferedImage FONT_ASCII_IMG;
+    public static Image FONT_ASCII_IMG;
 
     public static final HashMap<Character, Image> CHAR_IMAGE_MAP = new HashMap<>(95);
     public static final HashMap<Character, Integer> CHAR_IMAGE_WIDTH = new HashMap<>(95);
@@ -55,7 +54,7 @@ public class Images {
         try {
             FONT_ASCII_IMG = ImageIO.read(new File(new ResourceLocation("textures/font/ascii.png").toString()));
         } catch (IOException e) {
-            e.printStackTrace();
+            FONT_ASCII_IMG = new ImageIcon(new ResourceLocation("textures/font/ascii.png").toString()).getImage();
         }
         putsAscii();
     }
@@ -78,13 +77,8 @@ public class Images {
             try {
                 ITEM_IMG_MAP.put(item.toString(), ImageIO.read(new File(new ResourceLocation("textures/item/" + item.getRegistryName().getPath() + ".png").toString())));
             } catch (IOException e) {
-                try {
-                    ITEM_IMG_MAP.put(item.toString(),
-                            ImageIO.read(new File(new ResourceLocation("textures/block/" + item.getRegistryName().getPath() + ".png").toString())));
-                } catch (IOException ee) {
-                    ee.printStackTrace();
-                    ITEM_IMG_MAP.put(item.toString(), new ImageIcon(new ResourceLocation("textures/gui/missingo.png").toString()).getImage());
-                }
+                e.printStackTrace();
+                ITEM_IMG_MAP.put(item.toString(), new ImageIcon(new ResourceLocation("textures/gui/missingo.png").toString()).getImage());
             }
         }
         return ITEM_IMG_MAP.get(item.getRegistryName().toString());
@@ -120,78 +114,78 @@ public class Images {
     }
 
     private static void put128asciiU() {
-        putAscii(' ', 0, 16, 7);
-        putAscii('!', 8, 16, 3);
-        putAscii('"', 16, 16, 5);
+        putAscii(' ', 0, 16, 5);
+        putAscii('!', 8, 16, 1);
+        putAscii('"', 16, 16, 3);
         // ascii #, $, %, &
         for (int i = 0; i < 4; i++) {
-            putAscii(i + 35, i + 3 << 3, 16, 7);
+            putAscii(i + 35, i + 3 << 3, 16, 5);
         }
-        putAscii('\'', 56, 16, 3);
-        putAscii('(', 64, 16, 5);
-        putAscii(')', 72, 16, 5);
-        putAscii('*', 80, 16, 5);
-        putAscii('+', 88, 16, 7);
-        putAscii(',', 96, 16, 3);
-        putAscii('-', 104, 16, 7);
-        putAscii('.', 112, 16, 3);
-        putAscii('/', 120, 16, 7);
+        putAscii('\'', 56, 16, 1);
+        putAscii('(', 64, 16, 3);
+        putAscii(')', 72, 16, 3);
+        putAscii('*', 80, 16, 3);
+        putAscii('+', 88, 16, 5);
+        putAscii(',', 96, 16, 1);
+        putAscii('-', 104, 16, 5);
+        putAscii('.', 112, 16, 1);
+        putAscii('/', 120, 16, 5);
         // ascii 0~10
         for (int i = 0; i < 10; i++) {
-            putAscii(i + 48, i << 3, 24, 7);
+            putAscii(i + 48, i << 3, 24, 5);
         }
-        putAscii(':', 80, 24, 3);
-        putAscii(';', 88, 24, 3);
-        putAscii('<', 96, 24, 6);
-        putAscii('=', 104, 24, 7);
-        putAscii('>', 112, 24, 6);
-        putAscii('?', 120, 24, 7);
-        putAscii('@', 0, 32, 8);
+        putAscii(':', 80, 24, 1);
+        putAscii(';', 88, 24, 1);
+        putAscii('<', 96, 24, 4);
+        putAscii('=', 104, 24, 5);
+        putAscii('>', 112, 24, 4);
+        putAscii('?', 120, 24, 5);
+        putAscii('@', 0, 32, 6);
         // ascii A~H
         for (int i = 0; i < 8; i++) {
-            putAscii(i + 65, i + 1 << 3, 32, 7);
+            putAscii(i + 65, i + 1 << 3, 32, 5);
         }
-        putAscii('I', 72, 32, 5);
+        putAscii('I', 72, 32, 3);
         // ascii J~O
         for (int i = 0; i < 6; i++) {
-            putAscii(i + 74, i + 10 << 3, 32, 7);
+            putAscii(i + 74, i + 10 << 3, 32, 5);
         }
         // ascii P~Z
         for (int i = 0; i < 11; i++) {
-            putAscii(i + 80, i << 3, 40, 7);
+            putAscii(i + 80, i << 3, 40, 5);
         }
-        putAscii('[', 88, 40, 5);
-        putAscii('\\', 96, 40, 7);
-        putAscii(']', 104, 40, 5);
-        putAscii('^', 112, 40, 7);
-        putAscii('_', 120, 40, 7);
-        putAscii('`', 0, 48, 4);
+        putAscii('[', 88, 40, 3);
+        putAscii('\\', 96, 40, 5);
+        putAscii(']', 104, 40, 2);
+        putAscii('^', 112, 40, 5);
+        putAscii('_', 120, 40, 5);
+        putAscii('`', 0, 48, 2);
         // ascii a~e
         for (int i = 0; i < 5; i++) {
-            putAscii(i + 97, i + 1 << 3, 48, 7);
+            putAscii(i + 97, i + 1 << 3, 48, 5);
         }
-        putAscii('f', 48, 48, 6);
-        putAscii('g', 56, 48, 7);
-        putAscii('h', 64, 48, 7);
-        putAscii('i', 72, 48, 3);
-        putAscii('j', 80, 48, 7);
-        putAscii('k', 88, 48, 6);
-        putAscii('l', 96, 48, 4);
-        putAscii('m', 104, 48, 7);
-        putAscii('n', 112, 48, 7);
-        putAscii('o', 120, 48, 7);
+        putAscii('f', 48, 48, 4);
+        putAscii('g', 56, 48, 5);
+        putAscii('h', 64, 48, 5);
+        putAscii('i', 72, 48, 1);
+        putAscii('j', 80, 48, 5);
+        putAscii('k', 88, 48, 4);
+        putAscii('l', 96, 48, 2);
+        putAscii('m', 104, 48, 5);
+        putAscii('n', 112, 48, 5);
+        putAscii('o', 120, 48, 5);
         // ascii p~s
         for (int i = 0; i < 4; i++) {
-            putAscii(i + 112, i << 3, 56, 7);
+            putAscii(i + 112, i << 3, 56, 5);
         }
-        putAscii('t', 32, 56, 5);
+        putAscii('t', 32, 56, 3);
         // ascii u~z
         for (int i = 0; i < 6; i++) {
-            putAscii(i + 117, i + 5 << 3, 56, 7);
+            putAscii(i + 117, i + 5 << 3, 56, 5);
         }
-        putAscii('{', 88, 56, 5);
-        putAscii('|', 96, 56, 5);
-        putAscii('}', 104, 56, 5);
-        putAscii('~', 112, 56, 5);
+        putAscii('{', 88, 56, 3);
+        putAscii('|', 96, 56, 3);
+        putAscii('}', 104, 56, 3);
+        putAscii('~', 112, 56, 3);
     }
 }

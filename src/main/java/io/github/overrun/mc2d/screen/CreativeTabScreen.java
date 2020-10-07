@@ -30,14 +30,12 @@ import io.github.overrun.mc2d.game.Player;
 import io.github.overrun.mc2d.image.Images;
 import io.github.overrun.mc2d.item.Item;
 import io.github.overrun.mc2d.item.ItemGroup;
-import io.github.overrun.mc2d.item.ItemStack;
 import io.github.overrun.mc2d.item.Items;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.text.LiteralText;
 import io.github.overrun.mc2d.util.Highlight;
 import io.github.overrun.mc2d.util.IntUtil;
 import io.github.overrun.mc2d.util.ResourceLocation;
-import io.github.overrun.mc2d.util.collection.DefaultedList;
 import io.github.overrun.mc2d.util.registry.Registry;
 
 import javax.swing.ImageIcon;
@@ -58,10 +56,9 @@ public class CreativeTabScreen extends ScreenHandler {
     public static final Image SCROLL_INVALID = Images.getImagePart(TABS, 244, 0, 12, 15);
     private static int x = (Mc2dClient.getInstance().getWidth() >> 1) - 195,
             y = (Mc2dClient.getInstance().getHeight() >> 1) - 136;
-    public static final DefaultedList<ItemStack> ITEM_LIST = new DefaultedList<>();
 
     static {
-        ItemGroup.BUILDING_BLOCKS.appendStacks(ITEM_LIST);
+        ItemGroup.BUILDING_BLOCKS.appendStacks();
     }
 
     public CreativeTabScreen() {
@@ -85,10 +82,10 @@ public class CreativeTabScreen extends ScreenHandler {
         x = (Mc2dClient.getInstance().getWidth() >> 1) - 195;
         y = (Mc2dClient.getInstance().getHeight() >> 1) - 136;
         Screen.drawImage(g, IMG, x, y - 30, 390, 272);
-        Screen.drawText(g, x + 16, y - 16, LiteralText.of("Building Blocks"));
+        Screen.drawText(g, x + 16, y - 16, LiteralText.of("Building Blocks"), 3);
         Screen.drawImage(g, shouldShowScrollBar() ? SCROLL_VALID : SCROLL_INVALID, x + 350, y + 6, 24, 30);
-        for (int i = 0; i < ITEM_LIST.size(); i++) {
-            slots.get(i).setStack(ITEM_LIST.get(i));
+        for (int i = 0; i < ItemGroup.BUILDING_BLOCKS.size(); i++) {
+            slots.get(i).setStack(ItemGroup.BUILDING_BLOCKS.get(i));
         }
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 9; j++) {
@@ -129,7 +126,7 @@ public class CreativeTabScreen extends ScreenHandler {
 
     public boolean shouldShowScrollBar() {
         // 5 * 9 == 45
-        return ITEM_LIST.size() > 45;
+        return ItemGroup.BUILDING_BLOCKS.size() > 45;
     }
 
     @Override
