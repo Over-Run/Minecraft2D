@@ -27,8 +27,7 @@ package io.github.overrun.mc2d.client;
 import io.github.overrun.mc2d.Minecraft2D;
 import io.github.overrun.mc2d.game.Player;
 import io.github.overrun.mc2d.image.Images;
-import io.github.overrun.mc2d.input.KeyAdapter;
-import io.github.overrun.mc2d.input.MouseAdapter;
+import io.github.overrun.mc2d.input.MultiAdapter;
 import io.github.overrun.mc2d.option.Options;
 import io.github.overrun.mc2d.screen.Screen;
 import io.github.overrun.mc2d.screen.Screens;
@@ -59,10 +58,10 @@ public class Mc2dClient extends JFrame implements Screen {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setIconImage(new ImageIcon("icon.png").getImage());
-        addKeyListener(new KeyAdapter());
-        var mouse = new MouseAdapter();
-        addMouseListener(mouse);
-        addMouseWheelListener(mouse);
+        MultiAdapter ma = new MultiAdapter();
+        addKeyListener(ma);
+        addMouseListener(ma);
+        addMouseWheelListener(ma);
         Minecraft2D.LOGGER.debug("Max memory: " + ((Runtime.getRuntime().maxMemory() >> 10 >> 10) >= 1024
                 ? (Runtime.getRuntime().maxMemory() >> 10 >> 10 >> 10) + "GB"
                 : (Runtime.getRuntime().maxMemory() >> 10 >> 10) + "MB"));
@@ -88,7 +87,7 @@ public class Mc2dClient extends JFrame implements Screen {
         /////
         Screen.drawImage(gg, Images.getBlockTexture(Registry.BLOCK.get(Player.handledBlock)), getWidth() - 49, 1, 32, 32);
         LiteralText handledBlockId = LiteralText.of(Registry.BLOCK.get(Player.handledBlock).getRegistryName().toString());
-        Screen.drawText(gg, getWidth() - 16 - handledBlockId.getDisplayLength(2), 34, handledBlockId, 2);
+        Screen.drawText(gg, 0, 15, handledBlockId, Color.WHITE);
         /////
         if (Screens.isOpeningAnyScreen) {
             Screens.getOpeningScreenHandler().render(gg);

@@ -24,11 +24,12 @@
 
 package io.github.overrun.mc2d.screen;
 
-import io.github.overrun.mc2d.image.Images;
 import io.github.overrun.mc2d.text.IText;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.util.function.Consumer;
 
@@ -77,26 +78,33 @@ public interface Screen {
         operationWithColor(g, color, (gg) -> gg.fillRect(x, y, width, height));
     }
 
-    static void drawText(Graphics g, int x, int y, IText text, int size) {
-        char[] chars = text.asFormattedString().toCharArray();
-        int pos = 0;
-        for (char c : chars) {
-            int width = Images.CHAR_IMAGE_WIDTH.get(c) + (size - 1);
-            drawImage(g, Images.getCharInMap(c), x + pos, y, width, 8 + (size - 1) * 3);
-            pos += width + 2;
+    static void drawText(Graphics g, int x, int y, IText text, Color color, int size) {
+        Font font = g.getFont();
+        for (String nm : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
+            if ("minecraft".equalsIgnoreCase(nm) || "consolas".equalsIgnoreCase(nm) || "simsun".equalsIgnoreCase(nm) || "serif".equalsIgnoreCase(nm)) {
+                g.setFont(new Font(nm, Font.PLAIN, size));
+                break;
+            }
         }
+        operationWithColor(g, color, (gg) -> gg.drawString(text.asFormattedString(), x + 8, y + 30));
+        g.setFont(font);
     }
 
     /**
      * Draw text to screen.
      *
      * @param g graphics
+     * @param color text color
      * @param x pos x
      * @param y pos y
      * @param text The text. It can {@link io.github.overrun.mc2d.text.LiteralText LiteralText} now.
      */
+    static void drawText(Graphics g, int x, int y, IText text, Color color) {
+        drawText(g, x, y, text, color, 16);
+    }
+
     static void drawText(Graphics g, int x, int y, IText text) {
-        drawText(g, x, y, text, 1);
+        drawText(g, x, y, text, Color.WHITE);
     }
 
     static void operationWithColor(Graphics g, Color c, Consumer<Graphics> consumer) {

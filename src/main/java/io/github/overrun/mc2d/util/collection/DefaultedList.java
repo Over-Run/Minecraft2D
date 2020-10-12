@@ -24,14 +24,14 @@
 
 package io.github.overrun.mc2d.util.collection;
 
-import java.util.ArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 /**
  * @author squid233
  * @since 2020/10/03
  */
-public class DefaultedList<E> extends ArrayList<E> {
-    private static final long serialVersionUID = 9111199589492067958L;
+public class DefaultedList<E> extends ObjectArrayList<E> {
+    private static final long serialVersionUID = -3896425738329358008L;
     private E defReturnV;
 
     public void defaultReturnValue(E e) {

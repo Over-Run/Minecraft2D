@@ -24,7 +24,8 @@
 
 package io.github.overrun.mc2d.entity;
 
-import io.github.overrun.mc2d.item.Item;
+import io.github.overrun.mc2d.item.ItemStack;
+import io.github.overrun.mc2d.util.IntUtil;
 
 import java.util.HashMap;
 
@@ -35,7 +36,8 @@ import java.util.HashMap;
 public class PlayerEntity {
     private static final transient HashMap<String, PlayerEntity> CACHE = new HashMap<>();
     private final String name;
-    private Item handItem;
+    private final ItemStack[] hotbarItems = new ItemStack[9];
+    private ItemStack handItem;
 
     private PlayerEntity(String name) {
         this.name = name;
@@ -50,5 +52,24 @@ public class PlayerEntity {
 
     public String getName() {
         return name;
+    }
+
+    public PlayerEntity setHandItem(ItemStack handItem) {
+        this.handItem = handItem;
+        return this;
+    }
+
+    public PlayerEntity setHotbarItem(int index, ItemStack hotbarItem) {
+        // Don't ArrayIndexOutOfBoundsException
+        hotbarItems[IntUtil.clamp(index, 0, 8)] = hotbarItem;
+        return this;
+    }
+
+    public ItemStack[] getHotbarItems() {
+        return hotbarItems;
+    }
+
+    public ItemStack getHandItem() {
+        return handItem;
     }
 }

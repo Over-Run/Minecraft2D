@@ -24,21 +24,19 @@
 
 package io.github.overrun.mc2d.screen;
 
-import io.github.overrun.mc2d.block.Blocks;
 import io.github.overrun.mc2d.client.Mc2dClient;
-import io.github.overrun.mc2d.game.Player;
 import io.github.overrun.mc2d.image.Images;
 import io.github.overrun.mc2d.item.Item;
 import io.github.overrun.mc2d.item.ItemGroup;
+import io.github.overrun.mc2d.item.ItemStack;
 import io.github.overrun.mc2d.item.Items;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.text.LiteralText;
 import io.github.overrun.mc2d.util.Highlight;
-import io.github.overrun.mc2d.util.IntUtil;
 import io.github.overrun.mc2d.util.ResourceLocation;
-import io.github.overrun.mc2d.util.registry.Registry;
 
 import javax.swing.ImageIcon;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
@@ -54,12 +52,10 @@ public class CreativeTabScreen extends ScreenHandler {
     public static final Image TABS = new ImageIcon(new ResourceLocation("textures/gui/creative_tab/tabs.png").toString()).getImage();
     public static final Image SCROLL_VALID = Images.getImagePart(TABS, 232, 0, 12, 15);
     public static final Image SCROLL_INVALID = Images.getImagePart(TABS, 244, 0, 12, 15);
-    private static int x = (Mc2dClient.getInstance().getWidth() >> 1) - 195,
+    public static final Color NAME_COLOR = new Color(65, 65, 65);
+    private int x = (Mc2dClient.getInstance().getWidth() >> 1) - 195,
             y = (Mc2dClient.getInstance().getHeight() >> 1) - 136;
-
-    static {
-        ItemGroup.BUILDING_BLOCKS.appendStacks();
-    }
+    public ItemStack handledStack = ItemStack.EMPTY;
 
     public CreativeTabScreen() {
         // Creative Tabs
@@ -82,37 +78,46 @@ public class CreativeTabScreen extends ScreenHandler {
         x = (Mc2dClient.getInstance().getWidth() >> 1) - 195;
         y = (Mc2dClient.getInstance().getHeight() >> 1) - 136;
         Screen.drawImage(g, IMG, x, y - 30, 390, 272);
-        Screen.drawText(g, x + 16, y - 16, LiteralText.of("Building Blocks"), 3);
-        Screen.drawImage(g, shouldShowScrollBar() ? SCROLL_VALID : SCROLL_INVALID, x + 350, y + 6, 24, 30);
-        for (int i = 0; i < ItemGroup.BUILDING_BLOCKS.size(); i++) {
+        Screen.drawText(g, x + 16, y - 5, LiteralText.of("Building Blocks"), NAME_COLOR);
+                Screen.drawImage(g, shouldShowScrollBar() ? SCROLL_VALID : SCROLL_INVALID, x + 350, y + 6, 24, 30);
+        for (int i = 0, size = ItemGroup.BUILDING_BLOCKS.size(); i < size; i++) {
             slots.get(i).setStack(ItemGroup.BUILDING_BLOCKS.get(i));
         }
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 9; j++) {
-                Item it = slots.get(IntUtil.clamp(j, 0, 9) * IntUtil.clamp(i, 1, 9)).getStack().getItem();
-                if (!it.equals(Items.AIR)) {
-                    Screen.drawImage(g, Images.getItemTexture(it), x + 18 + j * 36, y + 6 + i * 36, 32, 32);
-                }
+        for (int i = 0, size = ItemGroup.BUILDING_BLOCKS.size(); i < size; i++) {
+            Item item = slots.get(i).getStack().getItem();
+            if (!item.equals(Items.AIR)) {
+                Screen.drawImage(g, Images.getItemTexture(item), x + 18 + (i % 9) * 36, y + 6 + (i / 9) * 36, 32, 32);
             }
         }
     }
 
     @Override
     public void onMousePressed(MouseEvent e) {
-        if (e.getX() > x
-                && e.getX() < x + 194
-                && e.getY() > y
-                && e.getY() < y + 135) {
-            for (int i = 0; i < slots.size() - HOTBAR; i++) {
-                if (!Registry.BLOCK.get(i + 1).equals(Blocks.AIR)
-                        && e.getX() > slots.get(i).getX() + x
-                        && e.getX() < slots.get(i).getX() + x + 31
-                        && e.getY() > slots.get(i).getY() + y
-                        && e.getY() < slots.get(i).getY() + y + 31
-                ) {
-                    Player.handledBlock = i + 1;
-                    break;
+        if (e.getX() > x && e.getX() < x + 388) {
+            if (e.getY() > y && e.getY() < y + 270) {
+                for (int i = 0, size = slots.size() - HOTBAR; i < size; i++) {
+                    if (
+                            e.getX() > slots.get(i).getX() + x
+                            && e.getX() < slots.get(i).getX() + x + 32
+                            && e.getY() > slots.get(i).getY() + y
+                            && e.getY() < slots.get(i).getY() + y + 32
+                    ) {
+                        if (handledStack.getItem() != Items.AIR) {
+                            if (handledStack.getItem() == slots.get(i).getStack().getItem()) {
+                                handledStack.grow();
+                            } else {
+                                handledStack = ItemStack.EMPTY;
+                            }
+                        } else {
+                            handledStack = slots.get(i).getStack();
+                        }
+                        break;
+                    }
                 }
+            } else if (
+                    e.getY() > y + 270
+                            && e.getY() < y + 272
+            ) {
             }
         }
     }
@@ -121,6 +126,12 @@ public class CreativeTabScreen extends ScreenHandler {
     public void onMouseMoved(Graphics g) {
         for (Slot slot : slots) {
             Highlight.slot(g, x + slot.getX(), y + slot.getY(), 32, 32);
+        }
+        if (handledStack != ItemStack.EMPTY) {
+            Screen.drawImage(g, Images.getItemTexture(handledStack.getItem()),
+                    Mc2dClient.getInstance().getMousePosition().x - 24,
+                    Mc2dClient.getInstance().getMousePosition().y - 46,
+                    32, 32);
         }
     }
 

@@ -34,20 +34,27 @@ import io.github.overrun.mc2d.util.registry.Registry;
  * @since 2020/09/15
  */
 public class Blocks {
+    public static final Settings EMPTY_SETTINGS = new Settings();
     public static final Block AIR;
-    public static final Block DIRT;
-    public static final Block GRASS_BLOCK;
-    public static final Block COBBLESTONE;
-    public static final Block BEDROCK;
     public static final Block STONE;
+    public static final Block GRASS_BLOCK;
+    public static final Block DIRT;
+    public static final Block COBBLESTONE;
+    public static final Block OAK_PLANKS;
+    public static final Block OAK_SAPLING;
+    public static final Block BEDROCK;
+    public static final Block SAND;
 
     static {
-        AIR = register("air", new BlockAir(new Settings()));
-        DIRT = register("dirt", new Block(new Settings()));
-        GRASS_BLOCK = register("grass_block", new Block(new Settings()));
-        COBBLESTONE = register("cobblestone", new Block(new Settings()));
-        BEDROCK = register("bedrock", new Block(new Settings()));
-        STONE = register("stone", new Block(new Settings()));
+        AIR = register("air", new BlockAir(EMPTY_SETTINGS));
+        STONE = register("stone", new Block(EMPTY_SETTINGS));
+        GRASS_BLOCK = register("grass_block", new Block(EMPTY_SETTINGS));
+        DIRT = register("dirt", new Block(EMPTY_SETTINGS));
+        COBBLESTONE = register("cobblestone", new Block(EMPTY_SETTINGS));
+        BEDROCK = register("bedrock", new Block(EMPTY_SETTINGS));
+        SAND = register("sand", new Block(EMPTY_SETTINGS));
+        OAK_PLANKS = register("oak_planks", new Block(EMPTY_SETTINGS));
+        OAK_SAPLING = register("oak_sapling", new Block(EMPTY_SETTINGS));
     }
 
     private static Block register(String name, Block block) {

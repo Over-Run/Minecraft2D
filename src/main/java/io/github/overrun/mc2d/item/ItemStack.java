@@ -45,6 +45,14 @@ public final class ItemStack {
         this(item, 1);
     }
 
+    public void grow() {
+        setCount(count + 1);
+    }
+
+    public void shrink() {
+        setCount(count - 1);
+    }
+
     public boolean isEmpty() {
         if (this == EMPTY) {
             return true;
@@ -53,6 +61,10 @@ public final class ItemStack {
         } else {
             return true;
         }
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 
     public Item getItem() {

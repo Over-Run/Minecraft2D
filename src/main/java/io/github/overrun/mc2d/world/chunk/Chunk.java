@@ -59,6 +59,9 @@ public class Chunk implements Serializable {
     }
 
     public void setBlock(BlockPos pos, Block block) {
+        if (block == null) {
+            block = Blocks.AIR;
+        }
         blocks.put(pos.toString(), Registry.BLOCK.get(block.getRegistryName()).setPos(pos));
     }
 

@@ -26,27 +26,50 @@ package io.github.overrun.mc2d;
 
 import io.github.overrun.mc2d.block.Blocks;
 import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.item.ItemGroup;
+import io.github.overrun.mc2d.item.Items;
 import io.github.overrun.mc2d.world.Overworld;
 import io.github.overrun.mc2d.world.Worlds;
 import io.github.overrun.mc2d.world.chunk.Chunk;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Random;
 
 /**
  * @author squid233
  * @since 2020/09/14
  */
 public class Main {
+    public static String playerName;
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
+        /////
+        Object2ObjectMap<String, String> map = new Object2ObjectOpenHashMap<>();
+        try {
+            for (String gp : args) {
+                if (gp.startsWith("--")) {
+                    String[] arr = StringUtils.split(gp, '=');
+                    map.put(arr[0].substring(2), arr[1]);
+                }
+            }
+        } catch (Exception ignored) {}
+        map.defaultReturnValue("player" + new Random().nextInt(10000));
+        playerName = map.get("username");
+        Minecraft2D.LOGGER.info("Setting user: " + playerName);
+        // Force init
+        new Blocks();
+        new Items();
         /////
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("saves/save.dat"))) {
             Worlds.overworld = (Overworld) ois.readObject();
@@ -65,6 +88,11 @@ public class Main {
                     }
                     chunk.setBlock(i, 13, Blocks.GRASS_BLOCK);
                 }
+            }
+        }
+        for (ItemGroup group : ItemGroup.getGroups()) {
+            if (group != null) {
+                group.appendStacks();
             }
         }
         /////

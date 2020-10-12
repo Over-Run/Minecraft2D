@@ -24,8 +24,7 @@
 
 package io.github.overrun.mc2d.text;
 
-import io.github.overrun.mc2d.image.Images;
-
+import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,6 +38,7 @@ public class LiteralText implements IText {
     private static final HashMap<String, LiteralText> INSTANCES = new HashMap<>();
     private final String text;
     private final Object[] args;
+    public static final Color DEFAULT_COLOR = new Color(63, 63, 63);
 
     /**
      * Construct a text.<br>
@@ -73,14 +73,12 @@ public class LiteralText implements IText {
     /**
      * <b>NOTE:</b> This method is linked to {@link io.github.overrun.mc2d.screen.Screen#drawText(Graphics, int, int, IText) Screen#drawText}.
      *
-     * @param size The font size.
      * @return The <b>formatted</b> text display length.
      */
-    public int getDisplayLength(int size) {
-        char[] chars = asFormattedString().toCharArray();
+    public int getDisplayLength() {
         int l = 0;
-        for (char c : chars) {
-            l += Images.CHAR_IMAGE_WIDTH.get(c) + 3;
+        for (int i = 0, len = asFormattedString().length(); i < len; i++) {
+            l += 6;
         }
         return l;
     }

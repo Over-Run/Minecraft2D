@@ -52,10 +52,7 @@ public final class Slot {
     }
 
     public ItemStack getStack() {
-        if (stack == null) {
-            return ItemStack.EMPTY;
-        }
-        return stack;
+        return stack == null ? ItemStack.EMPTY : stack;
     }
 
     public Slot setStack(ItemStack stack) {

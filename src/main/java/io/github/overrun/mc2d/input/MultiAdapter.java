@@ -24,26 +24,102 @@
 
 package io.github.overrun.mc2d.input;
 
-import io.github.overrun.mc2d.block.AbstractBlock;
 import io.github.overrun.mc2d.block.Block;
 import io.github.overrun.mc2d.block.BlockPos;
 import io.github.overrun.mc2d.block.Blocks;
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.game.Camera;
 import io.github.overrun.mc2d.game.Player;
+import io.github.overrun.mc2d.item.ItemStack;
 import io.github.overrun.mc2d.screen.Screens;
+import io.github.overrun.mc2d.util.MapFilter;
 import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.world.Worlds;
 import io.github.overrun.mc2d.world.chunk.Chunk;
 
+import javax.swing.JOptionPane;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.HashMap;
 
 /**
  * @author squid233
- * @since 2020/09/16
+ * @since 2020/10/10
  */
-public class MouseAdapter extends java.awt.event.MouseAdapter {
+public class MultiAdapter implements KeyListener, MouseListener, MouseWheelListener, MouseMotionListener {
+    public static final char K_ESC = '\u001B';
+    public static final char K_A = 'a';
+    public static final char K_D = 'd';
+    public static final char K_E = 'e';
+    public static final int KEY_COUNT = 300;
+
+    private static final HashMap<Integer, Boolean> KEY_DOWN = new HashMap<>(KEY_COUNT);
+
+    public MultiAdapter() {
+        for (int i = 0; i < KEY_COUNT; i++) {
+            KEY_DOWN.put(i, false);
+        }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        KEY_DOWN.put(e.getKeyCode(), true);
+        /////
+        if (getKeyDown(KeyEvent.VK_A)) {
+            Camera.reduce();
+        }
+        if (getKeyDown(KeyEvent.VK_D)) {
+            Camera.plus();
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        KEY_DOWN.put(e.getKeyCode(), false);
+        /////
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        if (e.getKeyChar() == K_E) {
+            Screens.setOpening(Screens.CREATIVE_TAB);
+            Screens.CREATIVE_TAB.handledStack = ItemStack.EMPTY;
+        }
+        if (e.getKeyChar() == K_ESC) {
+            int opt = JOptionPane.showConfirmDialog(Mc2dClient.getInstance(), "Are you sure want to save?", "Pausing", JOptionPane.YES_NO_CANCEL_OPTION);
+            if (opt == JOptionPane.CANCEL_OPTION) {
+                return;
+            }
+            if (opt == JOptionPane.YES_OPTION) {
+                try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("saves/save.dat"))) {
+                    for (Chunk c : Worlds.overworld.getStorageBlock().chunks) {
+                        c.setBlocks((HashMap<String, Block>) MapFilter.filterValue(c.getBlocks(), Blocks.AIR));
+                    }
+                    oos.writeObject(Worlds.overworld);
+                } catch (IOException ee) {
+                    ee.printStackTrace();
+                }
+            }
+            System.exit(0);
+        }
+    }
+
+    public static boolean getKeyDown(int keyCode) {
+        return KEY_DOWN.get(keyCode);
+    }
+
+
+    // Below is mouse
+
+
     public static final int W_P_UP = 1;
     public static final int W_P_DOWN = -1;
 
@@ -66,6 +142,15 @@ public class MouseAdapter extends java.awt.event.MouseAdapter {
     }
 
     @Override
+    public void mouseEntered(MouseEvent e) {}
+
+    @Override
+    public void mouseExited(MouseEvent e) {}
+
+    @Override
+    public void mouseClicked(MouseEvent e) {}
+
+    @Override
     public void mousePressed(MouseEvent e) {
         Screens.getOpeningScreenHandler().onMousePressed(e);
     }
@@ -81,4 +166,10 @@ public class MouseAdapter extends java.awt.event.MouseAdapter {
             }
         }
     }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {}
+
+    @Override
+    public void mouseMoved(MouseEvent e) {}
 }
