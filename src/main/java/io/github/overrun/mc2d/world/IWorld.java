@@ -32,9 +32,9 @@ import java.io.Serializable;
  */
 public interface IWorld extends Serializable {
     /**
-     * return storage block
+     * return front storage block
      *
      * @return storage block
      */
-    StorageBlock getStorageBlock();
+    StorageBlock getFrontStorageBlock();
 }

@@ -24,10 +24,16 @@
 
 package io.github.overrun.mc2d.screen;
 
-import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.Minecraft2D;
+import io.github.overrun.mc2d.image.Images;
 import io.github.overrun.mc2d.screen.slot.Slot;
+import io.github.overrun.mc2d.text.IText;
+import io.github.overrun.mc2d.util.Highlight;
+import io.github.overrun.mc2d.util.MathHelper;
 import io.github.overrun.mc2d.util.ResourceLocation;
 import io.github.overrun.mc2d.util.collection.DefaultedList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -39,21 +45,70 @@ import java.awt.event.MouseEvent;
  */
 public abstract class ScreenHandler implements Screen {
     public static final Color DEFAULT_BACKGROUND = new Color(64, 64, 64, 128);
-    public static final Color SLOT_HIGHLIGHT = new Color(255, 255, 255, 128);
+    public static final Color SLOT_HIGHLIGHT = new Color(255, 255, 255, 160);
 
+    private final ObjectList<ButtonWidget> buttons = new ObjectArrayList<>();
     protected DefaultedList<Slot> slots = new DefaultedList<>();
 
-    protected static void drawDefaultBackground(Graphics g) {
-        Screen.operationWithColor(g, DEFAULT_BACKGROUND, (gg) -> gg.fillRect(0, 0, Mc2dClient.getInstance().getWidth(), Mc2dClient.getInstance().getHeight()));
+    protected static void drawOptionsBg(Graphics g) {
+        for (int i = 0, height = MathHelper.ceilDivision(Minecraft2D.getHeight(), 16); i < height; i++) {
+            for (int j = 0, width = MathHelper.ceilDivision(Minecraft2D.getWidth(), 16); j < width; j++) {
+                Screen.drawImage(g, Images.OPTIONS_BG, j << 4, i << 4, 16);
+            }
+        }
     }
 
-    public void render(Graphics g) { }
+    protected static void drawDefaultBackground(Graphics g) {
+        Screen.drawBg(g, DEFAULT_BACKGROUND);
+    }
 
-    public void onMousePressed(MouseEvent e) { }
+    public void render(Graphics g) {
+        for (ButtonWidget button : buttons) {
+            IText text = button.getText();
+            int width = button.getWidth();
+            Screen.drawImage(g, button.getTexture(), button.getX(), button.getY(), width, button.getHeight());
+            Screen.drawText(g, button.getX() + (width >> 1) - (text.getDisplayLength() >> 1), button.getY() + 20, text);
+        }
+    }
 
-    public void onMouseMoved(Graphics g) { }
+    public void onMousePressed(MouseEvent e) {
+        for (int i = buttons.size() - 1; i >= 0; i--) {
+            ButtonWidget button = buttons.get(i);
+            if (
+                    e.getX() > button.getX() + 8
+                    && e.getX() < button.getX() + button.getWidth() + 8
+                    && e.getY() > button.getY() + 30
+                    && e.getY() < button.getY() + 30 + button.getHeight()
+            ) {
+                button.getAction().onPress(button);
+                break;
+            }
+        }
+    }
 
-    public void addSlot(Slot slot) {
+    public void onMouseMoved(Graphics g) {
+        // For each all buttons to bottom from upper
+        for (int i = buttons.size() - 1; i >= 0; i--) {
+            ButtonWidget button = buttons.get(i);
+            int x = Minecraft2D.getMouseX();
+            int y = Minecraft2D.getMouseY();
+            if (
+                    x > button.getX() + 8
+                    && x < button.getX() + button.getWidth() + 8
+                    && y > button.getY() + 30
+                    && y < button.getY() + 30 + button.getHeight()
+            ) {
+                Highlight.highlight(g, button.getX() + 8, button.getY() + 30, button.getWidth(), button.getHeight(), Color.WHITE);
+                break;
+            }
+        }
+    }
+
+    protected void addButton(ButtonWidget button) {
+        buttons.add(button);
+    }
+
+    protected void addSlot(Slot slot) {
         slots.add(slot);
     }
 
@@ -62,7 +117,9 @@ public abstract class ScreenHandler implements Screen {
      *
      * @return can use
      */
-    public abstract boolean canUse();
+    public boolean canUse() {
+        return true;
+    }
 
     /**
      * return this screen handler's texture

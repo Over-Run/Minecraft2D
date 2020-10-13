@@ -31,8 +31,6 @@ import io.github.overrun.mc2d.util.ResourceLocation;
  * @since 2020/10/01
  */
 public class Screens {
-    public static boolean isOpeningAnyScreen = false;
-
     public static final ScreenHandler EMPTY = new ScreenHandler() {
         @Override
         public boolean canUse() {
@@ -44,21 +42,23 @@ public class Screens {
             return null;
         }
     };
+    public static final TitleScreen TITLE_SCREEN = new TitleScreen();
     public static final CreativeTabScreen CREATIVE_TAB = new CreativeTabScreen();
+    public static final LanguagesScreen LANGUAGES_SCREEN = new LanguagesScreen();
 
-    private static ScreenHandler openingScreenHandler;
+    private static ScreenHandler openingScreenHandler = TITLE_SCREEN;
 
     public static void setOpening(ScreenHandler screenHandler) {
-        openingScreenHandler = screenHandler;
-        isOpeningAnyScreen = !isOpeningAnyScreen;
+        if (openingScreenHandler != screenHandler) {
+            openingScreenHandler = screenHandler;
+        }
     }
 
     public static void closeAll() {
         openingScreenHandler = EMPTY;
-        isOpeningAnyScreen = false;
     }
 
-    public static ScreenHandler getOpeningScreenHandler() {
+    public static ScreenHandler getOpening() {
         if (openingScreenHandler == null) {
             openingScreenHandler = EMPTY;
         }
@@ -66,6 +66,6 @@ public class Screens {
     }
 
     public static boolean isOpening(ScreenHandler screenHandler) {
-        return isOpeningAnyScreen && getOpeningScreenHandler().equals(screenHandler);
+        return getOpening() == screenHandler;
     }
 }

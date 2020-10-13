@@ -28,6 +28,7 @@ package io.github.overrun.mc2d.game;
  * @author squid233
  * @since 2020/09/15
  */
+@Deprecated(since = "0.1.0", forRemoval = true)
 public class Camera {
     public static byte view = 0;
 

@@ -22,18 +22,31 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world;
+package io.github.overrun.mc2d.screen;
+
+import io.github.overrun.mc2d.image.Images;
+import io.github.overrun.mc2d.text.LiteralText;
+
+import java.awt.Image;
 
 /**
  * @author squid233
- * @since 2020/09/15
+ * @since 2020/10/13
  */
-public class Overworld implements IWorld {
-    private static final StorageBlock FRONT_STORAGE_BLOCK = new StorageBlock();
-    private static final long serialVersionUID = 1L;
+public class LanguageButtonWidget extends ButtonWidget {
+    public static final Image BUTTON = Images.getImagePart(Images.WIDGETS, 0, 106, 20, 20);
+
+    public LanguageButtonWidget(int x, int y, PressAction action) {
+        super(x, y, 40, LiteralText.EMPTY, action);
+    }
 
     @Override
-    public StorageBlock getFrontStorageBlock() {
-        return FRONT_STORAGE_BLOCK;
+    public int getHeight() {
+        return 40;
+    }
+
+    @Override
+    public Image getTexture() {
+        return BUTTON;
     }
 }

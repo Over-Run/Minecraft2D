@@ -24,7 +24,7 @@
 
 package io.github.overrun.mc2d.screen;
 
-import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.Minecraft2D;
 import io.github.overrun.mc2d.image.Images;
 import io.github.overrun.mc2d.item.Item;
 import io.github.overrun.mc2d.item.ItemGroup;
@@ -53,8 +53,8 @@ public class CreativeTabScreen extends ScreenHandler {
     public static final Image SCROLL_VALID = Images.getImagePart(TABS, 232, 0, 12, 15);
     public static final Image SCROLL_INVALID = Images.getImagePart(TABS, 244, 0, 12, 15);
     public static final Color NAME_COLOR = new Color(65, 65, 65);
-    private int x = (Mc2dClient.getInstance().getWidth() >> 1) - 195,
-            y = (Mc2dClient.getInstance().getHeight() >> 1) - 136;
+    private int x = (Minecraft2D.getWidth() >> 1) - 195,
+            y = (Minecraft2D.getHeight() >> 1) - 136;
     public ItemStack handledStack = ItemStack.EMPTY;
 
     public CreativeTabScreen() {
@@ -75,8 +75,8 @@ public class CreativeTabScreen extends ScreenHandler {
     @Override
     public void render(Graphics g) {
         drawDefaultBackground(g);
-        x = (Mc2dClient.getInstance().getWidth() >> 1) - 195;
-        y = (Mc2dClient.getInstance().getHeight() >> 1) - 136;
+        x = (Minecraft2D.getWidth() >> 1) - 195;
+        y = (Minecraft2D.getHeight() >> 1) - 136;
         Screen.drawImage(g, IMG, x, y - 30, 390, 272);
         Screen.drawText(g, x + 16, y - 5, LiteralText.of("Building Blocks"), NAME_COLOR);
                 Screen.drawImage(g, shouldShowScrollBar() ? SCROLL_VALID : SCROLL_INVALID, x + 350, y + 6, 24, 30);
@@ -129,8 +129,8 @@ public class CreativeTabScreen extends ScreenHandler {
         }
         if (handledStack != ItemStack.EMPTY) {
             Screen.drawImage(g, Images.getItemTexture(handledStack.getItem()),
-                    Mc2dClient.getInstance().getMousePosition().x - 24,
-                    Mc2dClient.getInstance().getMousePosition().y - 46,
+                    Minecraft2D.getMouseX() - 24,
+                    Minecraft2D.getMouseY() - 46,
                     32, 32);
         }
     }
@@ -138,11 +138,6 @@ public class CreativeTabScreen extends ScreenHandler {
     public boolean shouldShowScrollBar() {
         // 5 * 9 == 45
         return ItemGroup.BUILDING_BLOCKS.size() > 45;
-    }
-
-    @Override
-    public boolean canUse() {
-        return true;
     }
 
     @Override

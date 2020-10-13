@@ -26,20 +26,14 @@ package io.github.overrun.mc2d;
 
 import io.github.overrun.mc2d.block.Blocks;
 import io.github.overrun.mc2d.client.Mc2dClient;
-import io.github.overrun.mc2d.item.ItemGroup;
 import io.github.overrun.mc2d.item.Items;
-import io.github.overrun.mc2d.world.Overworld;
-import io.github.overrun.mc2d.world.Worlds;
-import io.github.overrun.mc2d.world.chunk.Chunk;
+import io.github.overrun.mc2d.lang.Language;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.Random;
 
 /**
@@ -67,14 +61,15 @@ public class Main {
         map.defaultReturnValue("player" + new Random().nextInt(10000));
         playerName = map.get("username");
         Minecraft2D.LOGGER.info("Setting user: " + playerName);
+        Language.reload();
         // Force init
         new Blocks();
         new Items();
         /////
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("saves/save.dat"))) {
+        /*try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("saves/save.dat"))) {
             Worlds.overworld = (Overworld) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            for (Chunk chunk : Worlds.overworld.getStorageBlock().chunks) {
+            for (Chunk chunk : Worlds.overworld.getFrontStorageBlock().chunks) {
                 for (int i = 0; i < 16; i++) {
                     chunk.setBlock(i, 0, Blocks.BEDROCK);
                     for (int j = 0; j < 4; j++) {
@@ -94,7 +89,7 @@ public class Main {
             if (group != null) {
                 group.appendStacks();
             }
-        }
+        }*/
         /////
         Mc2dClient.getInstance();
     }

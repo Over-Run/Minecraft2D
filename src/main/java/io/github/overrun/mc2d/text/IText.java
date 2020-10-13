@@ -24,6 +24,10 @@
 
 package io.github.overrun.mc2d.text;
 
+import io.github.overrun.mc2d.util.StringHelper;
+
+import java.awt.Graphics;
+
 /**
  * @author squid233
  * @since 2020/09/18
@@ -42,4 +46,23 @@ public interface IText {
      * @return string
      */
     String asFormattedString();
+
+
+    /**
+     * <b>NOTE:</b> This method is linked to {@link io.github.overrun.mc2d.screen.Screen#drawText(Graphics, int, int, IText) Screen#drawText}.
+     *
+     * @return The <b>formatted</b> text display length.
+     */
+    default int getDisplayLength() {
+        char[] c = asFormattedString().toCharArray();
+        int len = 0;
+        for (char value : c) {
+            if (StringHelper.isLatin1(String.valueOf(value))) {
+                len += 9;
+            } else {
+                len += 16;
+            }
+        }
+        return len;
+    }
 }

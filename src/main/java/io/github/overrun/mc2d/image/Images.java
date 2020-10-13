@@ -44,6 +44,9 @@ import java.util.HashMap;
  */
 public class Images {
     public static Image FONT_ASCII_IMG;
+    public static final Image WIDGETS = ImageIcons.getGameImage("textures/gui/widgets.png");
+    public static final ResourceLocation OPTIONS_BG_ID = new ResourceLocation("textures/gui/options_background.png");
+    public static final Image OPTIONS_BG = ImageIcons.getGameImage("textures/gui/options_background.png");
 
     public static final HashMap<Character, Image> CHAR_IMAGE_MAP = new HashMap<>(95);
     public static final HashMap<Character, Integer> CHAR_IMAGE_WIDTH = new HashMap<>(95);

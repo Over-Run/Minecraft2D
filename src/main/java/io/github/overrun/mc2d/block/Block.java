@@ -24,7 +24,7 @@
 
 package io.github.overrun.mc2d.block;
 
-import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.Minecraft2D;
 import io.github.overrun.mc2d.image.Images;
 import io.github.overrun.mc2d.item.Item;
 import io.github.overrun.mc2d.screen.Screens;
@@ -53,11 +53,11 @@ public class Block extends AbstractBlock {
     @Override
     public void draw(Graphics g, int x) {
         if (
-                getPreviewX() > -8 && getPreviewX() < Mc2dClient.getInstance().getWidth()
-                && getPreviewY() > 14 && getPreviewY() < Mc2dClient.getInstance().getHeight()
+                getPreviewX() > -8 && getPreviewX() < Minecraft2D.getWidth()
+                && getPreviewY() > 14 && getPreviewY() < Minecraft2D.getHeight()
         ) {
             g.drawImage(Images.getBlockTexture(this), getPreviewX(x), getPreviewY(), 16, 16, null);
-            if (!Screens.isOpeningAnyScreen) {
+            if (Screens.getOpening() == Screens.EMPTY) {
                 Highlight.block(g, getPreviewX(x), getPreviewY());
             }
         }

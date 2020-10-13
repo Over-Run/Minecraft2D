@@ -22,18 +22,43 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world;
+package io.github.overrun.mc2d.text;
+
+import io.github.overrun.mc2d.lang.Language;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
+import java.util.Arrays;
 
 /**
  * @author squid233
- * @since 2020/09/15
+ * @since 2020/10/12
  */
-public class Overworld implements IWorld {
-    private static final StorageBlock FRONT_STORAGE_BLOCK = new StorageBlock();
-    private static final long serialVersionUID = 1L;
+public class TranslatableText implements IText {
+    private static final Object2ObjectMap<String, TranslatableText> INSTANCES = new Object2ObjectOpenHashMap<>();
+    private final String key;
+    private final Object[] params;
+
+    private TranslatableText(String key, Object... params) {
+        this.key = key;
+        this.params = params;
+    }
+
+    public static TranslatableText of(String key, Object... args) {
+        String s = key + Arrays.deepToString(args);
+        if (!INSTANCES.containsKey(s)) {
+            INSTANCES.put(s, new TranslatableText(key, args));
+        }
+        return INSTANCES.get(s);
+    }
 
     @Override
-    public StorageBlock getFrontStorageBlock() {
-        return FRONT_STORAGE_BLOCK;
+    public String asString() {
+        return Language.getValue(key);
+    }
+
+    @Override
+    public String asFormattedString() {
+        return String.format(asString(), params);
     }
 }

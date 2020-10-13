@@ -24,10 +24,11 @@
 
 package io.github.overrun.mc2d.util;
 
-import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.Minecraft2D;
 import io.github.overrun.mc2d.screen.Screen;
 import io.github.overrun.mc2d.screen.ScreenHandler;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 /**
@@ -35,15 +36,19 @@ import java.awt.Graphics;
  * @since 2020/09/15
  */
 public class Highlight {
-    public static void black(Graphics g, int prevX, int prevY, int width, int height) {
+    public static void highlight(Graphics g, int prevX, int prevY, int width, int height, Color color) {
         if (
-                Mc2dClient.getInstance().getMousePosition().x >= prevX
-                && Mc2dClient.getInstance().getMousePosition().x <= prevX + (width - 1)
-                && Mc2dClient.getInstance().getMousePosition().y >= prevY
-                && Mc2dClient.getInstance().getMousePosition().y <= prevY + (height - 1)
+                Minecraft2D.getMouseX() >= prevX
+                        && Minecraft2D.getMouseX() <= prevX + (width - 1)
+                        && Minecraft2D.getMouseY() >= prevY
+                        && Minecraft2D.getMouseY() <= prevY + (height - 1)
         ) {
-            g.drawRect(prevX, prevY, 15, 15);
+            Screen.operationWithColor(g, color, (gg) -> gg.drawRect(prevX, prevY, width, height));
         }
+    }
+
+    public static void black(Graphics g, int prevX, int prevY, int width, int height) {
+        highlight(g, prevX, prevY, width, height, Color.BLACK);
     }
 
     public static void block(Graphics g, int prevX, int prevY) {
@@ -52,10 +57,10 @@ public class Highlight {
 
     public static void slot(Graphics g, int prevX, int prevY, int width, int height) {
         if (
-                Mc2dClient.getInstance().getMousePosition().x >= prevX
-                && Mc2dClient.getInstance().getMousePosition().x <= prevX + (width - 1)
-                && Mc2dClient.getInstance().getMousePosition().y >= prevY
-                && Mc2dClient.getInstance().getMousePosition().y <= prevY + (height - 1)
+                Minecraft2D.getMouseX() >= prevX
+                && Minecraft2D.getMouseX() <= prevX + (width - 1)
+                && Minecraft2D.getMouseY() >= prevY
+                && Minecraft2D.getMouseY() <= prevY + (height - 1)
         ) {
             Screen.operationWithColor(g, ScreenHandler.SLOT_HIGHLIGHT, (gg) -> gg.fillRect(prevX, prevY, width, height));
         }

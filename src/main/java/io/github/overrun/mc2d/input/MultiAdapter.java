@@ -24,18 +24,9 @@
 
 package io.github.overrun.mc2d.input;
 
-import io.github.overrun.mc2d.block.Block;
-import io.github.overrun.mc2d.block.BlockPos;
-import io.github.overrun.mc2d.block.Blocks;
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.game.Camera;
-import io.github.overrun.mc2d.game.Player;
-import io.github.overrun.mc2d.item.ItemStack;
 import io.github.overrun.mc2d.screen.Screens;
-import io.github.overrun.mc2d.util.MapFilter;
-import io.github.overrun.mc2d.util.registry.Registry;
-import io.github.overrun.mc2d.world.Worlds;
-import io.github.overrun.mc2d.world.chunk.Chunk;
 
 import javax.swing.JOptionPane;
 import java.awt.event.KeyEvent;
@@ -45,9 +36,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
 /**
@@ -90,8 +78,8 @@ public class MultiAdapter implements KeyListener, MouseListener, MouseWheelListe
     @Override
     public void keyTyped(KeyEvent e) {
         if (e.getKeyChar() == K_E) {
-            Screens.setOpening(Screens.CREATIVE_TAB);
-            Screens.CREATIVE_TAB.handledStack = ItemStack.EMPTY;
+            ///Screens.setOpening(Screens.CREATIVE_TAB);
+            ///Screens.CREATIVE_TAB.handledStack = ItemStack.EMPTY;
         }
         if (e.getKeyChar() == K_ESC) {
             int opt = JOptionPane.showConfirmDialog(Mc2dClient.getInstance(), "Are you sure want to save?", "Pausing", JOptionPane.YES_NO_CANCEL_OPTION);
@@ -99,14 +87,14 @@ public class MultiAdapter implements KeyListener, MouseListener, MouseWheelListe
                 return;
             }
             if (opt == JOptionPane.YES_OPTION) {
-                try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("saves/save.dat"))) {
-                    for (Chunk c : Worlds.overworld.getStorageBlock().chunks) {
+                /*try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("saves/save.dat"))) {
+                    for (Chunk c : Worlds.overworld.getFrontStorageBlock().chunks) {
                         c.setBlocks((HashMap<String, Block>) MapFilter.filterValue(c.getBlocks(), Blocks.AIR));
                     }
                     oos.writeObject(Worlds.overworld);
                 } catch (IOException ee) {
                     ee.printStackTrace();
-                }
+                }*/
             }
             System.exit(0);
         }
@@ -125,10 +113,10 @@ public class MultiAdapter implements KeyListener, MouseListener, MouseWheelListe
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (!Screens.isOpeningAnyScreen) {
+        /*if (!Screens.isOpeningAnyScreen) {
             int clickedX = ((e.getX() + 8) >> 4) - 1;
             BlockPos clickedBlockPos = BlockPos.of(clickedX % 16, (Mc2dClient.getInstance().getHeight() - 8 - e.getY() - 1) >> 4);
-            Chunk chunk = Worlds.overworld.getStorageBlock().getChunk((clickedX >> 4) + Camera.view);
+            Chunk chunk = Worlds.overworld.getFrontStorageBlock().getChunk((clickedX >> 4) + Camera.view);
             Block block = chunk.getBlock(clickedBlockPos);
             if (e.getButton() == MouseEvent.BUTTON1) {
                 chunk.setBlock(clickedBlockPos, Blocks.AIR);
@@ -138,7 +126,7 @@ public class MultiAdapter implements KeyListener, MouseListener, MouseWheelListe
                     chunk.setBlock(clickedBlockPos, Registry.BLOCK.get(Player.handledBlock));
                 }
             }
-        }
+        }*/
     }
 
     @Override
@@ -152,19 +140,19 @@ public class MultiAdapter implements KeyListener, MouseListener, MouseWheelListe
 
     @Override
     public void mousePressed(MouseEvent e) {
-        Screens.getOpeningScreenHandler().onMousePressed(e);
+        Screens.getOpening().onMousePressed(e);
     }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        if (!Screens.isOpeningAnyScreen) {
+        /*if (!Screens.isOpeningAnyScreen) {
             if (e.getWheelRotation() == W_P_UP) {
                 Player.plusHandledBlock();
             }
             if (e.getWheelRotation() == W_P_DOWN) {
                 Player.reduceHandledBlock();
             }
-        }
+        }*/
     }
 
     @Override

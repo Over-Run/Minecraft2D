@@ -24,6 +24,7 @@
 
 package io.github.overrun.mc2d.screen;
 
+import io.github.overrun.mc2d.Minecraft2D;
 import io.github.overrun.mc2d.text.IText;
 
 import java.awt.Color;
@@ -64,6 +65,10 @@ public interface Screen {
         g.drawImage(img, x + 8, y + 30, width, height, null);
     }
 
+    static void drawImage(Graphics g, Image img, int x, int y, int size) {
+        drawImage(g, img, x, y, size, size);
+    }
+
     /**
      * draw rect to screen
      *
@@ -78,10 +83,15 @@ public interface Screen {
         operationWithColor(g, color, (gg) -> gg.fillRect(x, y, width, height));
     }
 
+    static void drawBg(Graphics g, Color color) {
+        drawRect(g, 0, 0, Minecraft2D.getWidth(), Minecraft2D.getHeight(), color);
+    }
+
     static void drawText(Graphics g, int x, int y, IText text, Color color, int size) {
         Font font = g.getFont();
         for (String nm : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
-            if ("minecraft".equalsIgnoreCase(nm) || "consolas".equalsIgnoreCase(nm) || "simsun".equalsIgnoreCase(nm) || "serif".equalsIgnoreCase(nm)) {
+            boolean available = nm != null && (nm.contains("minecraft") || nm.contains("宋体") || nm.contains("serif"));
+            if (available) {
                 g.setFont(new Font(nm, Font.PLAIN, size));
                 break;
             }

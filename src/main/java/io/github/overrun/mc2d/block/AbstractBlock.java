@@ -24,7 +24,7 @@
 
 package io.github.overrun.mc2d.block;
 
-import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.Minecraft2D;
 import io.github.overrun.mc2d.item.ItemConvertible;
 
 import java.awt.Graphics;
@@ -97,7 +97,7 @@ public abstract class AbstractBlock implements Serializable, ItemConvertible {
     }
 
     public int getPreviewY() {
-        return Mc2dClient.getInstance().getHeight() - ((y << 4) + 24);
+        return Minecraft2D.getHeight() - ((y << 4) + 24);
     }
 
     /**

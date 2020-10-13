@@ -30,6 +30,7 @@ import io.github.overrun.mc2d.util.registry.Registry;
  * @author squid233
  * @since 2020/09/17
  */
+@Deprecated(since = "0.1.0", forRemoval = true)
 public class Player {
     public static int handledBlock = 1;
 

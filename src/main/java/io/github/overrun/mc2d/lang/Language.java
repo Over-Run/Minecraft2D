@@ -22,18 +22,38 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world;
+package io.github.overrun.mc2d.lang;
+
+import io.github.overrun.mc2d.option.Options;
+import io.github.overrun.mc2d.util.ResourceLocation;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Properties;
 
 /**
  * @author squid233
- * @since 2020/09/15
+ * @since 2020/10/13
  */
-public class Overworld implements IWorld {
-    private static final StorageBlock FRONT_STORAGE_BLOCK = new StorageBlock();
-    private static final long serialVersionUID = 1L;
+public class Language {
+    public static final String EN_US = "en_us";
+    public static final String ZH_CN = "zh_cn";
+    private static final Properties LANG_FILE = new Properties();
+    private static String curLang = Options.get("lang", EN_US);
 
-    @Override
-    public StorageBlock getFrontStorageBlock() {
-        return FRONT_STORAGE_BLOCK;
+    public static void reload() {
+        try (FileReader fr = new FileReader(ResourceLocation.asString("lang/" + curLang + ".lang"))) {
+            LANG_FILE.load(fr);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String getValue(String translationKey) {
+        return LANG_FILE.getProperty(translationKey, translationKey);
+    }
+
+    public static void setCurrentLang(String currentLang) {
+        curLang = currentLang;
     }
 }

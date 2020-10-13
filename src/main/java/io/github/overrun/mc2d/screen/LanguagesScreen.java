@@ -22,18 +22,34 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world;
+package io.github.overrun.mc2d.screen;
+
+import io.github.overrun.mc2d.Minecraft2D;
+import io.github.overrun.mc2d.image.Images;
+import io.github.overrun.mc2d.text.TranslatableText;
+import io.github.overrun.mc2d.util.Constants;
+import io.github.overrun.mc2d.util.ResourceLocation;
+
+import java.awt.Graphics;
 
 /**
  * @author squid233
- * @since 2020/09/15
+ * @since 2020/10/13
  */
-public class Overworld implements IWorld {
-    private static final StorageBlock FRONT_STORAGE_BLOCK = new StorageBlock();
-    private static final long serialVersionUID = 1L;
+public class LanguagesScreen extends ScreenHandler {
+    public LanguagesScreen() {
+        addButton(new ButtonWidget(Minecraft2D.getHeight() - 16, 200, TranslatableText.of(Constants.BUTTON_DONE), button -> Screens.setOpening(Screens.TITLE_SCREEN)));
+    }
 
     @Override
-    public StorageBlock getFrontStorageBlock() {
-        return FRONT_STORAGE_BLOCK;
+    public void render(Graphics g) {
+        drawOptionsBg(g);
+        drawDefaultBackground(g);
+        super.render(g);
+    }
+
+    @Override
+    public ResourceLocation getTexture() {
+        return Images.OPTIONS_BG_ID;
     }
 }

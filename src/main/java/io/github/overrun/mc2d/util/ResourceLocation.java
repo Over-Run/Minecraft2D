@@ -41,6 +41,14 @@ public class ResourceLocation extends Identifier {
         super(id);
     }
 
+    public static String asString(String namespace, String path) {
+        return new ResourceLocation(namespace, path).toString();
+    }
+
+    public static String asString(String path) {
+        return new ResourceLocation(path).toString();
+    }
+
     @Override
     public String getPath() {
         return "assets/" + getNamespace() + "/" + super.getPath();

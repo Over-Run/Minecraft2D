@@ -22,18 +22,19 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world;
+package io.github.overrun.mc2d.image;
+
+import io.github.overrun.mc2d.util.ResourceLocation;
+
+import javax.swing.ImageIcon;
+import java.awt.Image;
 
 /**
  * @author squid233
- * @since 2020/09/15
+ * @since 2020/10/12
  */
-public class Overworld implements IWorld {
-    private static final StorageBlock FRONT_STORAGE_BLOCK = new StorageBlock();
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public StorageBlock getFrontStorageBlock() {
-        return FRONT_STORAGE_BLOCK;
+public class ImageIcons {
+    public static Image getGameImage(String path) {
+        return new ImageIcon(new ResourceLocation(path).toString()).getImage();
     }
 }

@@ -25,16 +25,10 @@
 package io.github.overrun.mc2d.client;
 
 import io.github.overrun.mc2d.Minecraft2D;
-import io.github.overrun.mc2d.game.Player;
-import io.github.overrun.mc2d.image.Images;
 import io.github.overrun.mc2d.input.MultiAdapter;
 import io.github.overrun.mc2d.option.Options;
 import io.github.overrun.mc2d.screen.Screen;
 import io.github.overrun.mc2d.screen.Screens;
-import io.github.overrun.mc2d.text.LiteralText;
-import io.github.overrun.mc2d.util.Colors;
-import io.github.overrun.mc2d.util.registry.Registry;
-import io.github.overrun.mc2d.world.Worlds;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -53,7 +47,7 @@ public class Mc2dClient extends JFrame implements Screen {
     public static final Point NULL_POINT = new Point();
 
     private Mc2dClient() {
-        super("Minecraft 2D " + Minecraft2D.VERSION + " [Esc:Quit Game] - Made by OverRun Organization");
+        super("Minecraft 2D " + Minecraft2D.VERSION + " - Made by OverRun Organization");
         setSize(Options.getI(Options.WIDTH, 1296), Options.getI(Options.HEIGHT, 486));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -81,18 +75,16 @@ public class Mc2dClient extends JFrame implements Screen {
         Image buf = createImage(getWidth(), getHeight());
         Graphics gg = buf.getGraphics();
         /////
-        drawBackground(gg, Colors.decode(Colors.skyBlue));
+        /*drawBackground(gg, Colors.decode(Colors.skyBlue));
         /////
-        Worlds.overworld.getStorageBlock().draw(gg);
+        Worlds.overworld.getFrontStorageBlock().draw(gg);
         /////
         Screen.drawImage(gg, Images.getBlockTexture(Registry.BLOCK.get(Player.handledBlock)), getWidth() - 49, 1, 32, 32);
         LiteralText handledBlockId = LiteralText.of(Registry.BLOCK.get(Player.handledBlock).getRegistryName().toString());
         Screen.drawText(gg, 0, 15, handledBlockId, Color.WHITE);
-        /////
-        if (Screens.isOpeningAnyScreen) {
-            Screens.getOpeningScreenHandler().render(gg);
-            Screens.getOpeningScreenHandler().onMouseMoved(gg);
-        }
+        /////*/
+        Screens.getOpening().render(gg);
+        Screens.getOpening().onMouseMoved(gg);
         /////
         g.drawImage(buf, 0, 0, null);
     }

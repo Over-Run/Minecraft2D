@@ -50,7 +50,7 @@ public class Logger {
 
     public void msg(String msg, String level) {
         System.out.println("[" + StringUtils.split(LocalTime.now().toString(), '.')[0]
-                + "][" + Thread.currentThread().getName() + "/" + level + "](" + name + ") " + msg);
+                + "] [" + Thread.currentThread().getName() + "/" + level + "] (" + name + ") " + msg);
     }
 
     public void info(String msg) {
