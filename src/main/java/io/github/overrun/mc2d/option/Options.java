@@ -104,8 +104,6 @@ public class Options {
         try (Writer w = new FileWriter("options.properties")) {
             r = new FileReader("options.properties");
             OPTIONS.load(r);
-            // Cannot store to file cause by some bugs
-            // Please go to options.properties to change option
             OPTIONS.store(w, null);
             OPTIONS.load(r);
         } catch (IOException e) {
