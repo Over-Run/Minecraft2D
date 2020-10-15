@@ -6,7 +6,7 @@
 3. press 'd' to move right (world move left)
 4. 'Identifier' class now can construct by a string array
 
-0.1.0.40 2020/10/04~2020/10/15 (11 days)
+0.1.0.40-pre-alpha 2020/10/04~2020/10/15 (11 days)
 1. Use Gradle to build
 2. Add new block: sand, oak planks, oak sapling
 3. After opening game will display title screen
