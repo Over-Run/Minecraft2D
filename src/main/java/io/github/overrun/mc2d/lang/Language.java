@@ -27,26 +27,40 @@ package io.github.overrun.mc2d.lang;
 import io.github.overrun.mc2d.option.Options;
 import io.github.overrun.mc2d.util.ResourceLocation;
 
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Properties;
+
+import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
 
 /**
  * @author squid233
  * @since 2020/10/13
  */
 public class Language {
-    public static final String EN_US = "en_us";
-    public static final String ZH_CN = "zh_cn";
+    public static final Language EN_US = new Language("en_us", "English (United States)");
+    public static final Language ZH_CN = new Language("zh_cn", "中文（简体）");
     private static final Properties LANG_FILE = new Properties();
-    private static String curLang = Options.get("lang", EN_US);
+    private static String curLang = Options.get("lang", EN_US.getCode());
+    private final String code;
+    private final String name;
+
+    public Language(String code, String name) {
+        this.code = code;
+        this.name = name;
+    }
 
     public static void reload() {
-        try (FileReader fr = new FileReader(ResourceLocation.asString("lang/" + curLang + ".lang"))) {
-            LANG_FILE.load(fr);
-        } catch (IOException e) {
+        try (Reader is = new InputStreamReader(Objects.requireNonNull(
+                ClassLoader.getSystemResourceAsStream(ResourceLocation.asString("lang/" + curLang + ".lang"))), StandardCharsets.UTF_8)) {
+            LANG_FILE.load(is);
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
+        LOGGER.info("Setting language to: " + curLang);
     }
 
     public static String getValue(String translationKey) {
@@ -55,5 +69,22 @@ public class Language {
 
     public static void setCurrentLang(String currentLang) {
         curLang = currentLang;
+    }
+
+    public static String getCurrentLang() {
+        return curLang;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return getCode();
     }
 }

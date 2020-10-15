@@ -5,3 +5,26 @@
 2. press 'a' to move left (world move right)
 3. press 'd' to move right (world move left)
 4. 'Identifier' class now can construct by a string array
+
+0.1.0.40 2020/10/04~2020/10/15 (11 days)
+1. Use Gradle to build
+2. Add new block: sand, oak planks, oak sapling
+3. After opening game will display title screen
+  1. Include 4 buttons:
+    1. Singleplayer (Draft)
+    2. Options (Draft)
+    3. Exit Game: Click to exit game
+    4. Languages (Earth icon): Click to open languages screen
+        1. Click a button to choose your language: Support to English (United States), 中文（简体）
+        2. Click 'Done' to set the chosen language and back to the title screen
+4. Remove world because the 'Singleplayer' button is drafting
+  1. Will refactor the world system
+  2. Add 'PlayerEntity' class to operation the player
+  3. 'BlockPos' will serializable and will remove the constructor 'BlockPos(String)'
+  4. Deprecated 'Camera'&'Player' class and marked as removal because 'PlayerEntity' will add
+5. Text not use 'ascii.png' now
+6. You can set player name by program parameter '--username YourName'
+7. Improve 'MathHelper#ceilDivision(double,double)' performance, change method signature to 'MathHelper#ceilDivision(int,int)'
+8. Game can read assets in jar now
+9. Move options.properties outside jar, game can auto generated if absent
+10. The image will split in next version, because it is difficult to determine the position of sprites

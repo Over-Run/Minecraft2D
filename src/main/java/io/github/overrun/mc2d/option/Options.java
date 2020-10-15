@@ -24,8 +24,14 @@
 
 package io.github.overrun.mc2d.option;
 
+import io.github.overrun.mc2d.lang.Language;
+
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -33,20 +39,38 @@ import java.util.Properties;
  * @since 2020/09/15
  */
 public class Options {
-    public static final Properties OPTIONS = new Properties(5);
+    public static final Properties OPTIONS = new Properties(6);
 
-    public static final String FPS_OPT = "fps";
+    public static final String FPS = "fps";
     public static final String VIEW_DISTANCE = "view_distance";
     public static final String DEBUGGING = "debugging";
     public static final String WIDTH = "width";
     public static final String HEIGHT = "height";
     public static final String LANG = "lang";
+    public static final String FPS_DEF = "60";
+    public static final String VIEW_DISTANCE_DEF = "4";
+    public static final String FALSE = "false";
+    public static final String WIDTH_DEF = "1040";
+    public static final String HEIGHT_DEF = "486";
+    public static final String LANG_DEF = Language.EN_US.getCode();
 
     static {
-        try {
-            OPTIONS.load(new FileReader("options.properties"));
+        try (Reader r = new FileReader("options.properties")) {
+            OPTIONS.load(r);
         } catch (IOException e) {
-            e.printStackTrace();
+            OPTIONS.putAll(Map.of(
+                    FPS, FPS_DEF,
+                    WIDTH, WIDTH_DEF,
+                    VIEW_DISTANCE, VIEW_DISTANCE_DEF,
+                    DEBUGGING, FALSE,
+                    LANG, LANG_DEF,
+                    HEIGHT, HEIGHT_DEF));
+            try {
+                Writer w = new FileWriter("options.properties");
+                OPTIONS.store(w, null);
+            } catch (IOException ee) {
+                ee.printStackTrace();
+            }
         }
     }
 
@@ -72,5 +96,28 @@ public class Options {
 
     public static boolean getB(String key) {
         return getB(key, false);
+    }
+
+    public static void set(String k, String v) {
+        OPTIONS.setProperty(k, v);
+        Reader r = null;
+        try (Writer w = new FileWriter("options.properties")) {
+            r = new FileReader("options.properties");
+            OPTIONS.load(r);
+            // Cannot store to file cause by some bugs
+            // Please go to options.properties to change option
+            OPTIONS.store(w, null);
+            OPTIONS.load(r);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (r != null) {
+                    r.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

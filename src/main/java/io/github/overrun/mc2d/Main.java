@@ -36,6 +36,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import java.util.Random;
 
+import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
+
 /**
  * @author squid233
  * @since 2020/09/14
@@ -43,6 +45,7 @@ import java.util.Random;
 public class Main {
     public static String playerName;
     public static void main(String[] args) {
+        LOGGER.info("Starting Minecraft 2D " + Minecraft2D.VERSION);
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
@@ -60,11 +63,11 @@ public class Main {
         } catch (Exception ignored) {}
         map.defaultReturnValue("player" + new Random().nextInt(10000));
         playerName = map.get("username");
-        Minecraft2D.LOGGER.info("Setting user: " + playerName);
+        LOGGER.info("Setting user: " + playerName);
         Language.reload();
-        // Force init
-        new Blocks();
-        new Items();
+        // Init game objects
+        Blocks.init();
+        Items.init();
         /////
         /*try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("saves/save.dat"))) {
             Worlds.overworld = (Overworld) ois.readObject();

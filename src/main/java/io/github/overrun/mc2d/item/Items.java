@@ -36,26 +36,30 @@ import io.github.overrun.mc2d.util.registry.Registry;
  * @since 2020/10/03
  */
 public class Items {
-    public static final Item AIR;
-    public static final Item STONE;
-    public static final Item GRASS_BLOCK;
-    public static final Item DIRT;
-    public static final Item COBBLESTONE;
-    public static final Item OAK_PLANKS;
-    public static final Item OAK_SAPLING;
-    public static final Item BEDROCK;
-    public static final Item SAND;
+    public static Item AIR;
+    public static Item STONE;
+    public static Item GRASS_BLOCK;
+    public static Item DIRT;
+    public static Item COBBLESTONE;
+    public static Item OAK_PLANKS;
+    public static Item OAK_SAPLING;
+    public static Item BEDROCK;
+    public static Item SAND;
 
-    static {
-        AIR = register(Blocks.AIR, new Item(new Settings()));
-        STONE = register(Blocks.STONE, ItemGroup.BUILDING_BLOCKS);
-        GRASS_BLOCK = register(Blocks.GRASS_BLOCK, ItemGroup.BUILDING_BLOCKS);
-        DIRT = register(Blocks.DIRT, ItemGroup.BUILDING_BLOCKS);
-        COBBLESTONE = register(Blocks.COBBLESTONE, ItemGroup.BUILDING_BLOCKS);
-        OAK_PLANKS = register(Blocks.OAK_PLANKS, ItemGroup.BUILDING_BLOCKS);
-        OAK_SAPLING = register(Blocks.OAK_SAPLING, ItemGroup.BUILDING_BLOCKS);
-        BEDROCK = register(Blocks.BEDROCK, ItemGroup.BUILDING_BLOCKS);
-        SAND = register(Blocks.SAND, ItemGroup.BUILDING_BLOCKS);
+    private static boolean init;
+
+    public static void init() {
+        if (!init) {
+            AIR = register(Blocks.AIR, new Item(new Settings()));
+            STONE = register(Blocks.STONE, ItemGroup.BUILDING_BLOCKS);
+            GRASS_BLOCK = register(Blocks.GRASS_BLOCK, ItemGroup.BUILDING_BLOCKS);
+            DIRT = register(Blocks.DIRT, ItemGroup.BUILDING_BLOCKS);
+            COBBLESTONE = register(Blocks.COBBLESTONE, ItemGroup.BUILDING_BLOCKS);
+            OAK_PLANKS = register(Blocks.OAK_PLANKS, ItemGroup.BUILDING_BLOCKS);
+            OAK_SAPLING = register(Blocks.OAK_SAPLING, ItemGroup.BUILDING_BLOCKS);
+            BEDROCK = register(Blocks.BEDROCK, ItemGroup.BUILDING_BLOCKS);
+            SAND = register(Blocks.SAND, ItemGroup.BUILDING_BLOCKS);
+        }
     }
 
     private static Item register(Identifier id, Item item) {

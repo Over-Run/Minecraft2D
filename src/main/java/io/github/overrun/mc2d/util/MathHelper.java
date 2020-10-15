@@ -24,26 +24,12 @@
 
 package io.github.overrun.mc2d.util;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * @author squid233
  * @since 2020/10/12
  */
 public class MathHelper {
-    public static int ceilDivision(double a, double b) {
-        String s;
-        if (b == 1) {
-            s = Double.toString(a);
-        } else {
-            s = Double.toString(a / b);
-        }
-        boolean neg = false;
-        if (StringUtils.startsWith(s, "-")) {
-            neg = true;
-        }
-        String[] arr = StringUtils.split(s, '.');
-        int i = Integer.parseInt(arr[0]);
-        return (arr.length == 1) ? (neg ? -i : i) : (neg ? (-(i + 1)) : (i + 1));
+    public static int ceilDivision(int a, int b) {
+        return a % b == 0 ? a / b : a / b + 1;
     }
 }

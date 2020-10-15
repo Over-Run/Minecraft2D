@@ -17,8 +17,8 @@ JRE 11
 ![200926-build0-0](/img/200926-0-0.png)![200926-build0-1](/img/200926-0-1.png)![200926-build0-2](/img/200926-0-2.png)
 
 ## 使用方法 Use Guide
-1. go [here](/archives) or [Releases](https://github.com/Over-Run/Minecraft2D/releases) to download。  
-首先，到[此处](/archives)或 [Releases](https://github.com/Over-Run/Minecraft2D/releases) 下载。
+1. go [here](https://github.com/Over-Run/Minecraft2D/tree/archives) or [Releases](https://github.com/Over-Run/Minecraft2D/releases) to download。  
+首先，到[此处](https://github.com/Over-Run/Minecraft2D/tree/archives) 或 [Releases](https://github.com/Over-Run/Minecraft2D/releases) 下载。
 2. Unzip to any directories.  
 将其解压到任意文件夹下。
 3. Write a startup script and put in your directory.  

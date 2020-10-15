@@ -40,10 +40,10 @@ public class RenderThread implements Runnable {
 
     public RenderThread(Mc2dClient client) {
         this.client = client;
-        fps = Options.getI(Options.FPS_OPT, 30);
+        fps = Options.getI(Options.FPS, 30);
         interval = 1000 / fps;
         Minecraft2D.LOGGER.debug("Created render thread");
-        Minecraft2D.LOGGER.debug("FPS: " + fps);
+        Minecraft2D.LOGGER.info("FPS: " + fps);
         Minecraft2D.LOGGER.debug("Render interval: " + interval + "ms");
     }
 

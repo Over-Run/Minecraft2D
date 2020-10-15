@@ -48,15 +48,15 @@ public class Mc2dClient extends JFrame implements Screen {
 
     private Mc2dClient() {
         super("Minecraft 2D " + Minecraft2D.VERSION + " - Made by OverRun Organization");
-        setSize(Options.getI(Options.WIDTH, 1296), Options.getI(Options.HEIGHT, 486));
+        setSize(Options.getI(Options.WIDTH, 1040), Options.getI(Options.HEIGHT, 486));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setIconImage(new ImageIcon("icon.png").getImage());
+        setIconImage(new ImageIcon(ClassLoader.getSystemResource("icon.png")).getImage());
         MultiAdapter ma = new MultiAdapter();
         addKeyListener(ma);
         addMouseListener(ma);
         addMouseWheelListener(ma);
-        Minecraft2D.LOGGER.debug("Max memory: " + ((Runtime.getRuntime().maxMemory() >> 10 >> 10) >= 1024
+        Minecraft2D.LOGGER.info("Max memory: " + (Runtime.getRuntime().maxMemory() >> 10 >> 10 >= 1024
                 ? (Runtime.getRuntime().maxMemory() >> 10 >> 10 >> 10) + "GB"
                 : (Runtime.getRuntime().maxMemory() >> 10 >> 10) + "MB"));
         new RenderThread(this).start();

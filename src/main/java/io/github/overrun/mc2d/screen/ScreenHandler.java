@@ -28,7 +28,6 @@ import io.github.overrun.mc2d.Minecraft2D;
 import io.github.overrun.mc2d.image.Images;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.text.IText;
-import io.github.overrun.mc2d.util.Highlight;
 import io.github.overrun.mc2d.util.MathHelper;
 import io.github.overrun.mc2d.util.ResourceLocation;
 import io.github.overrun.mc2d.util.collection.DefaultedList;
@@ -38,6 +37,7 @@ import it.unimi.dsi.fastutil.objects.ObjectList;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 
 /**
  * @author squid233
@@ -66,7 +66,9 @@ public abstract class ScreenHandler implements Screen {
         for (ButtonWidget button : buttons) {
             IText text = button.getText();
             int width = button.getWidth();
-            Screen.drawImage(g, button.getTexture(), button.getX(), button.getY(), width, button.getHeight());
+            Screen.drawImage(g, button.getTexture(),
+                    button.getX(), button.getY(),
+                    width, button.getHeight());
             Screen.drawText(g, button.getX() + (width >> 1) - (text.getDisplayLength() >> 1), button.getY() + 20, text);
         }
     }
@@ -86,21 +88,18 @@ public abstract class ScreenHandler implements Screen {
         }
     }
 
+    public void onMouseWheelMoved(MouseWheelEvent e) {}
+
     public void onMouseMoved(Graphics g) {
         // For each all buttons to bottom from upper
         for (int i = buttons.size() - 1; i >= 0; i--) {
             ButtonWidget button = buttons.get(i);
             int x = Minecraft2D.getMouseX();
             int y = Minecraft2D.getMouseY();
-            if (
-                    x > button.getX() + 8
+            button.isHover = x > button.getX() + 8
                     && x < button.getX() + button.getWidth() + 8
                     && y > button.getY() + 30
-                    && y < button.getY() + 30 + button.getHeight()
-            ) {
-                Highlight.highlight(g, button.getX() + 8, button.getY() + 30, button.getWidth(), button.getHeight(), Color.WHITE);
-                break;
-            }
+                    && y < button.getY() + 30 + button.getHeight();
         }
     }
 

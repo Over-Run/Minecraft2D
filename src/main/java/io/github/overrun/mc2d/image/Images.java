@@ -34,9 +34,9 @@ import javax.swing.ImageIcon;
 import java.awt.Image;
 import java.awt.image.CropImageFilter;
 import java.awt.image.FilteredImageSource;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * @author squid233
@@ -45,6 +45,7 @@ import java.util.HashMap;
 public class Images {
     public static Image FONT_ASCII_IMG;
     public static final Image WIDGETS = ImageIcons.getGameImage("textures/gui/widgets.png");
+    public static final Image MISSINGO = ImageIcons.getGameImage("textures/gui/missingo.png");
     public static final ResourceLocation OPTIONS_BG_ID = new ResourceLocation("textures/gui/options_background.png");
     public static final Image OPTIONS_BG = ImageIcons.getGameImage("textures/gui/options_background.png");
 
@@ -55,9 +56,9 @@ public class Images {
 
     static {
         try {
-            FONT_ASCII_IMG = ImageIO.read(new File(new ResourceLocation("textures/font/ascii.png").toString()));
-        } catch (IOException e) {
-            FONT_ASCII_IMG = new ImageIcon(new ResourceLocation("textures/font/ascii.png").toString()).getImage();
+            FONT_ASCII_IMG = ImageIO.read(Objects.requireNonNull(ClassLoader.getSystemResourceAsStream(ResourceLocation.asString("textures/font/ascii.png"))));
+        } catch (IOException | NullPointerException e) {
+            FONT_ASCII_IMG = ImageIcons.getGameImage(ResourceLocation.asString("textures/font/ascii.png"));
         }
         putsAscii();
     }
@@ -66,10 +67,10 @@ public class Images {
         if (!BLOCK_IMG_MAP.containsKey(block.getRegistryName().toString())) {
             try {
                 BLOCK_IMG_MAP.put(block.getRegistryName().toString(),
-                        ImageIO.read(new File(new ResourceLocation("textures/" + block.getModel().getProperty("texture") + ".png").toString())));
-            } catch (IOException e) {
+                        ImageIO.read(ClassLoader.getSystemResource(ResourceLocation.asString("textures/" + block.getModel().getProperty("texture") + ".png"))));
+            } catch (IOException | NullPointerException e) {
                 e.printStackTrace();
-                BLOCK_IMG_MAP.put(block.getRegistryName().toString(), new ImageIcon(new ResourceLocation("textures/gui/missingo.png").toString()).getImage());
+                BLOCK_IMG_MAP.put(block.getRegistryName().toString(), MISSINGO);
             }
         }
         return BLOCK_IMG_MAP.get(block.getRegistryName().toString());
@@ -78,10 +79,11 @@ public class Images {
     public static Image getItemTexture(Item item) {
         if (!ITEM_IMG_MAP.containsKey(item.toString())) {
             try {
-                ITEM_IMG_MAP.put(item.toString(), ImageIO.read(new File(new ResourceLocation("textures/item/" + item.getRegistryName().getPath() + ".png").toString())));
-            } catch (IOException e) {
+                ITEM_IMG_MAP.put(item.toString(),
+                        ImageIO.read(ClassLoader.getSystemResource(ResourceLocation.asString("textures/item/" + item.getRegistryName().getPath() + ".png"))));
+            } catch (IOException | NullPointerException e) {
                 e.printStackTrace();
-                ITEM_IMG_MAP.put(item.toString(), new ImageIcon(new ResourceLocation("textures/gui/missingo.png").toString()).getImage());
+                ITEM_IMG_MAP.put(item.toString(), MISSINGO);
             }
         }
         return ITEM_IMG_MAP.get(item.getRegistryName().toString());

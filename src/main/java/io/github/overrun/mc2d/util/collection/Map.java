@@ -22,19 +22,49 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.image;
+package io.github.overrun.mc2d.util.collection;
 
-import io.github.overrun.mc2d.util.ResourceLocation;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
-import javax.swing.ImageIcon;
-import java.awt.Image;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author squid233
- * @since 2020/10/12
+ * @since 2020/10/15
  */
-public class ImageIcons {
-    public static Image getGameImage(String path) {
-        return new ImageIcon(ClassLoader.getSystemResource(new ResourceLocation(path).toString())).getImage();
+public class Map<K, V> {
+    private final List<K> keys;
+    private final List<V> values;
+
+    public static <K, V> Map<K, V> of() {
+        return new Map<>();
+    }
+
+    public static <K, V> Map<K, V> of(List<K> keys, List<V> values) {
+        return new Map<>(keys, values);
+    }
+
+    private Map() {
+        this(new ObjectArrayList<>(), new ObjectArrayList<>());
+    }
+
+    private Map(List<K> keys, List<V> values) {
+        this.keys = keys;
+        this.values = values;
+    }
+
+    public Map<K, V> put(K k, V v) {
+        keys.add(k);
+        values.add(v);
+        return this;
+    }
+
+    public java.util.Map<K, V> build() {
+        java.util.Map<K, V> m = new HashMap<>(16);
+        for (int i = 0; i < keys.size(); i++) {
+            m.put(keys.get(i), values.get(i));
+        }
+        return m;
     }
 }

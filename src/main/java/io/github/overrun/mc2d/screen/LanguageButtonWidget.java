@@ -35,6 +35,7 @@ import java.awt.Image;
  */
 public class LanguageButtonWidget extends ButtonWidget {
     public static final Image BUTTON = Images.getImagePart(Images.WIDGETS, 0, 106, 20, 20);
+    public static final Image BUTTON_HOVER = Images.getImagePart(Images.WIDGETS, 0, 126, 20, 20);
 
     public LanguageButtonWidget(int x, int y, PressAction action) {
         super(x, y, 40, LiteralText.EMPTY, action);
@@ -47,6 +48,6 @@ public class LanguageButtonWidget extends ButtonWidget {
 
     @Override
     public Image getTexture() {
-        return BUTTON;
+        return isHover ? BUTTON_HOVER : BUTTON;
     }
 }

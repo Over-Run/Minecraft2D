@@ -153,6 +153,7 @@ public class MultiAdapter implements KeyListener, MouseListener, MouseWheelListe
                 Player.reduceHandledBlock();
             }
         }*/
+        Screens.getOpening().onMouseWheelMoved(e);
     }
 
     @Override

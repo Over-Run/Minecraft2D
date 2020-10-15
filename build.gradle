@@ -1,6 +1,16 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
+    }
+}
+
 plugins {
     id 'java'
     id 'idea'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -11,6 +21,7 @@ archivesBaseName = "minecraft2d"
 version project.mcversion
 
 apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 repositories {
     mavenCentral()
@@ -35,20 +46,9 @@ jar {
     }
 }
 
-task addDependToManifest {
-    if (!configurations.runtime.isEmpty()) {
-        jar.manifest.attributes 'Class-Path': ". game_libs/${configurations.runtime.collect { it.name }.join(' game_libs/')}"
-    }
+shadowJar {
+    from 'LICENSE'
 }
-
-jar.dependsOn += addDependToManifest
-
-task copyDependencies(type: Copy) {
-    from configurations.runtime
-    destinationDir = file('build/libs/game_libs')
-}
-
-jar.dependsOn += copyDependencies
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     archiveClassifier.set 'sources'

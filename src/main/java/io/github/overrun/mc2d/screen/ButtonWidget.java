@@ -26,6 +26,7 @@ package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.Minecraft2D;
 import io.github.overrun.mc2d.image.Images;
+import io.github.overrun.mc2d.option.Options;
 import io.github.overrun.mc2d.text.IText;
 
 import java.awt.Image;
@@ -37,7 +38,7 @@ import java.util.Objects;
  */
 public class ButtonWidget {
     public static final Image BUTTON = Images.getImagePart(Images.WIDGETS, 0, 66, 200, 20);
-    public static final Image BUTTON_CHOOSE = Images.getImagePart(Images.WIDGETS, 0, 86, 200, 20);
+    public static final Image BUTTON_HOVER = Images.getImagePart(Images.WIDGETS, 0, 86, 200, 20);
 
     private final int x;
     private final int y;
@@ -45,6 +46,7 @@ public class ButtonWidget {
     private final IText text;
     private final PressAction action;
     private boolean isCenter;
+    public boolean isHover;
 
     public ButtonWidget(int x, int y, int width, IText text, PressAction action) {
         this.x = x;
@@ -61,7 +63,7 @@ public class ButtonWidget {
     }
 
     public int getX() {
-        return isCenter ? (Minecraft2D.getWidth() >> 1) - (width >> 1) - 8 : x;
+        return isCenter ? (Minecraft2D.getWidth() >> 1) - (width >> 1) - 8 : x + (Minecraft2D.getWidth() - Options.getI(Options.WIDTH, Minecraft2D.getWidth()) >> 1);
     }
 
     public int getY() {
@@ -69,7 +71,7 @@ public class ButtonWidget {
     }
 
     public int getWidth() {
-        return width;
+        return getText().getDisplayLength() > width ? getText().getDisplayLength() + width + 2 : width;
     }
 
     public int getHeight() {
@@ -85,7 +87,7 @@ public class ButtonWidget {
     }
 
     public Image getTexture() {
-        return BUTTON;
+        return isHover ? BUTTON_HOVER : BUTTON;
     }
 
     public boolean isCenter() {

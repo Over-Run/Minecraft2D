@@ -26,6 +26,9 @@ package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.Minecraft2D;
 import io.github.overrun.mc2d.image.Images;
+import io.github.overrun.mc2d.lang.Language;
+import io.github.overrun.mc2d.option.Options;
+import io.github.overrun.mc2d.text.LiteralText;
 import io.github.overrun.mc2d.text.TranslatableText;
 import io.github.overrun.mc2d.util.Constants;
 import io.github.overrun.mc2d.util.ResourceLocation;
@@ -37,15 +40,32 @@ import java.awt.Graphics;
  * @since 2020/10/13
  */
 public class LanguagesScreen extends ScreenHandler {
+    private int scroll = 0;
+    private final Language[] lang = {Language.EN_US, Language.ZH_CN};
+
     public LanguagesScreen() {
-        addButton(new ButtonWidget(Minecraft2D.getHeight() - 16, 200, TranslatableText.of(Constants.BUTTON_DONE), button -> Screens.setOpening(Screens.TITLE_SCREEN)));
+        addButton(new ButtonWidget(10, 200, TranslatableText.of(Constants.BUTTON_DONE), button -> Screens.setOpening(Screens.TITLE_SCREEN)));
+        for (int i = 0; i < lang.length; i++) {
+            LiteralText lt = LiteralText.of(lang[i].getName());
+            int finalI = i;
+            addButton(new ButtonWidget(75 + (i << 5), 600, lt, button -> {
+                String c = lang[finalI].getCode();
+                if (!c.equals(Language.getCurrentLang())) {
+                    Language.setCurrentLang(c);
+                    Language.reload();
+                    Options.set(Options.LANG, c);
+                }
+            }));
+        }
     }
 
     @Override
     public void render(Graphics g) {
         drawOptionsBg(g);
         drawDefaultBackground(g);
+        Screen.drawRect(g, 0, 80, Minecraft2D.getWidth(), Minecraft2D.getHeight(), DEFAULT_BACKGROUND);
         super.render(g);
+        Screen.drawText(g, 10, 45, TranslatableText.of("text.minecraft2d.choose_lang"));
     }
 
     @Override

@@ -35,26 +35,31 @@ import io.github.overrun.mc2d.util.registry.Registry;
  */
 public class Blocks {
     public static final Settings EMPTY_SETTINGS = new Settings();
-    public static final Block AIR;
-    public static final Block STONE;
-    public static final Block GRASS_BLOCK;
-    public static final Block DIRT;
-    public static final Block COBBLESTONE;
-    public static final Block OAK_PLANKS;
-    public static final Block OAK_SAPLING;
-    public static final Block BEDROCK;
-    public static final Block SAND;
+    public static Block AIR;
+    public static Block STONE;
+    public static Block GRASS_BLOCK;
+    public static Block DIRT;
+    public static Block COBBLESTONE;
+    public static Block OAK_PLANKS;
+    public static Block OAK_SAPLING;
+    public static Block BEDROCK;
+    public static Block SAND;
 
-    static {
-        AIR = register("air", new BlockAir(EMPTY_SETTINGS));
-        STONE = register("stone", new Block(EMPTY_SETTINGS));
-        GRASS_BLOCK = register("grass_block", new Block(EMPTY_SETTINGS));
-        DIRT = register("dirt", new Block(EMPTY_SETTINGS));
-        COBBLESTONE = register("cobblestone", new Block(EMPTY_SETTINGS));
-        BEDROCK = register("bedrock", new Block(EMPTY_SETTINGS));
-        SAND = register("sand", new Block(EMPTY_SETTINGS));
-        OAK_PLANKS = register("oak_planks", new Block(EMPTY_SETTINGS));
-        OAK_SAPLING = register("oak_sapling", new Block(EMPTY_SETTINGS));
+    private static boolean init;
+
+    public static void init() {
+        if (!init) {
+            init = true;
+            AIR = register("air", new BlockAir(EMPTY_SETTINGS));
+            STONE = register("stone", new Block(EMPTY_SETTINGS));
+            GRASS_BLOCK = register("grass_block", new Block(EMPTY_SETTINGS));
+            DIRT = register("dirt", new Block(EMPTY_SETTINGS));
+            COBBLESTONE = register("cobblestone", new Block(EMPTY_SETTINGS));
+            BEDROCK = register("bedrock", new Block(EMPTY_SETTINGS));
+            SAND = register("sand", new Block(EMPTY_SETTINGS));
+            OAK_PLANKS = register("oak_planks", new Block(EMPTY_SETTINGS));
+            OAK_SAPLING = register("oak_sapling", new Block(EMPTY_SETTINGS));
+        }
     }
 
     private static Block register(String name, Block block) {

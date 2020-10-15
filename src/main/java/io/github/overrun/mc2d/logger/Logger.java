@@ -39,13 +39,17 @@ public class Logger {
     public static final String L_ERROR = "ERROR";
     public static final String L_DEBUG = "DEBUG";
 
+    public Logger(String name) {
+        this.name = name;
+    }
+
     public Logger() {
         String[] s = StringUtils.split(new Throwable().getStackTrace()[1].getClassName(), '.');
         this.name = s[s.length - 1];
     }
 
     public Logger(Class<?> clazz) {
-        this.name = clazz.getSimpleName();
+        this(clazz.getSimpleName());
     }
 
     public void msg(String msg, String level) {
