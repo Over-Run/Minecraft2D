@@ -1,8 +1,8 @@
 # Minecraft 2D
 <img src="icon.png" alt="icon" style="zoom:500%;" />
 
-Welcome to Minecraft 2D. This is a sandplay. **(Not sandbox game!!!)**  
-欢迎来到Minecraft 2D的世界！这是一个**沙盘**游戏。**（不是沙盒游戏！！！）**
+Welcome to Minecraft 2D. This is a sandplay. (Or 2D Sandbox Game)  
+欢迎来到Minecraft 2D的世界！这是一个**沙盘**游戏。（或2D沙盒游戏）
 
 This game is publishing on [itch.io](https://squid233.itch.io/minecraft2d), too.
 
@@ -19,9 +19,7 @@ JRE 11
 ## 使用方法 Use Guide
 1. go [here](https://github.com/Over-Run/Minecraft2D/tree/archives) or [Releases](https://github.com/Over-Run/Minecraft2D/releases) to download。  
 首先，到[此处](https://github.com/Over-Run/Minecraft2D/tree/archives) 或 [Releases](https://github.com/Over-Run/Minecraft2D/releases) 下载。
-2. Unzip to any directories.  
-将其解压到任意文件夹下。
-3. Write a startup script and put in your directory.  
+2. Write a startup script and put in your directory.  
 编写一个启动脚本并放到文件夹下。
 
 ### The startup script
@@ -54,5 +52,5 @@ Join our Discord channel just time! [![discord](https://img.shields.io/discord/7
 
 看看[Fandom Wiki](https://minecraft2d.fandom.com/zh/wiki/)!
 
-View this game on our [official site](https://Over-Run.github.io/minecraft2d)!  
-在 [官方网站](https://Over-Run.github.io/minecraft2d) 上看我们的游戏!
+View this game on our [official site](https://squid233.github.io)!  
+在 [官方网站](https://squid233.github.io) 上看我们的游戏!
