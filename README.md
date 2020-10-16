@@ -13,8 +13,8 @@ JRE 11
 最低要求JRE11，低于此版本会导致不能正常启动
 
 ## 展示图 Exhibition
-200926-pa-build.0  
-![200926-build0-0](/img/200926-0-0.png)![200926-build0-1](/img/200926-0-1.png)![200926-build0-2](/img/200926-0-2.png)
+0.1.0.40-pre-alpha  
+![0-1-0-40-0](/img/0-1-0-40-0.png)![0-1-0-40-1](/img/0-1-0-40-1.png)
 
 ## 使用方法 Use Guide
 1. go [here](https://github.com/Over-Run/Minecraft2D/tree/archives) or [Releases](https://github.com/Over-Run/Minecraft2D/releases) to download。  
