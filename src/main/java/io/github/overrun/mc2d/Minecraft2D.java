@@ -32,7 +32,7 @@ import io.github.overrun.mc2d.logger.Logger;
  * @since 2020/09/14
  */
 public class Minecraft2D {
-    public static final String VERSION = "0.1.0.40-pre-alpha";
+    public static final String VERSION = "0.2.0-pre-alpha";
     public static final String NAMESPACE = "minecraft2d";
     public static final Logger LOGGER = new Logger(Minecraft2D.class);
 

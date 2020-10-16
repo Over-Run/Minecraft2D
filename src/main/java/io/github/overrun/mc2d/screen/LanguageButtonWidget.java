@@ -24,7 +24,7 @@
 
 package io.github.overrun.mc2d.screen;
 
-import io.github.overrun.mc2d.image.Images;
+import io.github.overrun.mc2d.image.ImageIcons;
 import io.github.overrun.mc2d.text.LiteralText;
 
 import java.awt.Image;
@@ -34,8 +34,8 @@ import java.awt.Image;
  * @since 2020/10/13
  */
 public class LanguageButtonWidget extends ButtonWidget {
-    public static final Image BUTTON = Images.getImagePart(Images.WIDGETS, 0, 106, 20, 20);
-    public static final Image BUTTON_HOVER = Images.getImagePart(Images.WIDGETS, 0, 126, 20, 20);
+    public static final Image BUTTON = ImageIcons.getGameImage("textures/gui/lang_button.png");
+    public static final Image BUTTON_HOVER = ImageIcons.getGameImage("textures/gui/lang_button_hover.png");
 
     public LanguageButtonWidget(int x, int y, PressAction action) {
         super(x, y, 40, LiteralText.EMPTY, action);

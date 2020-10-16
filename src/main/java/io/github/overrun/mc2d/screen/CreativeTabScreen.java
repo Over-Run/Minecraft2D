@@ -25,6 +25,7 @@
 package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.Minecraft2D;
+import io.github.overrun.mc2d.image.ImageIcons;
 import io.github.overrun.mc2d.image.Images;
 import io.github.overrun.mc2d.item.Item;
 import io.github.overrun.mc2d.item.ItemGroup;
@@ -35,7 +36,6 @@ import io.github.overrun.mc2d.text.LiteralText;
 import io.github.overrun.mc2d.util.Highlight;
 import io.github.overrun.mc2d.util.ResourceLocation;
 
-import javax.swing.ImageIcon;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -47,11 +47,10 @@ import java.awt.event.MouseEvent;
  */
 public class CreativeTabScreen extends ScreenHandler {
     public static final ResourceLocation TEXTURE = new ResourceLocation("textures/gui/creative_tab/tab_items.png");
-    private static final Image IMG = Images.getImagePart(new ImageIcon(TEXTURE.toString()).getImage(), 0, 0, 195, 136);
+    private static final Image IMG = ImageIcons.getImage(TEXTURE);
     public static final int HOTBAR = 9;
-    public static final Image TABS = new ImageIcon(new ResourceLocation("textures/gui/creative_tab/tabs.png").toString()).getImage();
-    public static final Image SCROLL_VALID = Images.getImagePart(TABS, 232, 0, 12, 15);
-    public static final Image SCROLL_INVALID = Images.getImagePart(TABS, 244, 0, 12, 15);
+    public static final Image SCROLL_VALID = ImageIcons.getGameImage("textures/gui/creative_tab/scroll_valid.png");
+    public static final Image SCROLL_INVALID = ImageIcons.getGameImage("textures/gui/creative_tab/scroll_invalid.png");
     public static final Color NAME_COLOR = new Color(65, 65, 65);
     private int x = (Minecraft2D.getWidth() >> 1) - 195,
             y = (Minecraft2D.getHeight() >> 1) - 136;
@@ -77,16 +76,16 @@ public class CreativeTabScreen extends ScreenHandler {
         drawDefaultBackground(g);
         x = (Minecraft2D.getWidth() >> 1) - 195;
         y = (Minecraft2D.getHeight() >> 1) - 136;
-        Screen.drawImage(g, IMG, x, y - 30, 390, 272);
-        Screen.drawText(g, x + 16, y - 5, LiteralText.of("Building Blocks"), NAME_COLOR);
-                Screen.drawImage(g, shouldShowScrollBar() ? SCROLL_VALID : SCROLL_INVALID, x + 350, y + 6, 24, 30);
+        ScreenUtil.drawImage(g, IMG, x, y - 30, 390, 272);
+        ScreenUtil.drawText(g, x + 16, y - 5, LiteralText.of("Building Blocks"), NAME_COLOR);
+                ScreenUtil.drawImage(g, shouldShowScrollBar() ? SCROLL_VALID : SCROLL_INVALID, x + 350, y + 6, 24, 30);
         for (int i = 0, size = ItemGroup.BUILDING_BLOCKS.size(); i < size; i++) {
             slots.get(i).setStack(ItemGroup.BUILDING_BLOCKS.get(i));
         }
         for (int i = 0, size = ItemGroup.BUILDING_BLOCKS.size(); i < size; i++) {
             Item item = slots.get(i).getStack().getItem();
             if (!item.equals(Items.AIR)) {
-                Screen.drawImage(g, Images.getItemTexture(item), x + 18 + (i % 9) * 36, y + 6 + (i / 9) * 36, 32, 32);
+                ScreenUtil.drawImage(g, Images.getItemTexture(item), x + 18 + (i % 9) * 36, y + 6 + (i / 9) * 36, 32, 32);
             }
         }
     }
@@ -128,7 +127,7 @@ public class CreativeTabScreen extends ScreenHandler {
             Highlight.slot(g, x + slot.getX(), y + slot.getY(), 32, 32);
         }
         if (handledStack != ItemStack.EMPTY) {
-            Screen.drawImage(g, Images.getItemTexture(handledStack.getItem()),
+            ScreenUtil.drawImage(g, Images.getItemTexture(handledStack.getItem()),
                     Minecraft2D.getMouseX() - 24,
                     Minecraft2D.getMouseY() - 46,
                     32, 32);

@@ -35,6 +35,10 @@ import java.awt.Image;
  */
 public class ImageIcons {
     public static Image getGameImage(String path) {
-        return new ImageIcon(ClassLoader.getSystemResource(new ResourceLocation(path).toString())).getImage();
+        return getImage(new ResourceLocation(path));
+    }
+
+    public static Image getImage(ResourceLocation resourceLocation) {
+        return new ImageIcon(ClassLoader.getSystemResource(resourceLocation.toString())).getImage();
     }
 }

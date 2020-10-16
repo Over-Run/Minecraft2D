@@ -25,43 +25,39 @@
 package io.github.overrun.mc2d.image;
 
 import io.github.overrun.mc2d.block.Block;
-import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.item.Item;
 import io.github.overrun.mc2d.util.ResourceLocation;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import java.awt.Image;
-import java.awt.image.CropImageFilter;
-import java.awt.image.FilteredImageSource;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Objects;
 
 /**
  * @author squid233
  * @since 2020/09/15
  */
 public class Images {
-    public static Image FONT_ASCII_IMG;
-    public static final Image WIDGETS = ImageIcons.getGameImage("textures/gui/widgets.png");
+    //public static Image FONT_ASCII_IMG;
+
     public static final Image MISSINGO = ImageIcons.getGameImage("textures/gui/missingo.png");
     public static final ResourceLocation OPTIONS_BG_ID = new ResourceLocation("textures/gui/options_background.png");
     public static final Image OPTIONS_BG = ImageIcons.getGameImage("textures/gui/options_background.png");
 
-    public static final HashMap<Character, Image> CHAR_IMAGE_MAP = new HashMap<>(95);
-    public static final HashMap<Character, Integer> CHAR_IMAGE_WIDTH = new HashMap<>(95);
+    //public static final HashMap<Character, Image> CHAR_IMAGE_MAP = new HashMap<>(95);
+    //public static final HashMap<Character, Integer> CHAR_IMAGE_WIDTH = new HashMap<>(95);
+
     public static final HashMap<String, Image> BLOCK_IMG_MAP = new HashMap<>(6);
     public static final HashMap<String, Image> ITEM_IMG_MAP = new HashMap<>(6);
 
-    static {
+    /*static {
         try {
             FONT_ASCII_IMG = ImageIO.read(Objects.requireNonNull(ClassLoader.getSystemResourceAsStream(ResourceLocation.asString("textures/font/ascii.png"))));
         } catch (IOException | NullPointerException e) {
             FONT_ASCII_IMG = ImageIcons.getGameImage(ResourceLocation.asString("textures/font/ascii.png"));
         }
         putsAscii();
-    }
+    }*/
 
     public static Image getBlockTexture(Block block) {
         if (!BLOCK_IMG_MAP.containsKey(block.getRegistryName().toString())) {
@@ -89,7 +85,7 @@ public class Images {
         return ITEM_IMG_MAP.get(item.getRegistryName().toString());
     }
 
-    public static Image getImagePart(Image img, int x, int y, int width, int height) {
+    /*public static Image getImagePart(Image img, int x, int y, int width, int height) {
         return Mc2dClient.getInstance().createImage(new FilteredImageSource(img.getSource(), new CropImageFilter(x, y, width, height)));
     }
 
@@ -192,5 +188,5 @@ public class Images {
         putAscii('|', 96, 56, 3);
         putAscii('}', 104, 56, 3);
         putAscii('~', 112, 56, 3);
-    }
+    }*/
 }

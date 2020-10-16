@@ -1,0 +1,6 @@
+{
+  parent: 'block/square_all',
+  textures: {
+    all: 'block/oak_planks'
+  }
+}

@@ -25,13 +25,11 @@
 package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.Minecraft2D;
-import io.github.overrun.mc2d.image.Images;
 import io.github.overrun.mc2d.lang.Language;
 import io.github.overrun.mc2d.option.Options;
 import io.github.overrun.mc2d.text.LiteralText;
 import io.github.overrun.mc2d.text.TranslatableText;
 import io.github.overrun.mc2d.util.Constants;
-import io.github.overrun.mc2d.util.ResourceLocation;
 
 import java.awt.Graphics;
 
@@ -39,8 +37,7 @@ import java.awt.Graphics;
  * @author squid233
  * @since 2020/10/13
  */
-public class LanguagesScreen extends ScreenHandler {
-    private int scroll = 0;
+public class LanguagesScreen extends Screen {
     private final Language[] lang = {Language.EN_US, Language.ZH_CN};
 
     public LanguagesScreen() {
@@ -63,13 +60,8 @@ public class LanguagesScreen extends ScreenHandler {
     public void render(Graphics g) {
         drawOptionsBg(g);
         drawDefaultBackground(g);
-        Screen.drawRect(g, 0, 80, Minecraft2D.getWidth(), Minecraft2D.getHeight(), DEFAULT_BACKGROUND);
+        ScreenUtil.drawRect(g, 0, 80, Minecraft2D.getWidth(), Minecraft2D.getHeight(), DEFAULT_BACKGROUND);
         super.render(g);
-        Screen.drawText(g, 10, 45, TranslatableText.of("text.minecraft2d.choose_lang"));
-    }
-
-    @Override
-    public ResourceLocation getTexture() {
-        return Images.OPTIONS_BG_ID;
+        ScreenUtil.drawText(g, 10, 45, TranslatableText.of("text.minecraft2d.choose_lang"));
     }
 }

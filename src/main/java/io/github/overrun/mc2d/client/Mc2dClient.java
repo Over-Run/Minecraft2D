@@ -27,7 +27,7 @@ package io.github.overrun.mc2d.client;
 import io.github.overrun.mc2d.Minecraft2D;
 import io.github.overrun.mc2d.input.MultiAdapter;
 import io.github.overrun.mc2d.option.Options;
-import io.github.overrun.mc2d.screen.Screen;
+import io.github.overrun.mc2d.screen.ScreenUtil;
 import io.github.overrun.mc2d.screen.Screens;
 
 import javax.swing.ImageIcon;
@@ -42,7 +42,7 @@ import java.awt.Point;
  * @author squid233
  * @since 2020/09/14
  */
-public class Mc2dClient extends JFrame implements Screen {
+public class Mc2dClient extends JFrame {
     private static Mc2dClient instance;
     public static final Point NULL_POINT = new Point();
 
@@ -79,9 +79,9 @@ public class Mc2dClient extends JFrame implements Screen {
         /////
         Worlds.overworld.getFrontStorageBlock().draw(gg);
         /////
-        Screen.drawImage(gg, Images.getBlockTexture(Registry.BLOCK.get(Player.handledBlock)), getWidth() - 49, 1, 32, 32);
+        ScreenUtil.drawImage(gg, Images.getBlockTexture(Registry.BLOCK.get(Player.handledBlock)), getWidth() - 49, 1, 32, 32);
         LiteralText handledBlockId = LiteralText.of(Registry.BLOCK.get(Player.handledBlock).getRegistryName().toString());
-        Screen.drawText(gg, 0, 15, handledBlockId, Color.WHITE);
+        ScreenUtil.drawText(gg, 0, 15, handledBlockId, Color.WHITE);
         /////*/
         Screens.getOpening().render(gg);
         Screens.getOpening().onMouseMoved(gg);
@@ -90,7 +90,7 @@ public class Mc2dClient extends JFrame implements Screen {
     }
 
     private void drawBackground(Graphics g, Color color) {
-        Screen.drawRect(g, 0, 0, getWidth(), getHeight(), color);
+        ScreenUtil.drawRect(g, 0, 0, getWidth(), getHeight(), color);
     }
 
     @Override

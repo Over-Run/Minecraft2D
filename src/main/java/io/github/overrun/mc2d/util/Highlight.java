@@ -25,7 +25,7 @@
 package io.github.overrun.mc2d.util;
 
 import io.github.overrun.mc2d.Minecraft2D;
-import io.github.overrun.mc2d.screen.Screen;
+import io.github.overrun.mc2d.screen.ScreenUtil;
 import io.github.overrun.mc2d.screen.ScreenHandler;
 
 import java.awt.Color;
@@ -43,7 +43,7 @@ public class Highlight {
                         && Minecraft2D.getMouseY() >= prevY
                         && Minecraft2D.getMouseY() <= prevY + (height - 1)
         ) {
-            Screen.operationWithColor(g, color, (gg) -> gg.drawRect(prevX, prevY, width, height));
+            ScreenUtil.operationWithColor(g, color, (gg) -> gg.drawRect(prevX, prevY, width, height));
         }
     }
 
@@ -62,7 +62,7 @@ public class Highlight {
                 && Minecraft2D.getMouseY() >= prevY
                 && Minecraft2D.getMouseY() <= prevY + (height - 1)
         ) {
-            Screen.operationWithColor(g, ScreenHandler.SLOT_HIGHLIGHT, (gg) -> gg.fillRect(prevX, prevY, width, height));
+            ScreenUtil.operationWithColor(g, ScreenHandler.SLOT_HIGHLIGHT, (gg) -> gg.fillRect(prevX, prevY, width, height));
         }
     }
 }

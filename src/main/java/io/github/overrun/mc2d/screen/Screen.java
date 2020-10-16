@@ -25,102 +25,86 @@
 package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.Minecraft2D;
+import io.github.overrun.mc2d.image.Images;
 import io.github.overrun.mc2d.text.IText;
+import io.github.overrun.mc2d.util.MathHelper;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.GraphicsEnvironment;
-import java.awt.Image;
-import java.util.function.Consumer;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 
 /**
  * @author squid233
- * @since 2020/09/15
+ * @since 2020/10/16
  */
-public interface Screen {
-    /**
-     * draw image to screen
-     *
-     * @param g graphics
-     * @param img image
-     * @param x pos x
-     * @param y pos y
-     */
-    static void drawImage(Graphics g, Image img, int x, int y) {
-        g.drawImage(img, x + 8, y + 30, null);
+public abstract class Screen {
+    public static final Color DEFAULT_BACKGROUND = new Color(64, 64, 64, 128);
+    protected final ObjectList<ScreenComp> child = new ObjectArrayList<>();
+    protected final ObjectList<ButtonWidget> buttons = new ObjectArrayList<>();
+
+    protected static void drawOptionsBg(Graphics g) {
+        for (int i = 0, height = MathHelper.ceilDivision(Minecraft2D.getHeight(), 16); i < height; i++) {
+            for (int j = 0, width = MathHelper.ceilDivision(Minecraft2D.getWidth(), 16); j < width; j++) {
+                ScreenUtil.drawImage(g, Images.OPTIONS_BG, j << 4, i << 4, 16);
+            }
+        }
     }
 
-    /**
-     * draw image to screen
-     *
-     * @param g graphics
-     * @param img image
-     * @param x pos x
-     * @param y pos y
-     * @param width img width
-     * @param height img height
-     */
-    static void drawImage(Graphics g, Image img, int x, int y, int width, int height) {
-        g.drawImage(img, x + 8, y + 30, width, height, null);
+    protected static void drawDefaultBackground(Graphics g) {
+        ScreenUtil.drawBg(g, DEFAULT_BACKGROUND);
     }
 
-    static void drawImage(Graphics g, Image img, int x, int y, int size) {
-        drawImage(g, img, x, y, size, size);
+    public void render(Graphics g) {
+        for (ButtonWidget button : buttons) {
+            IText text = button.getText();
+            int width = button.getWidth();
+            ScreenUtil.drawImage(g, button.getTexture(),
+                    button.getX(), button.getY(),
+                    width, button.getHeight());
+            ScreenUtil.drawText(g, button.getX() + (width >> 1) - (text.getDisplayLength() >> 1), button.getY() + 20, text);
+        }
     }
 
-    /**
-     * draw rect to screen
-     *
-     * @param g graphics
-     * @param x pos x
-     * @param y pos y
-     * @param width rect width
-     * @param height rect height
-     * @param color color
-     */
-    static void drawRect(Graphics g, int x, int y, int width, int height, Color color) {
-        operationWithColor(g, color, (gg) -> gg.fillRect(x, y, width, height));
-    }
-
-    static void drawBg(Graphics g, Color color) {
-        drawRect(g, 0, 0, Minecraft2D.getWidth(), Minecraft2D.getHeight(), color);
-    }
-
-    static void drawText(Graphics g, int x, int y, IText text, Color color, int size) {
-        Font font = g.getFont();
-        for (String nm : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
-            boolean available = nm != null && (nm.contains("minecraft") || nm.contains("宋体") || nm.contains("serif"));
-            if (available) {
-                g.setFont(new Font(nm, Font.PLAIN, size));
+    public void onMousePressed(MouseEvent e) {
+        for (int i = buttons.size() - 1; i >= 0; i--) {
+            ButtonWidget button = buttons.get(i);
+            if (
+                    e.getX() > button.getX() + 8
+                            && e.getX() < button.getX() + button.getWidth() + 8
+                            && e.getY() > button.getY() + 30
+                            && e.getY() < button.getY() + 30 + button.getHeight()
+            ) {
+                button.getAction().onPress(button);
                 break;
             }
         }
-        operationWithColor(g, color, (gg) -> gg.drawString(text.asFormattedString(), x + 8, y + 30));
-        g.setFont(font);
     }
 
-    /**
-     * Draw text to screen.
-     *
-     * @param g graphics
-     * @param color text color
-     * @param x pos x
-     * @param y pos y
-     * @param text The text. It can {@link io.github.overrun.mc2d.text.LiteralText LiteralText} now.
-     */
-    static void drawText(Graphics g, int x, int y, IText text, Color color) {
-        drawText(g, x, y, text, color, 16);
+    public void onMouseWheelMoved(MouseWheelEvent e) {}
+
+    public void onMouseMoved(Graphics g) {
+        // For each all buttons to bottom from upper
+        for (int i = buttons.size() - 1; i >= 0; i--) {
+            ButtonWidget button = buttons.get(i);
+            int x = Minecraft2D.getMouseX();
+            int y = Minecraft2D.getMouseY();
+            button.isHover = x > button.getX() + 8
+                    && x < button.getX() + button.getWidth() + 8
+                    && y > button.getY() + 30
+                    && y < button.getY() + 30 + button.getHeight();
+        }
     }
 
-    static void drawText(Graphics g, int x, int y, IText text) {
-        drawText(g, x, y, text, Color.WHITE);
+    protected ButtonWidget addButton(ButtonWidget button) {
+        buttons.add(button);
+        return (ButtonWidget) addChild(button);
     }
 
-    static void operationWithColor(Graphics g, Color c, Consumer<Graphics> consumer) {
-        Color cc = g.getColor();
-        g.setColor(c);
-        consumer.accept(g);
-        g.setColor(cc);
+    protected ScreenComp addChild(ScreenComp comp) {
+        child.add(comp);
+        return comp;
     }
 }

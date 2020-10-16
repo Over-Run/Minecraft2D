@@ -25,7 +25,7 @@
 package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.Minecraft2D;
-import io.github.overrun.mc2d.image.Images;
+import io.github.overrun.mc2d.image.ImageIcons;
 import io.github.overrun.mc2d.option.Options;
 import io.github.overrun.mc2d.text.IText;
 
@@ -36,9 +36,9 @@ import java.util.Objects;
  * @author squid233
  * @since 2020/10/12
  */
-public class ButtonWidget {
-    public static final Image BUTTON = Images.getImagePart(Images.WIDGETS, 0, 66, 200, 20);
-    public static final Image BUTTON_HOVER = Images.getImagePart(Images.WIDGETS, 0, 86, 200, 20);
+public class ButtonWidget extends ScreenComp {
+    public static final Image BUTTON = ImageIcons.getGameImage("textures/gui/button.png");
+    public static final Image BUTTON_HOVER = ImageIcons.getGameImage("textures/gui/button_hover.png");
 
     private final int x;
     private final int y;
@@ -62,18 +62,22 @@ public class ButtonWidget {
         this.isCenter = true;
     }
 
+    @Override
     public int getX() {
         return isCenter ? (Minecraft2D.getWidth() >> 1) - (width >> 1) - 8 : x + (Minecraft2D.getWidth() - Options.getI(Options.WIDTH, Minecraft2D.getWidth()) >> 1);
     }
 
+    @Override
     public int getY() {
         return y;
     }
 
+    @Override
     public int getWidth() {
         return getText().getDisplayLength() > width ? getText().getDisplayLength() + width + 2 : width;
     }
 
+    @Override
     public int getHeight() {
         return 30;
     }

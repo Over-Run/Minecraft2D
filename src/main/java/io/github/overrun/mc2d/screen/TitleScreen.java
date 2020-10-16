@@ -26,9 +26,7 @@ package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.Minecraft2D;
 import io.github.overrun.mc2d.image.ImageIcons;
-import io.github.overrun.mc2d.image.Images;
 import io.github.overrun.mc2d.text.TranslatableText;
-import io.github.overrun.mc2d.util.ResourceLocation;
 
 import java.awt.Graphics;
 import java.awt.Image;
@@ -39,7 +37,7 @@ import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
  * @author squid233
  * @since 2020/10/12
  */
-public class TitleScreen extends ScreenHandler {
+public class TitleScreen extends Screen {
     public static final Image LOGO = ImageIcons.getGameImage("textures/gui/logo.png");
     public static final int LOGO_WIDTH = 356;
     public static final int LOGO_HEIGHT = 59;
@@ -58,12 +56,7 @@ public class TitleScreen extends ScreenHandler {
     public void render(Graphics g) {
         drawOptionsBg(g);
         drawDefaultBackground(g);
-        Screen.drawImage(g, LOGO, (Minecraft2D.getWidth() >> 1) - LOGO_WIDTH - 8, 10, LOGO_WIDTH << 1, LOGO_HEIGHT << 1);
+        ScreenUtil.drawImage(g, LOGO, (Minecraft2D.getWidth() >> 1) - LOGO_WIDTH - 8, 10, LOGO_WIDTH << 1, LOGO_HEIGHT << 1);
         super.render(g);
-    }
-
-    @Override
-    public ResourceLocation getTexture() {
-        return Images.OPTIONS_BG_ID;
     }
 }

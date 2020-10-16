@@ -24,48 +24,36 @@
 
 package io.github.overrun.mc2d.screen;
 
-import io.github.overrun.mc2d.util.ResourceLocation;
-
 /**
  * @author squid233
  * @since 2020/10/01
  */
 public class Screens {
-    public static final ScreenHandler EMPTY = new ScreenHandler() {
-        @Override
-        public boolean canUse() {
-            return false;
-        }
-
-        @Override
-        public ResourceLocation getTexture() {
-            return null;
-        }
-    };
+    public static final Screen EMPTY = new Screen() {};
     public static final TitleScreen TITLE_SCREEN = new TitleScreen();
     public static final CreativeTabScreen CREATIVE_TAB = new CreativeTabScreen();
     public static final LanguagesScreen LANGUAGES_SCREEN = new LanguagesScreen();
 
-    private static ScreenHandler openingScreenHandler = TITLE_SCREEN;
+    private static Screen openingScreen = TITLE_SCREEN;
 
-    public static void setOpening(ScreenHandler screenHandler) {
-        if (openingScreenHandler != screenHandler) {
-            openingScreenHandler = screenHandler;
+    public static void setOpening(Screen screen) {
+        if (openingScreen != screen) {
+            openingScreen = screen;
         }
     }
 
     public static void closeAll() {
-        openingScreenHandler = EMPTY;
+        openingScreen = EMPTY;
     }
 
-    public static ScreenHandler getOpening() {
-        if (openingScreenHandler == null) {
-            openingScreenHandler = EMPTY;
+    public static Screen getOpening() {
+        if (openingScreen == null) {
+            openingScreen = EMPTY;
         }
-        return openingScreenHandler;
+        return openingScreen;
     }
 
-    public static boolean isOpening(ScreenHandler screenHandler) {
-        return getOpening() == screenHandler;
+    public static boolean isOpening(Screen screen) {
+        return getOpening() == screen;
     }
 }
