@@ -33,6 +33,7 @@ import io.github.overrun.mc2d.item.ItemStack;
 import io.github.overrun.mc2d.item.Items;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.text.LiteralText;
+import io.github.overrun.mc2d.text.Style;
 import io.github.overrun.mc2d.util.Highlight;
 import io.github.overrun.mc2d.util.ResourceLocation;
 
@@ -77,7 +78,7 @@ public class CreativeTabScreen extends ScreenHandler {
         x = (Minecraft2D.getWidth() >> 1) - 195;
         y = (Minecraft2D.getHeight() >> 1) - 136;
         ScreenUtil.drawImage(g, IMG, x, y - 30, 390, 272);
-        ScreenUtil.drawText(g, x + 16, y - 5, LiteralText.of("Building Blocks"), NAME_COLOR);
+        ScreenUtil.drawText(g, x + 16, y - 5, LiteralText.of("Building Blocks", Style.builder().color(NAME_COLOR).build()));
                 ScreenUtil.drawImage(g, shouldShowScrollBar() ? SCROLL_VALID : SCROLL_INVALID, x + 350, y + 6, 24, 30);
         for (int i = 0, size = ItemGroup.BUILDING_BLOCKS.size(); i < size; i++) {
             slots.get(i).setStack(ItemGroup.BUILDING_BLOCKS.get(i));
@@ -91,7 +92,7 @@ public class CreativeTabScreen extends ScreenHandler {
     }
 
     @Override
-    public void onMousePressed(MouseEvent e) {
+    public void onMouseReleased(MouseEvent e) {
         if (e.getX() > x && e.getX() < x + 388) {
             if (e.getY() > y && e.getY() < y + 270) {
                 for (int i = 0, size = slots.size() - HOTBAR; i < size; i++) {

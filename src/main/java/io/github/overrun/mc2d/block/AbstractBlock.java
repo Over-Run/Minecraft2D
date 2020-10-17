@@ -24,7 +24,6 @@
 
 package io.github.overrun.mc2d.block;
 
-import io.github.overrun.mc2d.Minecraft2D;
 import io.github.overrun.mc2d.item.ItemConvertible;
 
 import java.awt.Graphics;
@@ -36,69 +35,9 @@ import java.util.Properties;
  * @since 2020/09/14
  */
 public abstract class AbstractBlock implements Serializable, ItemConvertible {
-    private static final long serialVersionUID = 7516708491939894861L;
-    public int x;
-    public int y;
+    private static final long serialVersionUID = -8225750952899376621L;
 
     public void draw(Graphics g, int x) { }
-
-    /**
-     * draw block screen
-     *
-     * @param g graphics
-     */
-    public abstract void draw(Graphics g);
-
-    public int getX() {
-        return x;
-    }
-
-    public AbstractBlock setX(int x) {
-        this.x = x;
-        return this;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public AbstractBlock setY(int y) {
-        this.y = y;
-        return this;
-    }
-
-    public AbstractBlock setPos(BlockPos pos) {
-        return setPos(pos.toString());
-    }
-
-    /**
-     * set pos
-     *
-     * @param pos pos
-     * @return this
-     */
-    public abstract AbstractBlock setPos(String pos);
-
-    public AbstractBlock setPos(int x, int y) {
-        setPos(BlockPos.of(x, y));
-        return this;
-    }
-
-    public BlockPos getPos() {
-        return BlockPos.of(x, y);
-    }
-
-    public int getPreviewX(int x) {
-        return (x << 4) + 8;
-    }
-
-    public int getPreviewX() {
-        return getPreviewX(x);
-    }
-
-    public int getPreviewY() {
-        return Minecraft2D.getHeight() - ((y << 4) + 24);
-    }
 
     /**
      * get block model

@@ -22,21 +22,23 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.block;
+package io.github.overrun.mc2d.client.model;
 
-import java.awt.Graphics;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.awt.Image;
 
 /**
  * @author squid233
- * @since 2020/09/15
+ * @since 2020/10/17
  */
-public class BlockAir extends Block {
-    private static final long serialVersionUID = 5165604420001555203L;
-
-    public BlockAir(Settings settings) {
-        super(settings);
+public class Models {
+    public static Image readBlockModel() {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(BlockModel.class, new BlockModelCodec())
+                .disableHtmlEscaping()
+                .create();
+        return null;
     }
-
-    @Override
-    public void draw(Graphics g, int x) { }
 }

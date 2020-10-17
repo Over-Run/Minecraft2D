@@ -26,6 +26,7 @@ package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.Minecraft2D;
 import io.github.overrun.mc2d.text.IText;
+import io.github.overrun.mc2d.text.Style;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -87,16 +88,31 @@ public class ScreenUtil {
         drawRect(g, 0, 0, Minecraft2D.getWidth(), Minecraft2D.getHeight(), color);
     }
 
-    public static void drawText(Graphics g, int x, int y, IText text, Color color, int size) {
+    public static void drawText(Graphics g, int x, int y, IText text, int size) {
         Font font = g.getFont();
         for (String nm : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
             boolean available = nm != null && (nm.contains("minecraft") || nm.contains("宋体") || nm.contains("serif"));
             if (available) {
-                g.setFont(new Font(nm, Font.PLAIN, size));
+                Style style = text.getStyle();
+                if (style.isBold()) {
+                    if (style.isItalic()) {
+                        g.setFont(new Font(nm, Font.BOLD | Font.ITALIC, size));
+                    } else {
+                        g.setFont(new Font(nm, Font.BOLD, size));
+                    }
+                } else if (style.isItalic()) {
+                    if (style.isBold()) {
+                        g.setFont(new Font(nm, Font.ITALIC | Font.BOLD, size));
+                    } else {
+                        g.setFont(new Font(nm, Font.ITALIC, size));
+                    }
+                } else {
+                    g.setFont(new Font(nm, Font.PLAIN, size));
+                }
                 break;
             }
         }
-        operationWithColor(g, color, (gg) -> gg.drawString(text.asFormattedString(), x + 8, y + 30));
+        operationWithColor(g, text.getStyle().getColor(), (gg) -> gg.drawString(text.asFormattedString(), x + 8, y + 30));
         g.setFont(font);
     }
 
@@ -104,17 +120,16 @@ public class ScreenUtil {
      * Draw text to screen.
      *
      * @param g graphics
-     * @param color text color
      * @param x pos x
      * @param y pos y
      * @param text The text. It can {@link io.github.overrun.mc2d.text.LiteralText LiteralText} now.
      */
-    public static void drawText(Graphics g, int x, int y, IText text, Color color) {
-        drawText(g, x, y, text, color, 16);
+    public static void drawText(Graphics g, int x, int y, IText text) {
+        drawText(g, x, y, text, 16);
     }
 
-    public static void drawText(Graphics g, int x, int y, IText text) {
-        drawText(g, x, y, text, Color.WHITE);
+    public static void drawText(Graphics g, int y, IText text) {
+        drawText(g, (Minecraft2D.getWidth() >> 1) - (text.getDisplayLength() >> 1) - 8, y, text);
     }
 
     public static void operationWithColor(Graphics g, Color c, Consumer<Graphics> consumer) {

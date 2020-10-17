@@ -22,58 +22,27 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.text;
+package io.github.overrun.mc2d.client.model;
 
-import java.util.Objects;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonSerializationContext;
+import io.github.squid233.serialization.JsonCodec;
+
+import java.lang.reflect.Type;
 
 /**
  * @author squid233
- * @since 2020/09/18
+ * @since 2020/10/17
  */
-public class LiteralText implements IText {
-    public static final LiteralText EMPTY = LiteralText.of("");
-    private final String text;
-    private final Style style;
-    private final Object[] args;
-
-    /**
-     * Construct a text.<br>
-     * Use {@link LiteralText#of(String, Object...)}.
-     *
-     * @param text The text.
-     * @param args Args for format.
-     */
-    private LiteralText(String text, Style style, Object... args) {
-        this.text = text;
-        this.style = style;
-        this.args = Objects.requireNonNullElse(args, new Object[0]);
-    }
-
-    public static LiteralText of(String text, Style style, Object... args) {
-        return new LiteralText(text, style, args);
-    }
-
-    public static LiteralText of(String text, Object... args) {
-        return of(text, Style.EMPTY, args);
+public class BlockModelCodec extends JsonCodec<BlockModel> {
+    @Override
+    public JsonElement encode(BlockModel src, Type typeOfSrc, JsonSerializationContext context) {
+        return null;
     }
 
     @Override
-    public String toString() {
-        return asString();
-    }
-
-    @Override
-    public String asString() {
-        return text;
-    }
-
-    @Override
-    public String asFormattedString() {
-        return String.format(text, args);
-    }
-
-    @Override
-    public Style getStyle() {
-        return style;
+    public BlockModel decode(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
+        return null;
     }
 }

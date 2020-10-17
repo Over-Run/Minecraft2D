@@ -24,15 +24,15 @@
 
 package io.github.overrun.mc2d.world.chunk;
 
-import io.github.overrun.mc2d.block.AbstractBlock;
 import io.github.overrun.mc2d.block.Block;
 import io.github.overrun.mc2d.block.BlockPos;
 import io.github.overrun.mc2d.block.Blocks;
 import io.github.overrun.mc2d.util.registry.Registry;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.awt.Graphics;
 import java.io.Serializable;
-import java.util.HashMap;
 
 /**
  * @author squid233
@@ -41,8 +41,8 @@ import java.util.HashMap;
 public class Chunk implements Serializable {
     public static final transient int WORLD_HEIGHT = 64;
     public static final transient int CHUNK_SIZE = 16;
-    private static final long serialVersionUID = 7972509854794260022L;
-    private HashMap<String, Block> blocks = new HashMap<>();
+    private static final long serialVersionUID = -1705473506565599035L;
+    private Object2ObjectMap<BlockPos, Block> blocks = new Object2ObjectOpenHashMap<>();
 
     public Chunk() {
         for (int i = 0; i < WORLD_HEIGHT; i++) {
@@ -53,7 +53,7 @@ public class Chunk implements Serializable {
     }
 
     public void draw(Graphics g, int x) {
-        for (String pos :  blocks.keySet()) {
+        for (BlockPos pos : blocks.keySet()) {
             blocks.get(pos).setPos(pos).draw(g, blocks.get(pos).x + (x << 4));
         }
     }
@@ -62,10 +62,6 @@ public class Chunk implements Serializable {
         if (block == null) {
             block = Blocks.AIR;
         }
-        blocks.put(pos.toString(), Registry.BLOCK.get(block.getRegistryName()).setPos(pos));
-    }
-
-    public void setBlock(String pos, Block block) {
         blocks.put(pos, Registry.BLOCK.get(block.getRegistryName()).setPos(pos));
     }
 
@@ -75,14 +71,14 @@ public class Chunk implements Serializable {
 
     public Block getBlock(BlockPos pos) {
         try {
-            return blocks.get(pos.toString());
+            return blocks.get(pos);
         } catch (Exception e) {
-            blocks.put(pos.toString(), Blocks.AIR);
+            blocks.put(pos, Blocks.AIR);
             return Blocks.AIR;
         }
     }
 
-    public Chunk setBlocks(HashMap<String, Block> blocks) {
+    public Chunk setBlocks(Object2ObjectMap<BlockPos, Block> blocks) {
         this.blocks = blocks;
         return this;
     }
@@ -91,7 +87,7 @@ public class Chunk implements Serializable {
         return getBlock(BlockPos.of(x, y));
     }
 
-    public HashMap<String, Block> getBlocks() {
+    public Object2ObjectMap<BlockPos, Block> getBlocks() {
         return blocks;
     }
 

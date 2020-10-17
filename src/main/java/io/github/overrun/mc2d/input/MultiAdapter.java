@@ -113,6 +113,7 @@ public class MultiAdapter implements KeyListener, MouseListener, MouseWheelListe
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        Screens.getOpening().onMouseReleased(e);
         /*if (!Screens.isOpeningAnyScreen) {
             int clickedX = ((e.getX() + 8) >> 4) - 1;
             BlockPos clickedBlockPos = BlockPos.of(clickedX % 16, (Mc2dClient.getInstance().getHeight() - 8 - e.getY() - 1) >> 4);
@@ -139,9 +140,7 @@ public class MultiAdapter implements KeyListener, MouseListener, MouseWheelListe
     public void mouseClicked(MouseEvent e) {}
 
     @Override
-    public void mousePressed(MouseEvent e) {
-        Screens.getOpening().onMousePressed(e);
-    }
+    public void mousePressed(MouseEvent e) {}
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {

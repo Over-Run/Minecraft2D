@@ -43,7 +43,9 @@ import java.util.Properties;
  * @since 2020/09/14
  */
 public class Block extends AbstractBlock {
-    private static final long serialVersionUID = 6678903782835480065L;
+    private static final long serialVersionUID = 3855328384963931960L;
+    public int x;
+    public int y;
     private final Properties model = new Properties();
     private boolean loadedModel;
     private Item cache;
@@ -67,37 +69,49 @@ public class Block extends AbstractBlock {
         return Registry.BLOCK.getId(this);
     }
 
-    @Override
-    public void draw(Graphics g) {
-        draw(g, x);
+    public int getX() {
+        return x;
     }
 
-    @Override
-    public Block setPos(String pos) {
-        BlockPos p = BlockPos.of(pos);
-        this.x = p.getX();
-        this.y = p.getY();
+    public Block setX(int x) {
+        this.x = x;
         return this;
     }
 
-    @Override
-    public Block setX(int x) {
-        return (Block) super.setX(x);
+    public int getY() {
+        return y;
     }
 
-    @Override
     public Block setY(int y) {
-        return (Block) super.setY(y);
+        this.y = y;
+        return this;
     }
 
-    @Override
     public Block setPos(BlockPos pos) {
-        return (Block) super.setPos(pos);
+        x = pos.getX();
+        y = pos.getY();
+        return this;
     }
 
-    @Override
     public Block setPos(int x, int y) {
-        return (Block) super.setPos(x, y);
+        setPos(BlockPos.of(x, y));
+        return this;
+    }
+
+    public BlockPos getPos() {
+        return BlockPos.of(x, y);
+    }
+
+    public int getPreviewX(int x) {
+        return (x << 4) + 8;
+    }
+
+    public int getPreviewX() {
+        return getPreviewX(x);
+    }
+
+    public int getPreviewY() {
+        return Minecraft2D.getHeight() - ((y << 4) + 24);
     }
 
     @Override

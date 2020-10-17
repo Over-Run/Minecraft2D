@@ -22,21 +22,27 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.block;
+package io.github.overrun.mc2d.client.model;
 
-import java.awt.Graphics;
+import io.github.overrun.mc2d.block.Block;
+import io.github.overrun.mc2d.client.block.BlockModelVariants;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author squid233
- * @since 2020/09/15
+ * @since 2020/10/17
  */
-public class BlockAir extends Block {
-    private static final long serialVersionUID = 5165604420001555203L;
+public class BlockModel implements Serializable {
+    private static final long serialVersionUID = -341978147373891160L;
+    private transient Block block;
+    @Nullable
+    private String parent;
+    private List<BlockModelVariants> variants;
+    private String[] from;
 
-    public BlockAir(Settings settings) {
-        super(settings);
+    public BlockModel() {
     }
-
-    @Override
-    public void draw(Graphics g, int x) { }
 }

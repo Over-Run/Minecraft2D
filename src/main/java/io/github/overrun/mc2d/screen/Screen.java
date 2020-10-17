@@ -58,27 +58,39 @@ public abstract class Screen {
     }
 
     public void render(Graphics g) {
-        for (ButtonWidget button : buttons) {
-            IText text = button.getText();
-            int width = button.getWidth();
-            ScreenUtil.drawImage(g, button.getTexture(),
-                    button.getX(), button.getY(),
-                    width, button.getHeight());
-            ScreenUtil.drawText(g, button.getX() + (width >> 1) - (text.getDisplayLength() >> 1), button.getY() + 20, text);
+        for (ScreenComp comp : child) {
+            if (comp instanceof ButtonWidget) {
+                ButtonWidget button = (ButtonWidget) comp;
+                IText text = button.getText();
+                int width = button.getWidth();
+                ScreenUtil.drawImage(g, button.getTexture(),
+                        button.getX(), button.getY(),
+                        width, button.getHeight());
+                ScreenUtil.drawText(g, button.getX() + (width >> 1) - (text.getDisplayLength() >> 1), button.getY() + 20, text);
+            } else if (comp instanceof ComboBox) {
+                ((ComboBox) comp).render(g);
+            }
         }
     }
 
-    public void onMousePressed(MouseEvent e) {
-        for (int i = buttons.size() - 1; i >= 0; i--) {
-            ButtonWidget button = buttons.get(i);
-            if (
-                    e.getX() > button.getX() + 8
-                            && e.getX() < button.getX() + button.getWidth() + 8
-                            && e.getY() > button.getY() + 30
-                            && e.getY() < button.getY() + 30 + button.getHeight()
-            ) {
-                button.getAction().onPress(button);
-                break;
+    public void onMouseReleased(MouseEvent e) {
+        for (int i = child.size() - 1; i >= 0; i--) {
+            ScreenComp comp = child.get(i);
+            if (comp instanceof ButtonWidget) {
+                ButtonWidget button = (ButtonWidget) comp;
+                if (
+                        e.getX() > button.getX() + 8
+                                && e.getX() < button.getX() + button.getWidth() + 8
+                                && e.getY() > button.getY() + 30
+                                && e.getY() < button.getY() + 30 + button.getHeight()
+                ) {
+                    button.getAction().onPress(button);
+                    break;
+                }
+            } else if (comp instanceof ComboBox) {
+                ComboBox box = (ComboBox) comp;
+                for (int j = 0; j < box.getTexts().size(); j++) {
+                }
             }
         }
     }

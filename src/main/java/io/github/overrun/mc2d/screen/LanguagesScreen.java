@@ -26,8 +26,8 @@ package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.Minecraft2D;
 import io.github.overrun.mc2d.lang.Language;
-import io.github.overrun.mc2d.option.Options;
 import io.github.overrun.mc2d.text.LiteralText;
+import io.github.overrun.mc2d.text.Style;
 import io.github.overrun.mc2d.text.TranslatableText;
 import io.github.overrun.mc2d.util.Constants;
 
@@ -42,7 +42,7 @@ public class LanguagesScreen extends Screen {
 
     public LanguagesScreen() {
         addButton(new ButtonWidget(10, 200, TranslatableText.of(Constants.BUTTON_DONE), button -> Screens.setOpening(Screens.TITLE_SCREEN)));
-        for (int i = 0; i < lang.length; i++) {
+        /*for (int i = 0; i < lang.length; i++) {
             LiteralText lt = LiteralText.of(lang[i].getName());
             int finalI = i;
             addButton(new ButtonWidget(75 + (i << 5), 600, lt, button -> {
@@ -53,7 +53,10 @@ public class LanguagesScreen extends Screen {
                     Options.set(Options.LANG, c);
                 }
             }));
-        }
+        }*/
+        addChild(new ComboBox(0, 80, Minecraft2D.getHeight())
+                .addText(LiteralText.of(Language.EN_US.getName(), Style.builder().pressAction(screen -> Language.setLang(Language.EN_US)).build()))
+                .addText(LiteralText.of(Language.ZH_CN.getName(), Style.builder().pressAction(screen -> Language.setLang(Language.ZH_CN)).build())));
     }
 
     @Override

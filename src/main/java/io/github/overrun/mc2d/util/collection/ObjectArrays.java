@@ -22,21 +22,21 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.block;
+package io.github.overrun.mc2d.util.collection;
 
-import java.awt.Graphics;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+
+import java.util.Arrays;
 
 /**
  * @author squid233
- * @since 2020/09/15
+ * @since 2020/10/16
  */
-public class BlockAir extends Block {
-    private static final long serialVersionUID = 5165604420001555203L;
-
-    public BlockAir(Settings settings) {
-        super(settings);
+public class ObjectArrays {
+    @SafeVarargs
+    public static <T> ObjectArrayList<T> newObjectArrayList(T... elements) {
+        ObjectArrayList<T> l = new ObjectArrayList<>(elements.length);
+        l.addAll(Arrays.asList(elements));
+        return l;
     }
-
-    @Override
-    public void draw(Graphics g, int x) { }
 }

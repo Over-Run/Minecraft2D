@@ -63,6 +63,12 @@ public class Language {
         LOGGER.info("Setting language to: " + curLang);
     }
 
+    public static void setLang(Language lang) {
+        Language.setCurrentLang(lang.getCode());
+        Language.reload();
+        Options.set(Options.LANG, lang.getCode());
+    }
+
     public static String getValue(String translationKey) {
         return LANG_FILE.getProperty(translationKey, translationKey);
     }

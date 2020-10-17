@@ -22,58 +22,32 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.text;
+package io.github.squid233.serialization;
 
-import java.util.Objects;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+
+import java.lang.reflect.Type;
 
 /**
  * @author squid233
- * @since 2020/09/18
+ * @since 2020/10/17
  */
-public class LiteralText implements IText {
-    public static final LiteralText EMPTY = LiteralText.of("");
-    private final String text;
-    private final Style style;
-    private final Object[] args;
+public abstract class JsonCodec<T> implements JsonSerializer<T>, JsonDeserializer<T> {
+    public abstract JsonElement encode(T src, Type typeOfSrc, JsonSerializationContext context);
+    public abstract T decode(JsonElement json, Type typeOfT, JsonDeserializationContext context);
 
-    /**
-     * Construct a text.<br>
-     * Use {@link LiteralText#of(String, Object...)}.
-     *
-     * @param text The text.
-     * @param args Args for format.
-     */
-    private LiteralText(String text, Style style, Object... args) {
-        this.text = text;
-        this.style = style;
-        this.args = Objects.requireNonNullElse(args, new Object[0]);
-    }
-
-    public static LiteralText of(String text, Style style, Object... args) {
-        return new LiteralText(text, style, args);
-    }
-
-    public static LiteralText of(String text, Object... args) {
-        return of(text, Style.EMPTY, args);
+    @Override
+    public JsonElement serialize(T src, Type typeOfSrc, JsonSerializationContext context) {
+        return encode(src, typeOfSrc, context);
     }
 
     @Override
-    public String toString() {
-        return asString();
-    }
-
-    @Override
-    public String asString() {
-        return text;
-    }
-
-    @Override
-    public String asFormattedString() {
-        return String.format(text, args);
-    }
-
-    @Override
-    public Style getStyle() {
-        return style;
+    public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        return decode(json, typeOfT, context);
     }
 }

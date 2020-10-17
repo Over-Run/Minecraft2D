@@ -48,6 +48,7 @@ public interface IText {
      */
     String asFormattedString();
 
+    Style getStyle();
 
     /**
      * <b>NOTE:</b> This method is linked to {@link ScreenUtil#drawText(Graphics, int, int, IText) ScreenUtil#drawText}.

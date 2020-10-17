@@ -25,31 +25,35 @@
 package io.github.overrun.mc2d.text;
 
 import io.github.overrun.mc2d.lang.Language;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
-import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @author squid233
  * @since 2020/10/12
  */
 public class TranslatableText implements IText {
-    private static final Object2ObjectMap<String, TranslatableText> INSTANCES = new Object2ObjectOpenHashMap<>();
     private final String key;
+    private final Style style;
     private final Object[] params;
 
-    private TranslatableText(String key, Object... params) {
+    private TranslatableText(String key, Style style, Object... params) {
         this.key = key;
-        this.params = params;
+        this.style = style;
+        this.params = Objects.requireNonNullElse(params, new Object[0]);
+    }
+
+    public static TranslatableText of(String key, Style style, Object... params) {
+        return new TranslatableText(key, style, params);
     }
 
     public static TranslatableText of(String key, Object... args) {
-        String s = key + Arrays.deepToString(args);
-        if (!INSTANCES.containsKey(s)) {
-            INSTANCES.put(s, new TranslatableText(key, args));
-        }
-        return INSTANCES.get(s);
+        return of(key, Style.EMPTY, args);
+    }
+
+    @Override
+    public String toString() {
+        return key;
     }
 
     @Override
@@ -60,5 +64,10 @@ public class TranslatableText implements IText {
     @Override
     public String asFormattedString() {
         return String.format(asString(), params);
+    }
+
+    @Override
+    public Style getStyle() {
+        return style;
     }
 }
