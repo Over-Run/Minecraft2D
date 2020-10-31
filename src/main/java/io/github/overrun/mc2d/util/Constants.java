@@ -30,4 +30,5 @@ package io.github.overrun.mc2d.util;
  */
 public class Constants {
     public static final String BUTTON_DONE = "button.minecraft2d.done";
+    public static final String FALSE = "false";
 }

@@ -63,7 +63,7 @@ public class Blocks {
     }
 
     private static Block register(String name, Block block) {
-        Minecraft2D.LOGGER.debug("Registered block: " + Registry.register(Registry.BLOCK, name, block));
+        Minecraft2D.LOGGER.debug("Registered block: {}", Registry.register(Registry.BLOCK, name, block));
         return block;
     }
 }

@@ -34,8 +34,8 @@ import java.util.Objects;
  */
 public class TranslatableText implements IText {
     private final String key;
-    private final Style style;
     private final Object[] params;
+    private Style style;
 
     private TranslatableText(String key, Style style, Object... params) {
         this.key = key;
@@ -69,5 +69,11 @@ public class TranslatableText implements IText {
     @Override
     public Style getStyle() {
         return style;
+    }
+
+    @Override
+    public TranslatableText setStyle(Style style) {
+        this.style = style;
+        return this;
     }
 }

@@ -56,11 +56,10 @@ public class Mc2dClient extends JFrame {
         addKeyListener(ma);
         addMouseListener(ma);
         addMouseWheelListener(ma);
-        Minecraft2D.LOGGER.info("Max memory: " + (Runtime.getRuntime().maxMemory() >> 10 >> 10 >= 1024
-                ? (Runtime.getRuntime().maxMemory() >> 10 >> 10 >> 10) + "GB"
-                : (Runtime.getRuntime().maxMemory() >> 10 >> 10) + "MB"));
+        Minecraft2D.LOGGER.info("Max memory: {}", Runtime.getRuntime().maxMemory() >> 20 >= 1024
+                ? (Runtime.getRuntime().maxMemory() >> 30) + "GB"
+                : (Runtime.getRuntime().maxMemory() >> 20) + "MB");
         new RenderThread(this).start();
-        setVisible(true);
     }
 
     public static synchronized Mc2dClient getInstance() {

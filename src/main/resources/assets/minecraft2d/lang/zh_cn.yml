@@ -1,0 +1,9 @@
+button:
+  minecraft2d:
+    done: 完成
+    exit_game: 退出游戏
+    options: 选项
+    singleplayer: 单人游戏
+text:
+  minecraft2d:
+    choose_lang: 选择你的语言

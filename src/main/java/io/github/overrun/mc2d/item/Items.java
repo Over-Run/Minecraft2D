@@ -66,7 +66,7 @@ public class Items {
         if (item instanceof ItemBlock) {
             ((ItemBlock) item).appendBlocks(Item.BLOCK_ITEMS, item);
         }
-        Minecraft2D.LOGGER.debug("Registered item: " + Registry.register(Registry.ITEM, id, item));
+        Minecraft2D.LOGGER.debug("Registered item: {}", Registry.register(Registry.ITEM, id, item));
         return item;
     }
 

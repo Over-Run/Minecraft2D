@@ -22,27 +22,43 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.client.model;
+package io.github.overrun.mc2d.util.collection;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonSerializationContext;
-import io.github.squid233.serialization.JsonCodec;
-
-import java.lang.reflect.Type;
+import java.util.Collection;
 
 /**
  * @author squid233
- * @since 2020/10/17
+ * @since 2020/10/23
  */
-public class BlockModelCodec extends JsonCodec<BlockModel> {
-    @Override
-    public JsonElement encode(BlockModel src, Type typeOfSrc, JsonSerializationContext context) {
-        return null;
-    }
+public interface List2D<E> extends Collection<E> {
+    boolean contains(int y, Object o);
 
     @Override
-    public BlockModel decode(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
-        return null;
+    Object[][] toArray();
+
+    <T> T[][] toArray(T[][] a);
+
+    List2D<E> add(int y, E e);
+
+    List2D<E> add(int y, int x, E e);
+
+    boolean containsAll(int y, Collection<?> c);
+
+    List2D<E> addAll(int y, Collection<? extends E> c);
+
+    List2D<E> addAll(int y, int x, Collection<? extends E> c);
+
+    List2D<E> removeAll(int y, Collection<?> c);
+
+    List2D<E> retainAll(int y, Collection<?> c);
+
+    List2D<E> remove(int y, Object o);
+
+    List2D<E> set(int x, int y, E e);
+
+    E get(int x, int y);
+
+    default int getSize() {
+        return size();
     }
 }

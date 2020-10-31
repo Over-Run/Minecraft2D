@@ -24,50 +24,30 @@
 
 package io.github.overrun.mc2d.logger;
 
-import io.github.overrun.mc2d.option.Options;
-import org.apache.commons.lang3.StringUtils;
-
-import java.time.LocalTime;
-
 /**
  * @author squid233
- * @since 2020/09/15
+ * @since 2020/10/24
  */
-public class Logger {
-    private final String name;
-    public static final String L_INFO = "INFO";
-    public static final String L_ERROR = "ERROR";
-    public static final String L_DEBUG = "DEBUG";
+public interface Logger {
+    void info(String msg);
 
-    public Logger(String name) {
-        this.name = name;
-    }
+    void info(String msg, Object... params);
 
-    public Logger() {
-        String[] s = StringUtils.split(new Throwable().getStackTrace()[1].getClassName(), '.');
-        this.name = s[s.length - 1];
-    }
+    void warn(String msg);
 
-    public Logger(Class<?> clazz) {
-        this(clazz.getSimpleName());
-    }
+    void warn(String msg, Object... params);
 
-    public void msg(String msg, String level) {
-        System.out.println("[" + StringUtils.split(LocalTime.now().toString(), '.')[0]
-                + "] [" + Thread.currentThread().getName() + "/" + level + "] (" + name + ") " + msg);
-    }
+    void error(String msg);
 
-    public void info(String msg) {
-        msg(msg, L_INFO);
-    }
+    void error(String msg, Object... params);
 
-    public void error(String msg) {
-        msg(msg, L_ERROR);
-    }
+    void fatal(String msg);
 
-    public void debug(String msg) {
-        if (Options.getB(Options.DEBUGGING)) {
-            msg(msg, L_DEBUG);
-        }
-    }
+    void fatal(String msg, Object... params);
+
+    void debug(String msg);
+
+    void debug(String msg, Object... params);
+
+    String getName();
 }

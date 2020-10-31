@@ -22,16 +22,18 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.client.block;
-
-import java.io.Serializable;
-import java.util.List;
+package io.github.overrun.mc2d.logger;
 
 /**
  * @author squid233
- * @since 2020/10/17
+ * @since 2020/10/24
  */
-public class BlockModelVariants implements Serializable {
-    private static final long serialVersionUID = 7584369142013685413L;
-    private List<Boolean> c;
+public class LogManager {
+    public static DefaultLogger getLogger(String name) {
+        return new DefaultLogger(name);
+    }
+
+    public static DefaultLogger getLogger(Class<?> c) {
+        return getLogger(c.getSimpleName());
+    }
 }

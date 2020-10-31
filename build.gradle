@@ -1,12 +1,3 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
-    }
-}
-
 plugins {
     id 'java'
     id 'idea'
@@ -20,19 +11,16 @@ group 'io.github.overrun.mc2d'
 archivesBaseName = "minecraft2d"
 version project.mcversion
 
-apply plugin: 'java'
-apply plugin: 'com.github.johnrengelman.shadow'
-
 repositories {
     mavenCentral()
 }
 
 dependencies {
     compileOnly "org.jetbrains:annotations:$annotations"
-    compile "org.apache.commons:commons-lang3:$lang3"
     compile "it.unimi.dsi:fastutil:$fastutil"
-    compile "com.google.code.gson:gson:$gson"
     compile "com.google.guava:guava:$guava-jre"
+    compile "org.apache.commons:commons-lang3:$lang3"
+    compile "org.yaml:snakeyaml:$snakeyaml"
 }
 
 tasks.withType(JavaCompile) {

@@ -25,6 +25,7 @@
 package io.github.overrun.mc2d;
 
 import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.logger.LogManager;
 import io.github.overrun.mc2d.logger.Logger;
 
 /**
@@ -34,7 +35,7 @@ import io.github.overrun.mc2d.logger.Logger;
 public class Minecraft2D {
     public static final String VERSION = "0.2.0-pre-alpha";
     public static final String NAMESPACE = "minecraft2d";
-    public static final Logger LOGGER = new Logger(Minecraft2D.class);
+    public static final Logger LOGGER = LogManager.getLogger(Minecraft2D.class);
 
     public static int getWidth() {
         return Mc2dClient.getInstance().getWidth();

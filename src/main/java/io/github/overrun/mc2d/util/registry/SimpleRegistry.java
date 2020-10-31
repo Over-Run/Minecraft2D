@@ -27,6 +27,7 @@ package io.github.overrun.mc2d.util.registry;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Iterators;
+import io.github.overrun.mc2d.logger.LogManager;
 import io.github.overrun.mc2d.logger.Logger;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.Util;
@@ -47,7 +48,7 @@ import java.util.Objects;
  * @since 2020/10/06
  */
 public class SimpleRegistry<T> implements IndexedIterable<T> {
-    protected static final Logger LOGGER = new Logger();
+    protected static final Logger LOGGER = LogManager.getLogger(SimpleRegistry.class);
     private final ObjectList<T> rawId2entry = new ObjectArrayList<>(256);
     private final Object2IntMap<T> entry2rawId = new Object2IntOpenCustomHashMap<>(Util.identityHashStrategy());
     private final BiMap<Identifier, T> id2entry;
@@ -68,7 +69,7 @@ public class SimpleRegistry<T> implements IndexedIterable<T> {
         rawId2entry.set(rawId, entry);
         entry2rawId.put(entry, rawId);
         if (id2entry.containsValue(entry)) {
-            LOGGER.error("Adding duplicate value '" + entry + "' to registry");
+            LOGGER.error("Adding duplicate value '{}' to registry", entry);
         }
         this.id2entry.put(id, entry);
         if (nextId <= rawId) {

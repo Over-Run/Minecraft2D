@@ -1,0 +1,9 @@
+button:
+  minecraft2d:
+    done: Done
+    exit_game: 'Exit Game'
+    options: Options
+    singleplayer: Singleplayer
+text:
+  minecraft2d:
+    choose_lang: 'Choose your language'

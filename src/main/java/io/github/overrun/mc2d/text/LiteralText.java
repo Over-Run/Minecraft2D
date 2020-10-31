@@ -33,8 +33,8 @@ import java.util.Objects;
 public class LiteralText implements IText {
     public static final LiteralText EMPTY = LiteralText.of("");
     private final String text;
-    private final Style style;
     private final Object[] args;
+    private Style style;
 
     /**
      * Construct a text.<br>
@@ -75,5 +75,11 @@ public class LiteralText implements IText {
     @Override
     public Style getStyle() {
         return style;
+    }
+
+    @Override
+    public LiteralText setStyle(Style style) {
+        this.style = style;
+        return this;
     }
 }

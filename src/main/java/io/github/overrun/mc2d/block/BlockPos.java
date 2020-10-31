@@ -33,30 +33,22 @@ import java.util.StringJoiner;
  * @since 2020/09/15
  */
 public final class BlockPos implements Serializable {
-    private static final long serialVersionUID = 5305772047820978518L;
+    private static final long serialVersionUID = 1L;
     private final int x;
     private final int y;
 
-    private BlockPos(int x, int y) {
+    public BlockPos(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    public static BlockPos of() {
-        return of(0, 0);
-    }
+    public static BlockPos of() { return of(0, 0); }
 
-    public static BlockPos of(int x, int y) {
-        return new BlockPos(x, y);
-    }
+    public static BlockPos of(int x, int y) { return new BlockPos(x, y); }
 
-    public int getX() {
-        return x;
-    }
+    public int getX() { return x; }
 
-    public int getY() {
-        return y;
-    }
+    public int getY() { return y; }
 
     @Override
     public String toString() {
@@ -67,12 +59,8 @@ public final class BlockPos implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        return o instanceof BlockPos && ((BlockPos) o).x == x && ((BlockPos) o).y == y;
-    }
+    public boolean equals(Object o) { return o instanceof BlockPos && ((BlockPos) o).x == x && ((BlockPos) o).y == y; }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(getX(), getY());
-    }
+    public int hashCode() { return Objects.hash(getX(), getY()); }
 }

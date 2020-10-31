@@ -34,6 +34,8 @@ import java.io.Writer;
 import java.util.Map;
 import java.util.Properties;
 
+import static io.github.overrun.mc2d.util.Constants.FALSE;
+
 /**
  * @author squid233
  * @since 2020/09/15
@@ -47,9 +49,10 @@ public class Options {
     public static final String WIDTH = "width";
     public static final String HEIGHT = "height";
     public static final String LANG = "lang";
+
     public static final String FPS_DEF = "60";
     public static final String VIEW_DISTANCE_DEF = "4";
-    public static final String FALSE = "false";
+    public static final String DEBUGGING_DEF = FALSE;
     public static final String WIDTH_DEF = "1040";
     public static final String HEIGHT_DEF = "486";
     public static final String LANG_DEF = Language.EN_US.getCode();

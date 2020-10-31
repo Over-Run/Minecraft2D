@@ -43,8 +43,8 @@ public class RenderThread implements Runnable {
         fps = Options.getI(Options.FPS, 30);
         interval = 1000 / fps;
         Minecraft2D.LOGGER.debug("Created render thread");
-        Minecraft2D.LOGGER.info("FPS: " + fps);
-        Minecraft2D.LOGGER.debug("Render interval: " + interval + "ms");
+        Minecraft2D.LOGGER.info("FPS: {}", fps);
+        Minecraft2D.LOGGER.debug("Render interval: {}ms", interval);
     }
 
     @Override
@@ -56,11 +56,11 @@ public class RenderThread implements Runnable {
                 //noinspection BusyWait
                 Thread.sleep(interval);
             } catch (InterruptedException e) {
-                Minecraft2D.LOGGER.error(thread.getName() + "Error: " + e.toString());
+                Minecraft2D.LOGGER.error(thread.getName() + " {} {}", "Error:", e.toString());
                 exited = true;
             }
         }
-        Minecraft2D.LOGGER.info(thread.getName() + "Stop rendering");
+        Minecraft2D.LOGGER.info(thread.getName() + " {}", "Stop rendering");
         System.exit(0);
     }
 

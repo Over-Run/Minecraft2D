@@ -25,9 +25,10 @@
 package io.github.overrun.mc2d;
 
 import io.github.overrun.mc2d.block.Blocks;
-import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.item.Items;
 import io.github.overrun.mc2d.lang.Language;
+import io.github.overrun.mc2d.util.collection.List2D;
+import io.github.overrun.mc2d.util.collection.ObjectList2D;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.apache.commons.lang3.StringUtils;
@@ -44,8 +45,9 @@ import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
  */
 public class Main {
     public static String playerName;
+
     public static void main(String[] args) {
-        LOGGER.info("Starting Minecraft 2D " + Minecraft2D.VERSION);
+        LOGGER.info("Starting Minecraft 2D {}", Minecraft2D.VERSION);
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
@@ -63,7 +65,7 @@ public class Main {
         } catch (Exception ignored) {}
         map.defaultReturnValue("player" + new Random().nextInt(10000));
         playerName = map.get("username");
-        LOGGER.info("Setting user: " + playerName);
+        LOGGER.info("Setting user: {}", playerName);
         Language.reload();
         // Init game objects
         Blocks.init();
@@ -94,6 +96,10 @@ public class Main {
             }
         }*/
         /////
-        Mc2dClient.getInstance();
+        //Mc2dClient.getInstance().setVisible(true);
+        List2D<String> list2D = new ObjectList2D<>(10);
+        list2D.add(0, "0-0").add(0, "2-0").add(0, "1-0").add(0, "3-0").add(0, "4-0")
+                .add(1, "0-1").add(1, "1-1").add(1, "2-1").add(1, "3-1").add(1, "4-1");
+        System.out.println(list2D);
     }
 }

@@ -26,13 +26,7 @@ package io.github.overrun.mc2d.lang;
 
 import io.github.overrun.mc2d.option.Options;
 import io.github.overrun.mc2d.util.ResourceLocation;
-
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import java.util.Properties;
+import io.github.overrun.mc2d.util.YamlReader;
 
 import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
 
@@ -43,7 +37,7 @@ import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
 public class Language {
     public static final Language EN_US = new Language("en_us", "English (United States)");
     public static final Language ZH_CN = new Language("zh_cn", "中文（简体）");
-    private static final Properties LANG_FILE = new Properties();
+    private static final YamlReader YAML_READER = new YamlReader();
     private static String curLang = Options.get("lang", EN_US.getCode());
     private final String code;
     private final String name;
@@ -54,13 +48,8 @@ public class Language {
     }
 
     public static void reload() {
-        try (Reader is = new InputStreamReader(Objects.requireNonNull(
-                ClassLoader.getSystemResourceAsStream(ResourceLocation.asString("lang/" + curLang + ".lang"))), StandardCharsets.UTF_8)) {
-            LANG_FILE.load(is);
-        } catch (IOException | NullPointerException e) {
-            e.printStackTrace();
-        }
-        LOGGER.info("Setting language to: " + curLang);
+        YAML_READER.setPath(ResourceLocation.asString("lang/" + curLang + ".lang"));
+        LOGGER.info("Setting language to: {}", curLang);
     }
 
     public static void setLang(Language lang) {
@@ -70,7 +59,7 @@ public class Language {
     }
 
     public static String getValue(String translationKey) {
-        return LANG_FILE.getProperty(translationKey, translationKey);
+        return YAML_READER.get(translationKey, translationKey).toString();
     }
 
     public static void setCurrentLang(String currentLang) {

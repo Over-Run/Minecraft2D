@@ -50,7 +50,7 @@ public class DefaultedRegistry<T> extends SimpleRegistry<T> {
         return this.defaultId;
     }
 
-    public Optional<T> getOrEmpty(@javax.annotation.Nullable Identifier id) {
+    public Optional<T> getOrEmpty(@Nullable Identifier id) {
         return Optional.ofNullable(super.get(id));
     }
 

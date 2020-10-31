@@ -1,2 +1,9 @@
+pluginManagement {
+    repositories {
+        mavenCentral()
+        jcenter()
+        gradlePluginPortal()
+    }
+}
 rootProject.name = 'Minecraft2D'
 

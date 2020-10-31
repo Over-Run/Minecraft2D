@@ -50,6 +50,8 @@ public interface IText {
 
     Style getStyle();
 
+    IText setStyle(Style style);
+
     /**
      * <b>NOTE:</b> This method is linked to {@link ScreenUtil#drawText(Graphics, int, int, IText) ScreenUtil#drawText}.
      *
