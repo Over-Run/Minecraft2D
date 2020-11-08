@@ -24,82 +24,11 @@
 
 package io.github.overrun.mc2d;
 
-import io.github.overrun.mc2d.block.Blocks;
-import io.github.overrun.mc2d.item.Items;
-import io.github.overrun.mc2d.lang.Language;
-import io.github.overrun.mc2d.util.collection.List2D;
-import io.github.overrun.mc2d.util.collection.ObjectList2D;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import org.apache.commons.lang3.StringUtils;
-
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import java.util.Random;
-
-import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
-
 /**
  * @author squid233
  * @since 2020/09/14
  */
 public class Main {
-    public static String playerName;
-
     public static void main(String[] args) {
-        LOGGER.info("Starting Minecraft 2D {}", Minecraft2D.VERSION);
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            e.printStackTrace();
-        }
-        /////
-        Object2ObjectMap<String, String> map = new Object2ObjectOpenHashMap<>();
-        try {
-            for (String gp : args) {
-                if (gp.startsWith("--")) {
-                    String[] arr = StringUtils.split(gp, '=');
-                    map.put(arr[0].substring(2), arr[1]);
-                }
-            }
-        } catch (Exception ignored) {}
-        map.defaultReturnValue("player" + new Random().nextInt(10000));
-        playerName = map.get("username");
-        LOGGER.info("Setting user: {}", playerName);
-        Language.reload();
-        // Init game objects
-        Blocks.init();
-        Items.init();
-        /////
-        /*try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("saves/save.dat"))) {
-            Worlds.overworld = (Overworld) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            for (Chunk chunk : Worlds.overworld.getFrontStorageBlock().chunks) {
-                for (int i = 0; i < 16; i++) {
-                    chunk.setBlock(i, 0, Blocks.BEDROCK);
-                    for (int j = 0; j < 4; j++) {
-                        chunk.setBlock(i, j + 1, Blocks.STONE);
-                    }
-                    for (int j = 0; j < 4; j++) {
-                        chunk.setBlock(i, j + 5, Blocks.COBBLESTONE);
-                    }
-                    for (int j = 0; j < 4; j++) {
-                        chunk.setBlock(i, j + 9, Blocks.DIRT);
-                    }
-                    chunk.setBlock(i, 13, Blocks.GRASS_BLOCK);
-                }
-            }
-        }
-        for (ItemGroup group : ItemGroup.getGroups()) {
-            if (group != null) {
-                group.appendStacks();
-            }
-        }*/
-        /////
-        //Mc2dClient.getInstance().setVisible(true);
-        List2D<String> list2D = new ObjectList2D<>(10);
-        list2D.add(0, "0-0").add(0, "2-0").add(0, "1-0").add(0, "3-0").add(0, "4-0")
-                .add(1, "0-1").add(1, "1-1").add(1, "2-1").add(1, "3-1").add(1, "4-1");
-        System.out.println(list2D);
     }
 }
