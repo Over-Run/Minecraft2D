@@ -1,4 +1,4 @@
-# Minecraft 2D
+﻿# Minecraft 2D
 
 |                                                              |                                                              |                                                              |                                                              |                                                              |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -24,8 +24,8 @@ Some assets are producing by Mojang Studios.
 ![0-1-0-40-0](/img/0-1-0-40-0.png)![0-1-0-40-1](/img/0-1-0-40-1.png)
 
 ## 使用方法 Use Guide
-1. go [here](https://github.com/Over-Run/Minecraft2D/tree/archives) or [Releases](https://github.com/Over-Run/Minecraft2D/releases) to download。  
-首先，到[此处](https://github.com/Over-Run/Minecraft2D/tree/archives) 或 [Releases](https://github.com/Over-Run/Minecraft2D/releases) 下载。
+1. go [here](https://github.com/Over-Run/mc2d-acv) or [Releases](https://github.com/Over-Run/Minecraft2D/releases) to download。  
+首先，到[此处](https://github.com/Over-Run/mc2d-acv) 或 [Releases](https://github.com/Over-Run/Minecraft2D/releases) 下载。
 2. Write a startup script and put in your directory.  
 编写一个启动脚本并放到文件夹下。
 
@@ -52,3 +52,6 @@ Join our Discord channel just time! [![discord](https://img.shields.io/discord/7
 
 View this game on our [official site](https://squid233.github.io)!  
 在 [官方网站](https://squid233.github.io) 上看我们的游戏!
+
+## Credits
+Thanks for Aliyun
