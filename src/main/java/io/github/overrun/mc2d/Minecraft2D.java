@@ -24,10 +24,30 @@
 
 package io.github.overrun.mc2d;
 
+import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.logger.Logger;
+
 /**
  * @author squid233
  * @since 2020/09/14
  */
 public final class Minecraft2D {
-    public static final String VERSION = "0.2.0-pre-alpha";
+    public static final Logger LOGGER = new Logger(Minecraft2D.class);
+    public static final String VERSION = "0.2.0";
+
+    public static int getWidth() {
+        return Mc2dClient.getInstance().getWidth();
+    }
+
+    public static int getHeight() {
+        return Mc2dClient.getInstance().getHeight();
+    }
+
+    public static int getMouseX() {
+        return Mc2dClient.getInstance().getMousePosition().x;
+    }
+
+    public static int getMouseY() {
+        return Mc2dClient.getInstance().getMousePosition().y;
+    }
 }

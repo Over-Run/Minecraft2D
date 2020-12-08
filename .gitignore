@@ -7,7 +7,14 @@ build/
 out/
 *.iml
 
+# eclipse
+.settings/
+.classpath
+.project
+
 # vscode
 .vscode/
+bin/
+*.code-workspace
 
 run/

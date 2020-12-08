@@ -7,9 +7,9 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
-group 'io.github.overrun'
+group 'io.github.over-run'
 archivesBaseName = "minecraft2d"
-version project.mcversion
+version '0.2.0'
 
 repositories {
     maven { url 'https://maven.aliyun.com/repository/central' }
@@ -19,7 +19,7 @@ repositories {
 dependencies {
     compileOnly "org.jetbrains:annotations:$annotations"
     compile "it.unimi.dsi:fastutil:$fastutil"
-    //compile "com.google.guava:guava:$guava-jre"
+    compile "com.google.guava:guava:$guava-jre"
     //compile "org.apache.commons:commons-lang3:$lang3"
     //compile "org.yaml:snakeyaml:$snakeyaml"
 }

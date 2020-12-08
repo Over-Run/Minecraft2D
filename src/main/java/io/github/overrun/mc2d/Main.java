@@ -24,11 +24,32 @@
 
 package io.github.overrun.mc2d;
 
+import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.client.renderer.GameRenderer;
+import io.github.overrun.mc2d.lang.Language;
+import io.github.overrun.mc2d.screen.Screens;
+
+import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
+import static io.github.overrun.mc2d.Minecraft2D.VERSION;
+
 /**
  * @author squid233
  * @since 2020/09/14
  */
-public class Main {
+public final class Main {
     public static void main(String[] args) {
+        LOGGER.info("Starting Minecraft2D " + VERSION);
+        Language.load("mc2d");
+        try {
+            initReg();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        new GameRenderer(Mc2dClient.getInstance()).start();
+        Mc2dClient.getInstance().setVisible(true);
+    }
+
+    private static void initReg() throws ClassNotFoundException {
+        Class.forName(Screens.class.getName());
     }
 }
