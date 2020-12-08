@@ -1,0 +1,10 @@
+language.name=中文
+language.region=简体
+button.mc2d.back=返回
+button.mc2d.done=完成
+button.mc2d.exit_game=退出游戏
+button.mc2d.multiplayer=多人游戏
+button.mc2d.options=选项
+button.mc2d.singleplayer=单人游戏
+options.mc2d.choose_lang=选择你的语言
+options.mc2d.langWarning=（翻译不一定100%准确）

@@ -1,0 +1,10 @@
+language.name=English
+language.region=United States
+button.mc2d.back=Back
+button.mc2d.done=Done
+button.mc2d.exit_game=Exit Game
+button.mc2d.multiplayer=Multiplayer
+button.mc2d.options=Options
+button.mc2d.singleplayer=Singleplayer
+options.mc2d.choose_lang=Choose your language
+options.mc2d.langWarning=Language translations may not be 100%% accurate
