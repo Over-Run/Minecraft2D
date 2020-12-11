@@ -48,10 +48,11 @@ public final class DrawHelper {
 
     static {
         try {
-            if (notContains(getLocalGraphicsEnvironment().getAvailableFontFamilyNames(), "新宋体"))
-            simsunb = Font.createFont(Font.TRUETYPE_FONT,
-                    new File("simsun.ttc"))
-                    .deriveFont(18f);
+            if (notContains(getLocalGraphicsEnvironment().getAvailableFontFamilyNames(), "新宋体")) {
+                simsunb = Font.createFont(Font.TRUETYPE_FONT,
+                        new File("simsun.ttc"))
+                        .deriveFont(18f);
+            }
         } catch (FontFormatException | IOException e) {
             e.printStackTrace();
         }
@@ -107,10 +108,8 @@ public final class DrawHelper {
 
     public static void drawText(Graphics g, IText text, int x, int y) {
         drawWithColor(g, Color.WHITE, gg -> {
-            Font f = gg.getFont();
-            getSimsunMetrics(gg);
-            gg.drawString(text.asString(), x, y + text.getPrevHeight(gg.getFontMetrics()));
-            gg.setFont(f);
+            gg.setFont(simsunb == null ? SIMSUN : simsunb);
+            gg.drawString(text.asString(), x, y + text.getPrevHeight(gg));
         });
     }
 
@@ -136,7 +135,6 @@ public final class DrawHelper {
     }
 
     public static FontMetrics getSimsunMetrics(Graphics g) {
-        g.setFont(simsunb == null ? SIMSUN : simsunb);
-        return g.getFontMetrics();
+        return g.getFontMetrics(simsunb == null ? SIMSUN : simsunb);
     }
 }

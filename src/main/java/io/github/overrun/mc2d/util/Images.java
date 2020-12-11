@@ -35,6 +35,7 @@ public final class Images {
     public static final BufferedImage LOGO = guiImg("logo");
     public static final BufferedImage BUTTON = guiImg("button");
     public static final BufferedImage BUTTON_HOVER = guiImg("button_hover");
+    public static final BufferedImage BUTTON_DISABLE = guiImg("button_disable");
     public static final BufferedImage LANG_BUTTON = guiImg("lang_button");
     public static final BufferedImage LANG_BUTTON_HOVER = guiImg("lang_button_hover");
 

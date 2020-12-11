@@ -24,7 +24,7 @@
 
 package io.github.overrun.mc2d.text;
 
-import java.awt.*;
+import java.awt.Graphics;
 
 import static io.github.overrun.mc2d.util.DrawHelper.getSimsunMetrics;
 
@@ -39,19 +39,11 @@ public interface IText {
         return new LiteralText("");
     }
 
-    default int getPrevWidth(FontMetrics fm) {
-        return fm.stringWidth(asString());
-    }
-
-    default int getPrevHeight(FontMetrics fm) {
-        return fm.getAscent() - fm.getDescent();
-    }
-
     default int getPrevWidth(Graphics g) {
-        return getPrevWidth(getSimsunMetrics(g));
+        return getSimsunMetrics(g).stringWidth(asString());
     }
 
     default int getPrevHeight(Graphics g) {
-        return getPrevHeight(getSimsunMetrics(g));
+        return getSimsunMetrics(g).getAscent() - getSimsunMetrics(g).getDescent();
     }
 }

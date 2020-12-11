@@ -18,8 +18,8 @@ repositories {
 
 dependencies {
     compileOnly "org.jetbrains:annotations:$annotations"
-    compile "it.unimi.dsi:fastutil:$fastutil"
-    compile "com.google.guava:guava:$guava-jre"
+    implementation "it.unimi.dsi:fastutil:$fastutil"
+    implementation "com.google.guava:guava:$guava-jre"
     //compile "org.apache.commons:commons-lang3:$lang3"
     //compile "org.yaml:snakeyaml:$snakeyaml"
 }
@@ -45,10 +45,6 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 }
 
 idea {
-    project {
-        languageLevel.level = 'JDK_11'
-    }
-    module {
-        inheritOutputDirs = true
-    }
+    project.languageLevel.level = 'JDK_11'
+    module.inheritOutputDirs = true
 }

@@ -30,7 +30,7 @@ import io.github.overrun.mc2d.util.registry.Registry;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 
-import java.awt.*;
+import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 
 import static io.github.overrun.mc2d.screen.Screens.openScreen;
@@ -43,10 +43,11 @@ import static java.awt.event.KeyEvent.VK_ESCAPE;
  * @since 2020/11/24
  */
 public abstract class Screen implements Renderable {
-    protected final ObjectList<ScreenWidget> widgets = new ObjectArrayList<>(5);
-    protected final ObjectList<ButtonWidget> buttons = new ObjectArrayList<>(5);
+    protected final ObjectList<ScreenWidget> widgets = new ObjectArrayList<>(6);
+    protected final ObjectList<ButtonWidget> buttons = new ObjectArrayList<>(6);
     private final Screen parent;
     protected Mc2dClient client;
+    private static boolean shouldShowHand;
 
     protected Screen(Screen parent) {
         this.parent = parent;
@@ -57,8 +58,8 @@ public abstract class Screen implements Renderable {
     public void render(Graphics g) {
         drawDirtBackground(g);
         drawDefaultBackground(g);
-        for (ScreenWidget widget : widgets) {
-            widget.render(g);
+        for (ScreenWidget w : widgets) {
+            w.render(g);
         }
     }
 
@@ -69,16 +70,18 @@ public abstract class Screen implements Renderable {
     }
 
     public void addWidget(ScreenWidget widget) {
-        widgets.add(widget);
+        widgets.add(0,widget);
     }
 
     public void addButton(ButtonWidget widget) {
-        buttons.add(widget);
+        buttons.add(0, widget);
         addWidget(widget);
     }
 
     protected void close() {
-        if (parent != null) openScreen(parent);
+        if (parent != null) {
+            open(parent);
+        }
     }
 
     public void open(Screen screen) {
@@ -90,8 +93,7 @@ public abstract class Screen implements Renderable {
     }
 
     public void onMouseClicked() {
-        for (int i = buttons.size() - 1; i >= 0; i--) {
-            ButtonWidget b = buttons.get(i);
+        for (ButtonWidget b : buttons) {
             if (b.isHover()) {
                 b.getAction().onPress(b);
                 break;

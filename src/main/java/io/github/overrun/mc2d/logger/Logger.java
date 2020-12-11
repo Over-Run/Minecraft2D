@@ -96,13 +96,15 @@ public class Logger {
     }
 
     public void debug(String msg) {
-        if (logDebugEnable())
+        if (logDebugEnable()) {
             getJavaLogger().config(msg);
+        }
     }
 
     public void debug(String msg, Object... params) {
-        if (logDebugEnable())
+        if (logDebugEnable()) {
             getJavaLogger().log(Level.CONFIG, msg, params);
+        }
     }
 
     public void exception(String msg, Throwable throwable) {
