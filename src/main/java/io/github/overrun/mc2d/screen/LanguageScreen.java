@@ -24,12 +24,15 @@
 
 package io.github.overrun.mc2d.screen;
 
+import io.github.overrun.mc2d.option.Options;
 import io.github.overrun.mc2d.text.LiteralText;
 import io.github.overrun.mc2d.text.TranslatableText;
 
-import java.awt.*;
+import java.awt.Graphics;
+import java.util.Map;
 
 import static io.github.overrun.mc2d.lang.Language.getByLocale;
+import static io.github.overrun.mc2d.util.Constants.CANCEL;
 import static io.github.overrun.mc2d.util.Constants.DONE;
 import static io.github.overrun.mc2d.util.Coordinator.D_M;
 
@@ -38,16 +41,21 @@ import static io.github.overrun.mc2d.util.Coordinator.D_M;
  * @since 2020/12/06
  */
 public class LanguageScreen extends Screen {
+    private static final Map<String, ComboBoxItem> MAP = Map.of(
+            "en_us", genItem("en_us"),
+            "zh_cn", genItem("zh_cn")
+    );
     public LanguageScreen(Screen parent) {
         super(parent);
-        addButton(new ButtonWidget(-100, 30, 200, D_M, new TranslatableText(DONE), w -> close()));
+        addButton(new ButtonWidget(-210, 30, 200, D_M, new TranslatableText(DONE), w -> close()));
+        addButton(new ButtonWidget(10, 30, 200, D_M, new TranslatableText(CANCEL), w -> close()));
         addWidget(new ComboBoxWidget(
-                genItem("en_us"),
-                genItem("zh_cn")
-        ));
+                MAP.get("en_us"),
+                MAP.get("zh_cn")
+        ).setSelectedItem(MAP.get(Options.get(Options.LANG, "en_us"))));
     }
 
-    private ComboBoxItem genItem(String locale) {
+    private static ComboBoxItem genItem(String locale) {
         return new ComboBoxItem(new LiteralText(getByLocale(locale, "language.name")
                 + " ("
                 + getByLocale(locale, "language.region")

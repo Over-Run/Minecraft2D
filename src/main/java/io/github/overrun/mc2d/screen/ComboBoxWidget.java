@@ -60,25 +60,28 @@ public class ComboBoxWidget extends ScreenWidget {
     public void render(Graphics g) {
         fillRect(g, BG_COLOR, getX(), getY(), getWidth(), getY() << 2, U_L);
         ArrayStream.forEach(items, (item, i) -> {
+            final IText t = item.getContent();
+            final Point p = transformation(-(t.getPrevWidth(g) >> 1),
+                    getY() + i * t.getPrevHeight(g),
+                    U_M);
             if (getSelectedItem() == item) {
-                IText t = item.getContent();
-                Point p = transformation(-(t.getPrevWidth(g) >> 1),
-                        getY() + i * t.getPrevHeight(g),
-                        U_M);
                 drawRect(g,
                         Color.WHITE,
-                        p.x,
-                        p.y,
+                        -(t.getPrevWidth(g) >> 1) - 4,
+                        p.y - 30,
                         t.getPrevWidth(g) + 4,
                         t.getPrevHeight(g) + 4,
                         U_M);
             }
-            item.render(g, getY());
+            System.out.println(t + ":width:" + t.getPrevWidth(g));
+            System.out.println(t + ":height:" + t.getPrevHeight(g));
+            item.render(g, p.y - 30);
         });
     }
 
-    public void setSelectedItem(ComboBoxItem item) {
+    public ComboBoxWidget setSelectedItem(ComboBoxItem item) {
         selectedItem = item;
+        return this;
     }
 
     public List<ComboBoxItem> getItems() {

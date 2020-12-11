@@ -29,11 +29,16 @@ import io.github.overrun.mc2d.input.KeyInput;
 import io.github.overrun.mc2d.input.MouseInput;
 import io.github.overrun.mc2d.option.Options;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import java.awt.Graphics;
+import java.awt.HeadlessException;
+import java.awt.Image;
+import java.awt.Point;
 
 import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
 import static io.github.overrun.mc2d.screen.Screens.getOpenScreen;
+import static io.github.overrun.mc2d.util.ImgUtil.readImage;
+import static io.github.overrun.mc2d.util.Utils.compute;
 
 /**
  * @author squid233
@@ -53,10 +58,11 @@ public final class Mc2dClient extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         addKeyListener(new KeyInput());
         addMouseListener(new MouseInput());
-        setIconImage(new ImageIcon(ClassLoader.getSystemResource("icon.png")).getImage());
-        LOGGER.info("Max memory: {}", Runtime.getRuntime().maxMemory() >> 20 >= 1024
-                ? (Runtime.getRuntime().maxMemory() >> 30) + "GB"
-                : (Runtime.getRuntime().maxMemory() >> 20) + "MB");
+        setIconImage(readImage("icon.png"));
+        final long mem = Runtime.getRuntime().maxMemory() >> 20;
+        LOGGER.info("Max memory: {}", mem >= 1024
+                ? (mem >> 10) + "GB"
+                : mem + "MB");
     }
 
     @Override
@@ -69,8 +75,7 @@ public final class Mc2dClient extends JFrame {
 
     @Override
     public Point getMousePosition() throws HeadlessException {
-        final Point p = super.getMousePosition();
-        return p == null ? NP : p;
+        return compute(super.getMousePosition(), NP);
     }
 
     public static Mc2dClient getInstance() {

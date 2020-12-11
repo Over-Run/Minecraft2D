@@ -26,15 +26,16 @@ package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.text.IText;
 
-import java.awt.*;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Point;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
 import static io.github.overrun.mc2d.util.Coordinator.*;
 import static io.github.overrun.mc2d.util.DrawHelper.drawText;
-import static io.github.overrun.mc2d.util.Images.BUTTON;
-import static io.github.overrun.mc2d.util.Images.BUTTON_HOVER;
+import static io.github.overrun.mc2d.util.Images.*;
 
 /**
  * @author squid233
@@ -48,6 +49,7 @@ public class ButtonWidget extends AbstractButtonWidget {
     private final IText text;
     private final PressAction action;
     private final Supplier<List<IText>> tooltipSupplier;
+    private boolean isEnable = true;
 
     public ButtonWidget(int x,
                         int y,
@@ -91,6 +93,15 @@ public class ButtonWidget extends AbstractButtonWidget {
         this(x, y, width, text, action, List::of);
     }
 
+    public ButtonWidget(int x,
+                        int y,
+                        int width,
+                        int layout,
+                        IText text) {
+        this(x, y, width, layout, text, w -> {});
+        setEnable(false);
+    }
+
     @Override
     public void render(Graphics g) {
         super.render(g);
@@ -101,6 +112,16 @@ public class ButtonWidget extends AbstractButtonWidget {
                         isUp(layout) || isCenter(layout) ? getY() + tY : getY() - tY,
                         layout)
         );
+    }
+
+    @Override
+    public boolean isEnable() {
+        return isEnable;
+    }
+
+    public ButtonWidget setEnable(boolean enable) {
+        isEnable = enable;
+        return this;
     }
 
     public List<IText> getTooltips() {
@@ -115,6 +136,11 @@ public class ButtonWidget extends AbstractButtonWidget {
     @Override
     public Image getHoverTexture() {
         return BUTTON_HOVER;
+    }
+
+    @Override
+    public Image getDisableTexture() {
+        return BUTTON_DISABLE;
     }
 
     @Override
@@ -149,8 +175,12 @@ public class ButtonWidget extends AbstractButtonWidget {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ButtonWidget that = (ButtonWidget) o;
         return getX() == that.getX()
                 && getY() == that.getY()

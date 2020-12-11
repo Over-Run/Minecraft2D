@@ -38,4 +38,8 @@ public final class Utils {
     public static String newLine() {
         return System.getProperty("line.separator");
     }
+
+    public static <T> T compute(T t, T def) {
+        return t != null ? t : def;
+    }
 }

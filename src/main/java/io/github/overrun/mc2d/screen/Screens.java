@@ -25,17 +25,11 @@
 package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.logger.Logger;
-import io.github.overrun.mc2d.text.LiteralText;
-import io.github.overrun.mc2d.text.TranslatableText;
 import io.github.overrun.mc2d.util.registry.Registry;
 
-import java.awt.*;
+import java.awt.Color;
 
 import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
-import static io.github.overrun.mc2d.util.Constants.BACK;
-import static io.github.overrun.mc2d.util.Coordinator.D_M;
-import static io.github.overrun.mc2d.util.Coordinator.M_M;
-import static io.github.overrun.mc2d.util.DrawHelper.drawCenteredText;
 
 /**
  * @author squid233
@@ -51,19 +45,6 @@ public final class Screens {
         TITLE_SCREEN = register("title_screen", new TitleScreen(null));
         LANG_SCREEN = register("lang_screen", new LanguageScreen(TITLE_SCREEN));
     }
-
-    public static final Screen NO = new Screen(TITLE_SCREEN) {
-        {
-            addButton(new ButtonWidget(-100, 30, 200, D_M, new TranslatableText(BACK), w -> close()));
-        }
-
-        @Override
-        public void render(Graphics g) {
-            super.render(g);
-            drawCenteredText(g, new LiteralText("Not implementation yet"), 0, M_M);
-            drawCenteredText(g, new LiteralText("作者太菜，暂未实现"), 20, M_M);
-        }
-    };
 
     private static Screen screen = TITLE_SCREEN;
 

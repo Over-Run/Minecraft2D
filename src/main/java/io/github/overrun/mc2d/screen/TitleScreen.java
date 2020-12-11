@@ -27,9 +27,8 @@ package io.github.overrun.mc2d.screen;
 import io.github.overrun.mc2d.text.LiteralText;
 import io.github.overrun.mc2d.text.TranslatableText;
 
-import java.awt.*;
+import java.awt.Graphics;
 
-import static io.github.overrun.mc2d.screen.Screens.NO;
 import static io.github.overrun.mc2d.util.Coordinator.U_M;
 import static io.github.overrun.mc2d.util.DrawHelper.drawCenterImage;
 import static io.github.overrun.mc2d.util.Images.LOGO;
@@ -41,14 +40,10 @@ import static io.github.overrun.mc2d.util.Images.LOGO;
 public final class TitleScreen extends Screen {
     public TitleScreen(Screen parent) {
         super(parent);
-        addButton(new ButtonWidget(-100, 62, 200, U_M, new TranslatableText("button.mc2d.singleplayer"),
-                w -> open(NO)));
-        addButton(new ButtonWidget(-100, 88, 200, U_M, new TranslatableText("button.mc2d.multiplayer"),
-                w -> open(NO)));
-        addButton(new ButtonWidget(-100, 114, 200, U_M, new LiteralText("Mods"),
-                w -> open(NO)));
-        addButton(new ButtonWidget(-100, 140, 200, U_M, new TranslatableText("button.mc2d.options"),
-                w -> open(NO)));
+        addButton(new ButtonWidget(-100, 62, 200, U_M, new TranslatableText("button.mc2d.singleplayer")));
+        addButton(new ButtonWidget(-100, 88, 200, U_M, new TranslatableText("button.mc2d.multiplayer")));
+        addButton(new ButtonWidget(-100, 114, 200, U_M, new LiteralText("Mods")));
+        addButton(new ButtonWidget(-100, 140, 200, U_M, new TranslatableText("button.mc2d.options")));
         addButton(new ButtonWidget(-100, 166, 200, U_M, new TranslatableText("button.mc2d.exit_game"),
                 w -> System.exit(0)));
         addButton(new LanguageButtonWidget(60, 192, U_M, w -> open(Screens.LANG_SCREEN)));

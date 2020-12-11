@@ -30,5 +30,6 @@ package io.github.overrun.mc2d.util;
  */
 public final class Constants {
     public static final String DONE = "button.mc2d.done";
+    public static final String CANCEL = "button.mc2d.cancel";
     public static final String BACK = "button.mc2d.back";
 }

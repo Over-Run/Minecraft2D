@@ -24,7 +24,9 @@
 
 package io.github.overrun.mc2d.screen;
 
-import java.awt.*;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Point;
 
 import static io.github.overrun.mc2d.Minecraft2D.getMouseX;
 import static io.github.overrun.mc2d.Minecraft2D.getMouseY;
@@ -35,10 +37,9 @@ import static io.github.overrun.mc2d.util.DrawHelper.drawImage;
  * @since 2020/12/02
  */
 public abstract class AbstractButtonWidget extends ScreenWidget {
+    public abstract boolean isEnable();
     public abstract Image getUsualTexture();
-
     public abstract int getHeight();
-
     public abstract int getWidth();
 
     public Point getPrevPos() {
@@ -56,8 +57,12 @@ public abstract class AbstractButtonWidget extends ScreenWidget {
         return getUsualTexture();
     }
 
+    public Image getDisableTexture() {
+        return getUsualTexture();
+    }
+
     public Image getTexture() {
-        return isHover() ? getHoverTexture() : getUsualTexture();
+        return isEnable() ? isHover() ? getHoverTexture() : getUsualTexture() : getDisableTexture();
     }
 
     public abstract PressAction getAction();

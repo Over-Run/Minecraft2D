@@ -1,6 +1,7 @@
 language.name=中文
 language.region=简体
 button.mc2d.back=返回
+button.mc2d.cancel=取消
 button.mc2d.done=完成
 button.mc2d.exit_game=退出游戏
 button.mc2d.multiplayer=多人游戏

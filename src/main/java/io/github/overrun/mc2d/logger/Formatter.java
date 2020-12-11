@@ -51,9 +51,11 @@ public class Formatter extends java.util.logging.Formatter {
                 level = record.getLevel().getName();
         }
         String msg = record.getMessage();
-        if (record.getParameters() != null)
-            for (Object o : record.getParameters())
+        if (record.getParameters() != null) {
+            for (Object o : record.getParameters()) {
                 msg = msg.replaceFirst("\\{}", String.valueOf(o));
+            }
+        }
         StringBuilder sb = new StringBuilder("[")
                 .append(LocalTime.now().toString().split("\\.")[0])
                 .append("] [")
@@ -68,12 +70,12 @@ public class Formatter extends java.util.logging.Formatter {
             Throwable t = record.getThrown();
             sb.append(" Caused by: ")
                     .append(t)
-                    .append(newLine())
-                    .append(t);
-            for (StackTraceElement ste : t.getStackTrace())
+                    .append(newLine());
+            for (StackTraceElement ste : t.getStackTrace()) {
                 sb.append(newLine())
                         .append("\tat ")
                         .append(ste);
+            }
         }
         sb.append(newLine());
         return sb.toString();
