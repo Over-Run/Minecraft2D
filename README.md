@@ -22,8 +22,8 @@ Some assets are producing by Mojang Studios.
 
 ## 使用方法 Use Guide
 
-1. go [here](https://github.com/Over-Run/mc2d-acv) to download。  
-首先，到 [此处](https://github.com/Over-Run/mc2d-acv) 下载。
+1. go to [itch.io](https://squid233.itch.io/minecraft2d) to download。  
+首先，到 [此处](https://over-run.github.io/mc2d/latest.html) 选择版本并下载。
 2. Write a startup script and put in your directory.  
 编写一个启动脚本并放到文件夹里。
 
