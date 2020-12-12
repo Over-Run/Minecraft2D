@@ -24,18 +24,15 @@
 
 package io.github.overrun.mc2d.screen;
 
-import io.github.overrun.mc2d.client.renderer.Renderable;
-
-import java.awt.*;
+import java.awt.Graphics;
 
 /**
  * @author squid233
- * @since 2020/11/24
+ * @since 2020/10/16
  */
-public abstract class ScreenWidget implements Renderable {
+public abstract class ScreenWidget {
     public abstract int getX();
     public abstract int getY();
 
-    @Override
     public void render(Graphics g) {}
 }

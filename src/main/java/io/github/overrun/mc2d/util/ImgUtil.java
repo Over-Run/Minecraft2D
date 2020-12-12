@@ -32,7 +32,7 @@ import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
 
 /**
  * @author squid233
- * @since 2020/11/24
+ * @since 2020/09/15
  */
 public final class ImgUtil {
     public static BufferedImage readImage(String name) {

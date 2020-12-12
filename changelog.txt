@@ -30,4 +30,5 @@
 10. The image will split in next version, because it is difficult to determine the position of sprites
 
 0.2.0 2020/10/16~
-1. Remove GSON, use snakeyaml
+1. Remove GSON
+2. screen add button

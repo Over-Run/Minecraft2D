@@ -25,58 +25,41 @@
 package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.text.IText;
-import io.github.overrun.mc2d.util.stream.ArrayStream;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 
-import java.awt.*;
-import java.util.List;
+import java.awt.Graphics;
+import java.util.Map;
 
 import static io.github.overrun.mc2d.Minecraft2D.getHeight;
 import static io.github.overrun.mc2d.Minecraft2D.getWidth;
 import static io.github.overrun.mc2d.screen.Screens.BG_COLOR;
-import static io.github.overrun.mc2d.util.Coordinator.*;
-import static io.github.overrun.mc2d.util.Coordinator.U_M;
-import static io.github.overrun.mc2d.util.DrawHelper.drawRect;
+import static io.github.overrun.mc2d.util.Coordinator.U_L;
 import static io.github.overrun.mc2d.util.DrawHelper.fillRect;
 
 /**
  * @author squid233
- * @since 2020/12/06
+ * @since 2020/10/16
  */
 public class ComboBoxWidget extends ScreenWidget {
-    private final List<ComboBoxItem> items;
+    private final Map<IText, ComboBoxItem> items;
     private ComboBoxItem selectedItem;
 
-    public ComboBoxWidget(List<ComboBoxItem> items) {
-        this.items = items;
-    }
-
-    public ComboBoxWidget(ComboBoxItem... items) {
-        this(new ObjectArrayList<>(items.length));
-        ((ObjectArrayList<ComboBoxItem>) getItems()).addElements(0, items);
+    public ComboBoxWidget(Screen screen, IText... itemContents) {
+        this.items = new Object2ObjectArrayMap<>(itemContents.length);
+        for (int i = 0; i < itemContents.length; i++) {
+            IText t = itemContents[i];
+            items.put(t, (ComboBoxItem) screen.addButton(
+                    new ComboBoxItem(getY() + i * 25, t, w -> setSelectedItem((ComboBoxItem) w)))
+            );
+        }
     }
 
     @Override
     public void render(Graphics g) {
         fillRect(g, BG_COLOR, getX(), getY(), getWidth(), getY() << 2, U_L);
-        ArrayStream.forEach(items, (item, i) -> {
-            final IText t = item.getContent();
-            final Point p = transformation(-(t.getPrevWidth(g) >> 1),
-                    getY() + i * t.getPrevHeight(g),
-                    U_M);
-            if (getSelectedItem() == item) {
-                drawRect(g,
-                        Color.WHITE,
-                        -(t.getPrevWidth(g) >> 1) - 4,
-                        p.y - 30,
-                        t.getPrevWidth(g) + 4,
-                        t.getPrevHeight(g) + 4,
-                        U_M);
-            }
-            System.out.println(t + ":width:" + t.getPrevWidth(g));
-            System.out.println(t + ":height:" + t.getPrevHeight(g));
-            item.render(g, p.y - 30);
-        });
+        for (ComboBoxItem i : items.values()) {
+            i.render(g);
+        }
     }
 
     public ComboBoxWidget setSelectedItem(ComboBoxItem item) {
@@ -84,7 +67,11 @@ public class ComboBoxWidget extends ScreenWidget {
         return this;
     }
 
-    public List<ComboBoxItem> getItems() {
+    public ComboBoxWidget setSelectedItem(IText itemContent) {
+        return setSelectedItem(getItems().get(itemContent));
+    }
+
+    public Map<IText, ComboBoxItem> getItems() {
         return items;
     }
 

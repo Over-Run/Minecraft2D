@@ -24,21 +24,13 @@
 
 package io.github.overrun.mc2d.util.registry;
 
-import io.github.overrun.mc2d.screen.Screen;
-import io.github.overrun.mc2d.screen.Screens;
 import io.github.overrun.mc2d.util.Identifier;
 
 /**
  * @author squid233
- * @since 2020/11/24
+ * @since 2020/10/06
  */
 public final class Registry {
-    public static final DefaultedRegistry<Screen> SCREEN;
-
-    static {
-        SCREEN = new DefaultedRegistry<>(Screens.TITLE_SCREEN);
-    }
-
     public static <T> T register(BaseRegistry<T> registry, Identifier id, T entry) {
         return registry.register(id, entry);
     }

@@ -25,8 +25,6 @@
 package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.client.Mc2dClient;
-import io.github.overrun.mc2d.client.renderer.Renderable;
-import io.github.overrun.mc2d.util.registry.Registry;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 
@@ -40,21 +38,19 @@ import static java.awt.event.KeyEvent.VK_ESCAPE;
 
 /**
  * @author squid233
- * @since 2020/11/24
+ * @since 2020/10/16
  */
-public abstract class Screen implements Renderable {
+public abstract class Screen {
     protected final ObjectList<ScreenWidget> widgets = new ObjectArrayList<>(6);
     protected final ObjectList<ButtonWidget> buttons = new ObjectArrayList<>(6);
     private final Screen parent;
     protected Mc2dClient client;
-    private static boolean shouldShowHand;
 
     protected Screen(Screen parent) {
         this.parent = parent;
         this.client = Mc2dClient.getInstance();
     }
 
-    @Override
     public void render(Graphics g) {
         drawDirtBackground(g);
         drawDefaultBackground(g);
@@ -64,18 +60,19 @@ public abstract class Screen implements Renderable {
     }
 
     public void onKeyDown(KeyEvent e) {
-        if (e.getKeyCode() == VK_ESCAPE) {
+        if (e.getKeyChar() == VK_ESCAPE) {
             close();
         }
     }
 
-    public void addWidget(ScreenWidget widget) {
-        widgets.add(0,widget);
+    public ScreenWidget addWidget(ScreenWidget widget) {
+        widgets.add(0, widget);
+        return widget;
     }
 
-    public void addButton(ButtonWidget widget) {
+    public ButtonWidget addButton(ButtonWidget widget) {
         buttons.add(0, widget);
-        addWidget(widget);
+        return (ButtonWidget) addWidget(widget);
     }
 
     protected void close() {
@@ -94,15 +91,10 @@ public abstract class Screen implements Renderable {
 
     public void onMouseClicked() {
         for (ButtonWidget b : buttons) {
-            if (b.isHover()) {
+            if (b.isHover() && b.isEnable()) {
                 b.getAction().onPress(b);
                 break;
             }
         }
-    }
-
-    @Override
-    public String toString() {
-        return Registry.SCREEN.getId(this).toString();
     }
 }

@@ -33,7 +33,7 @@ import static io.github.overrun.mc2d.util.Images.LANG_BUTTON_HOVER;
 
 /**
  * @author squid233
- * @since 2020/12/06
+ * @since 2020/10/13
  */
 public class LanguageButtonWidget extends ButtonWidget {
     public LanguageButtonWidget(int x, int y, int layout, PressAction action) {

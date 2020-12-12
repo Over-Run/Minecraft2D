@@ -88,11 +88,23 @@ public final class Coordinator {
         return type >= U_L && type <= U_R;
     }
 
-    public static boolean isCenter(int type) {
+    public static boolean isLayerCenter(int type) {
         return type >= M_L && type <= M_R;
     }
 
     public static boolean isDown(int type) {
         return type >= D_R && type <= D_R;
+    }
+
+    public static boolean isLeft(int type) {
+        return type == U_L || type == M_L || type == D_L;
+    }
+
+    public static boolean isCenter(int type) {
+        return type == U_M || type == M_M || type == D_M;
+    }
+
+    public static boolean isRight(int type) {
+        return type == U_R || type == M_R || type == D_R;
     }
 }

@@ -26,7 +26,7 @@ package io.github.overrun.mc2d.util;
 
 /**
  * @author squid233
- * @since 2020/11/24
+ * @since 2020/09/28
  */
 public class ResourceLocation extends Identifier {
     public ResourceLocation(String namespace, String path) {

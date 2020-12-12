@@ -31,7 +31,7 @@ import java.awt.event.MouseEvent;
 
 /**
  * @author squid233
- * @since 2020/11/27
+ * @since 2020/09/16
  */
 public final class MouseInput extends MouseAdapter {
     @Override

@@ -42,7 +42,7 @@ import static java.util.Collections.unmodifiableMap;
 
 /**
  * @author squid233
- * @since 2020/12/05
+ * @since 2020/10/13
  */
 public class Language {
     private static final Map<String, String> K2V_EN_US = new Object2ObjectArrayMap<>(6);

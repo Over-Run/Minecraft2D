@@ -28,7 +28,7 @@ import io.github.overrun.mc2d.util.Identifier;
 
 /**
  * @author squid233
- * @since 2020/11/24
+ * @since 2020/10/06
  */
 public abstract class BaseRegistry<T> implements Iterable<T> {
     public abstract T register(Identifier id, T entry);

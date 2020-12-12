@@ -28,7 +28,7 @@ import java.util.Objects;
 
 /**
  * @author squid233
- * @since 2020/11/24
+ * @since 2020/09/14
  */
 public class Identifier {
     private final String namespace;

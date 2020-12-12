@@ -28,7 +28,7 @@ import io.github.overrun.mc2d.lang.Language;
 
 /**
  * @author squid233
- * @since 2020/12/06
+ * @since 2020/10/12
  */
 public class TranslatableText extends BaseText {
     public TranslatableText(String key, Object... params) {

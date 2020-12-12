@@ -26,6 +26,8 @@ package io.github.overrun.mc2d.input;
 
 import it.unimi.dsi.fastutil.chars.Char2ObjectArrayMap;
 
+import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.function.Consumer;
 
 /**
@@ -70,5 +72,31 @@ public final class KeyBinding {
 
     public static KeyBinding getKeyBinding(char keyChar) {
         return KEY_BINDINGS.get(keyChar);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        KeyBinding that = (KeyBinding) o;
+        return getKey() == that.getKey() && getType() == that.getType();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getKey(), getType());
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", KeyBinding.class.getSimpleName() + "[", "]")
+                .add("key=" + key)
+                .add("type=" + type)
+                .add("operation=" + operation)
+                .toString();
     }
 }

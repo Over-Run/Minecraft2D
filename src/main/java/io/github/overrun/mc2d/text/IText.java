@@ -30,7 +30,7 @@ import static io.github.overrun.mc2d.util.DrawHelper.getSimsunMetrics;
 
 /**
  * @author squid233
- * @since 2020/11/25
+ * @since 2020/09/18
  */
 public interface IText {
     String asString();
@@ -44,6 +44,6 @@ public interface IText {
     }
 
     default int getPrevHeight(Graphics g) {
-        return getSimsunMetrics(g).getAscent() - getSimsunMetrics(g).getDescent();
+        return getSimsunMetrics(g).getAscent();
     }
 }

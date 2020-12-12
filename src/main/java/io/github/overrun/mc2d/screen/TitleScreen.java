@@ -35,7 +35,7 @@ import static io.github.overrun.mc2d.util.Images.LOGO;
 
 /**
  * @author squid233
- * @since 2020/11/24
+ * @since 2020/10/12
  */
 public final class TitleScreen extends Screen {
     public TitleScreen(Screen parent) {
@@ -43,7 +43,8 @@ public final class TitleScreen extends Screen {
         addButton(new ButtonWidget(-100, 62, 200, U_M, new TranslatableText("button.mc2d.singleplayer")));
         addButton(new ButtonWidget(-100, 88, 200, U_M, new TranslatableText("button.mc2d.multiplayer")));
         addButton(new ButtonWidget(-100, 114, 200, U_M, new LiteralText("Mods")));
-        addButton(new ButtonWidget(-100, 140, 200, U_M, new TranslatableText("button.mc2d.options")));
+        addButton(new ButtonWidget(-100, 140, 200, U_M, new TranslatableText("button.mc2d.options"),
+                w -> open(Screens.OPTIONS_SCREEN)));
         addButton(new ButtonWidget(-100, 166, 200, U_M, new TranslatableText("button.mc2d.exit_game"),
                 w -> System.exit(0)));
         addButton(new LanguageButtonWidget(60, 192, U_M, w -> open(Screens.LANG_SCREEN)));

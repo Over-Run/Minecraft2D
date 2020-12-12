@@ -25,13 +25,14 @@
 package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.text.IText;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Supplier;
+import java.util.function.Consumer;
 
 import static io.github.overrun.mc2d.util.Coordinator.*;
 import static io.github.overrun.mc2d.util.DrawHelper.drawText;
@@ -39,7 +40,7 @@ import static io.github.overrun.mc2d.util.Images.*;
 
 /**
  * @author squid233
- * @since 2020/11/24
+ * @since 2020/10/12
  */
 public class ButtonWidget extends AbstractButtonWidget {
     private final int x;
@@ -48,7 +49,8 @@ public class ButtonWidget extends AbstractButtonWidget {
     private final int layout;
     private final IText text;
     private final PressAction action;
-    private final Supplier<List<IText>> tooltipSupplier;
+    private final Consumer<List<IText>> tooltipSupplier;
+    private final List<IText> tooltips = new ObjectArrayList<>(1);
     private boolean isEnable = true;
 
     public ButtonWidget(int x,
@@ -57,7 +59,7 @@ public class ButtonWidget extends AbstractButtonWidget {
                         int layout,
                         IText text,
                         PressAction action,
-                        Supplier<List<IText>> tooltipSupplier) {
+                        Consumer<List<IText>> tooltipSupplier) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -65,6 +67,7 @@ public class ButtonWidget extends AbstractButtonWidget {
         this.text = text;
         this.action = action;
         this.tooltipSupplier = tooltipSupplier;
+        tooltipSupplier.accept(tooltips);
     }
 
     public ButtonWidget(int x,
@@ -72,7 +75,7 @@ public class ButtonWidget extends AbstractButtonWidget {
                         int width,
                         IText text,
                         PressAction action,
-                        Supplier<List<IText>> tooltipSupplier) {
+                        Consumer<List<IText>> tooltipSupplier) {
         this(x, y, width, D_M, text, action, tooltipSupplier);
     }
 
@@ -82,7 +85,7 @@ public class ButtonWidget extends AbstractButtonWidget {
                         int layout,
                         IText text,
                         PressAction action) {
-        this(x, y, width, layout, text, action, List::of);
+        this(x, y, width, layout, text, action, t -> {});
     }
 
     public ButtonWidget(int x,
@@ -90,7 +93,7 @@ public class ButtonWidget extends AbstractButtonWidget {
                         int width,
                         IText text,
                         PressAction action) {
-        this(x, y, width, text, action, List::of);
+        this(x, y, width, text, action, t -> {});
     }
 
     public ButtonWidget(int x,
@@ -109,14 +112,9 @@ public class ButtonWidget extends AbstractButtonWidget {
         drawText(g, text,
                 transformation(
                         getX() + (getWidth() >> 1) - (text.getPrevWidth(g) >> 1),
-                        isUp(layout) || isCenter(layout) ? getY() + tY : getY() - tY,
+                        layout <= M_R ? getY() + tY : getY() - tY,
                         layout)
         );
-    }
-
-    @Override
-    public boolean isEnable() {
-        return isEnable;
     }
 
     public ButtonWidget setEnable(boolean enable) {
@@ -124,8 +122,17 @@ public class ButtonWidget extends AbstractButtonWidget {
         return this;
     }
 
+    public IText getText() {
+        return text;
+    }
+
     public List<IText> getTooltips() {
-        return tooltipSupplier.get();
+        return tooltips;
+    }
+
+    @Override
+    public boolean isEnable() {
+        return isEnable;
     }
 
     @Override
