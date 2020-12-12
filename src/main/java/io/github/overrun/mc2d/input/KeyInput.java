@@ -34,11 +34,9 @@ import static io.github.overrun.mc2d.screen.Screens.getOpenScreen;
 
 /**
  * @author squid233
- * @since 2020/11/22
+ * @since 2020/09/14
  */
 public final class KeyInput extends KeyAdapter {
-    public static final char K_ESC = '\u001b';
-
     private static int pressing = 0;
 
     @Override
@@ -55,8 +53,9 @@ public final class KeyInput extends KeyAdapter {
 
     @Override
     public void keyReleased(KeyEvent e) {
-        if (pressing != 0)
+        if (pressing != 0) {
             execute(e, RELEASE);
+        }
         pressing = 0;
     }
 
@@ -65,8 +64,11 @@ public final class KeyInput extends KeyAdapter {
     }
 
     private void execute(KeyEvent e, int type) {
-        KeyBinding kb = getKeyBinding(e.getKeyChar());
-        if (kb.getType() == type && getOpenScreen() instanceof GameScreen)
-            kb.onTyping().accept(kb);
+        if (getOpenScreen() instanceof GameScreen) {
+            KeyBinding kb = getKeyBinding(e.getKeyChar());
+            if (kb != null && kb.getType() == type) {
+                kb.onTyping().accept(kb);
+            }
+        }
     }
 }

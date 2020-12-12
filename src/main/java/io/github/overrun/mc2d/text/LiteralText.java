@@ -26,7 +26,7 @@ package io.github.overrun.mc2d.text;
 
 /**
  * @author squid233
- * @since 2020/11/25
+ * @since 2020/09/18
  */
 public class LiteralText extends BaseText {
     public LiteralText(String text, Object... params) {

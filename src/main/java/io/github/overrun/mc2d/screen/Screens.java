@@ -24,36 +24,26 @@
 
 package io.github.overrun.mc2d.screen;
 
-import io.github.overrun.mc2d.logger.Logger;
-import io.github.overrun.mc2d.util.registry.Registry;
-
 import java.awt.Color;
-
-import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
 
 /**
  * @author squid233
- * @since 2020/11/24
+ * @since 2020/10/01
  */
 public final class Screens {
     public static final Color BG_COLOR = new Color(64, 64, 64, 64);
 
     public static final Screen TITLE_SCREEN;
     public static final Screen LANG_SCREEN;
+    public static final Screen OPTIONS_SCREEN;
 
     static {
-        TITLE_SCREEN = register("title_screen", new TitleScreen(null));
-        LANG_SCREEN = register("lang_screen", new LanguageScreen(TITLE_SCREEN));
+        TITLE_SCREEN = new TitleScreen(null);
+        LANG_SCREEN = new LanguageScreen(TITLE_SCREEN);
+        OPTIONS_SCREEN = new OptionsScreen(TITLE_SCREEN);
     }
 
     private static Screen screen = TITLE_SCREEN;
-
-    private static Screen register(String id, Screen screen) {
-        if (Logger.logDebugEnable()) {
-            LOGGER.debug("Registered screen: {}", Registry.register(Registry.SCREEN, id, screen));
-        }
-        return screen;
-    }
 
     public static void openScreen(Screen s) {
         screen = s;

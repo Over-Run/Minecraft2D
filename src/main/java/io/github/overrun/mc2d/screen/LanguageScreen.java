@@ -24,47 +24,63 @@
 
 package io.github.overrun.mc2d.screen;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
 import io.github.overrun.mc2d.option.Options;
+import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.text.LiteralText;
 import io.github.overrun.mc2d.text.TranslatableText;
 
 import java.awt.Graphics;
-import java.util.Map;
 
 import static io.github.overrun.mc2d.lang.Language.getByLocale;
 import static io.github.overrun.mc2d.util.Constants.CANCEL;
 import static io.github.overrun.mc2d.util.Constants.DONE;
 import static io.github.overrun.mc2d.util.Coordinator.D_M;
+import static io.github.overrun.mc2d.util.DrawHelper.drawCenteredText;
 
 /**
  * @author squid233
- * @since 2020/12/06
+ * @since 2020/10/13
  */
 public class LanguageScreen extends Screen {
-    private static final Map<String, ComboBoxItem> MAP = Map.of(
+    private final BiMap<String, IText> map = ImmutableBiMap.of(
             "en_us", genItem("en_us"),
             "zh_cn", genItem("zh_cn")
     );
+
     public LanguageScreen(Screen parent) {
         super(parent);
-        addButton(new ButtonWidget(-210, 30, 200, D_M, new TranslatableText(DONE), w -> close()));
-        addButton(new ButtonWidget(10, 30, 200, D_M, new TranslatableText(CANCEL), w -> close()));
-        addWidget(new ComboBoxWidget(
-                MAP.get("en_us"),
-                MAP.get("zh_cn")
-        ).setSelectedItem(MAP.get(Options.get(Options.LANG, "en_us"))));
+        ComboBoxWidget cbw = new ComboBoxWidget(this,
+                map.get("en_us"),
+                map.get("zh_cn")
+        ).setSelectedItem(map.get(Options.get(Options.LANG, "en_us")));
+        addWidget(cbw);
+        addButton(new ButtonWidget(-210, 30, 200, D_M, new TranslatableText(DONE), w -> {
+            Options.setAndSave(Options.LANG, map.inverse().get(cbw.getSelectedItem().getText()));
+            close();
+        }));
+        addButton(new ButtonWidget(10, 30, 200, D_M, new TranslatableText(CANCEL), w -> {
+            cbw.setSelectedItem(map.get(Options.get(Options.LANG, "en_us")));
+            close();
+        }));
     }
 
-    private static ComboBoxItem genItem(String locale) {
-        return new ComboBoxItem(new LiteralText(getByLocale(locale, "language.name")
+    private IText genItem(String locale) {
+        return new LiteralText(getByLocale(locale, "language.name")
                 + " ("
                 + getByLocale(locale, "language.region")
                 + ")"
-        ));
+        );
     }
 
     @Override
     public void render(Graphics g) {
         super.render(g);
+        drawCenteredText(g, new TranslatableText("options.mc2d.choose_lang"), 5);
+        drawCenteredText(g,
+                new TranslatableText("options.mc2d.current_lang", map.get(Options.get(Options.LANG, "en_us"))),
+                25);
+        drawCenteredText(g, new TranslatableText("options.mc2d.lang_warning"), 45);
     }
 }

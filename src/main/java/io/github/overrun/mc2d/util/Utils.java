@@ -28,7 +28,7 @@ import java.io.InputStream;
 
 /**
  * @author squid233
- * @since 2020/12/02
+ * @since 2020/10/04
  */
 public final class Utils {
     public static InputStream getResource(String id) {

@@ -40,7 +40,7 @@ import static java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment;
 
 /**
  * @author squid233
- * @since 2020/11/24
+ * @since 2020/09/15
  */
 public final class DrawHelper {
     public static Font simsunb;
@@ -132,6 +132,10 @@ public final class DrawHelper {
             Point p = transformation(x, y, layout);
             gg.fillRect(p.x, p.y, width, height);
         });
+    }
+
+    public static void fillRect(Graphics g, Color color, int x, int y, int width, int height) {
+        fillRect(g, color, x, y, width, height, U_L);
     }
 
     public static FontMetrics getSimsunMetrics(Graphics g) {

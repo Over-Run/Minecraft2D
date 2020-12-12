@@ -24,28 +24,17 @@
 
 package io.github.overrun.mc2d.screen;
 
+import io.github.overrun.mc2d.Minecraft2D;
 import io.github.overrun.mc2d.text.IText;
 
-import java.awt.*;
-
-import static io.github.overrun.mc2d.util.DrawHelper.drawCenteredText;
+import static io.github.overrun.mc2d.util.Coordinator.U_L;
 
 /**
  * @author squid233
  * @since 2020/12/06
  */
-public class ComboBoxItem {
-    private final IText content;
-
-    public ComboBoxItem(IText content) {
-        this.content = content;
-    }
-
-    public IText getContent() {
-        return content;
-    }
-
-    public void render(Graphics g, int y) {
-        drawCenteredText(g, getContent(), y);
+public class ComboBoxItem extends ButtonWidget {
+    public ComboBoxItem(int y, IText text, PressAction action) {
+        super(0, y, Minecraft2D.getWidth() - 16, U_L, text, action);
     }
 }

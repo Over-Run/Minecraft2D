@@ -1,11 +1,11 @@
 plugins {
     id 'java'
     id 'idea'
+    id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_11
 
 group 'io.github.over-run'
 archivesBaseName = "minecraft2d"
@@ -28,6 +28,11 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
+tasks.withType(Javadoc) {
+    options.encoding = 'UTF-8'
+    options.charSet = 'UTF-8'
+}
+
 jar {
     from 'LICENSE'
     manifest {
@@ -44,7 +49,16 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier.set 'javadoc'
+    from javadoc.destinationDir
+}
+
 idea {
     project.languageLevel.level = 'JDK_11'
     module.inheritOutputDirs = true
+}
+
+publishing {
+    repositories { mavenLocal() }
 }

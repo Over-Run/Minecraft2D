@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Properties;
 
 import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
@@ -55,14 +56,31 @@ public final class Options {
                 OPTIONS.put(LANG, "en_us");
                 OPTIONS.store(fw, null);
             } catch (IOException e) {
-                LOGGER.error("Cannot write options: {}", e);
+                LOGGER.exception("Cannot write options!", e);
             }
         }
         try (FileReader fr = new FileReader(f)) {
             OPTIONS.load(fr);
         } catch (IOException e) {
-            LOGGER.error("Cannot read options: {}", e);
+            LOGGER.exception("Cannot read options!", e);
         }
+    }
+
+    public static void save() {
+        try (Writer w = new FileWriter("options.properties")) {
+            OPTIONS.store(w, null);
+        } catch (IOException e) {
+            LOGGER.exception("Cannot save options!", e);
+        }
+    }
+
+    public static void set(String k, String v) {
+        OPTIONS.setProperty(k, v);
+    }
+
+    public static void setAndSave(String k, String v) {
+        set(k, v);
+        save();
     }
 
     public static String get(String k) {

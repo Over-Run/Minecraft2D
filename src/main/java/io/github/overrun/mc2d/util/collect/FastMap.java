@@ -36,7 +36,9 @@ public final class FastMap {
     @SafeVarargs
     public static <K, V> Object2ObjectArrayMap<K, V> of(Map.Entry<K, V>... entries) {
         Object2ObjectArrayMap<K, V> m = new Object2ObjectArrayMap<>(entries.length);
-        for (Map.Entry<K, V> entry : entries) m.put(entry.getKey(), entry.getValue());
+        for (Map.Entry<K, V> entry : entries) {
+            m.put(entry.getKey(), entry.getValue());
+        }
         return m;
     }
 }
