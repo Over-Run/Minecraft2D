@@ -48,10 +48,10 @@ public class LanguageScreen extends Screen {
             "en_us", genItem("en_us"),
             "zh_cn", genItem("zh_cn")
     );
+    private final ComboBoxWidget cbw;
 
-    public LanguageScreen(Screen parent) {
-        super(parent);
-        ComboBoxWidget cbw = new ComboBoxWidget(this,
+    public LanguageScreen() {
+        cbw = new ComboBoxWidget(this,
                 map.get("en_us"),
                 map.get("zh_cn")
         ).setSelectedItem(map.get(Options.get(Options.LANG, "en_us")));
@@ -79,7 +79,7 @@ public class LanguageScreen extends Screen {
         super.render(g);
         drawCenteredText(g, new TranslatableText("options.mc2d.choose_lang"), 5);
         drawCenteredText(g,
-                new TranslatableText("options.mc2d.current_lang", map.get(Options.get(Options.LANG, "en_us"))),
+                new TranslatableText("options.mc2d.current_lang", cbw.getSelectedItem().getText()),
                 25);
         drawCenteredText(g, new TranslatableText("options.mc2d.lang_warning"), 45);
     }

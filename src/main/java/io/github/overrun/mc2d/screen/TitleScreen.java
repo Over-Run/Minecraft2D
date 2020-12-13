@@ -38,8 +38,7 @@ import static io.github.overrun.mc2d.util.Images.LOGO;
  * @since 2020/10/12
  */
 public final class TitleScreen extends Screen {
-    public TitleScreen(Screen parent) {
-        super(parent);
+    public TitleScreen() {
         addButton(new ButtonWidget(-100, 62, 200, U_M, new TranslatableText("button.mc2d.singleplayer")));
         addButton(new ButtonWidget(-100, 88, 200, U_M, new TranslatableText("button.mc2d.multiplayer")));
         addButton(new ButtonWidget(-100, 114, 200, U_M, new LiteralText("Mods")));

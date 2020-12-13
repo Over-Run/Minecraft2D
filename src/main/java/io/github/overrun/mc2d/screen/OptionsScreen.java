@@ -38,8 +38,7 @@ import static io.github.overrun.mc2d.util.DrawHelper.drawCenteredText;
  * @since 2020/12/12
  */
 public class OptionsScreen extends Screen {
-    public OptionsScreen(Screen parent) {
-        super(parent);
+    public OptionsScreen() {
         addButton(new ButtonWidget(-100, 30, 200, D_M, new TranslatableText(BACK), w -> close()));
         addButton(new ButtonWidget(-210, 55, 200, U_M, new TranslatableText("button.mc2d.language"),
                 w -> open(Screens.LANG_SCREEN)));

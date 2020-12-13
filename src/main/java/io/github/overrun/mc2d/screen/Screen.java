@@ -43,11 +43,9 @@ import static java.awt.event.KeyEvent.VK_ESCAPE;
 public abstract class Screen {
     protected final ObjectList<ScreenWidget> widgets = new ObjectArrayList<>(6);
     protected final ObjectList<ButtonWidget> buttons = new ObjectArrayList<>(6);
-    private final Screen parent;
     protected Mc2dClient client;
 
-    protected Screen(Screen parent) {
-        this.parent = parent;
+    protected Screen() {
         this.client = Mc2dClient.getInstance();
     }
 
@@ -76,12 +74,10 @@ public abstract class Screen {
     }
 
     protected void close() {
-        if (parent != null) {
-            open(parent);
-        }
+        open(Screens.getParent());
     }
 
-    public void open(Screen screen) {
+    protected void open(Screen screen) {
         openScreen(screen);
     }
 

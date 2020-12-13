@@ -38,15 +38,26 @@ public final class Screens {
     public static final Screen OPTIONS_SCREEN;
 
     static {
-        TITLE_SCREEN = new TitleScreen(null);
-        LANG_SCREEN = new LanguageScreen(TITLE_SCREEN);
-        OPTIONS_SCREEN = new OptionsScreen(TITLE_SCREEN);
+        TITLE_SCREEN = new TitleScreen();
+        LANG_SCREEN = new LanguageScreen();
+        OPTIONS_SCREEN = new OptionsScreen();
     }
 
     private static Screen screen = TITLE_SCREEN;
+    private static final Screen[] PARENTS = new Screen[127];
+    private static byte parent = 0;
 
-    public static void openScreen(Screen s) {
+    static void openScreen(Screen s) {
+        if (s != getParent()) {
+            //TODO;;;
+            parent++;
+            PARENTS[parent] = s;
+        }
         screen = s;
+    }
+
+    static Screen getParent() {
+        return PARENTS[parent < 0 || parent > 126 ? 0 : parent];
     }
 
     public static Screen getOpenScreen() {

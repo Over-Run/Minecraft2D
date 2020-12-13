@@ -29,7 +29,4 @@ package io.github.overrun.mc2d.screen;
  * @since 2020/11/24
  */
 public final class GameScreen extends Screen {
-    public GameScreen(Screen parent) {
-        super(parent);
-    }
 }

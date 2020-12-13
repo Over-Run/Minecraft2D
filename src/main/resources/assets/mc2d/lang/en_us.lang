@@ -9,5 +9,5 @@ button.mc2d.multiplayer=Multiplayer
 button.mc2d.options=Options
 button.mc2d.singleplayer=Singleplayer
 options.mc2d.choose_lang=Choose your language
-options.mc2d.current_lang=Current language: %s
+options.mc2d.current_lang=Current choosing language: %s
 options.mc2d.lang_warning=Language translations may not be 100%% accurate
