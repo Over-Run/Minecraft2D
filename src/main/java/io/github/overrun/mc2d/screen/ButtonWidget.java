@@ -49,7 +49,6 @@ public class ButtonWidget extends AbstractButtonWidget {
     private final int layout;
     private final IText text;
     private final PressAction action;
-    private final Consumer<List<IText>> tooltipSupplier;
     private final List<IText> tooltips = new ObjectArrayList<>(1);
     private boolean isEnable = true;
 
@@ -66,7 +65,6 @@ public class ButtonWidget extends AbstractButtonWidget {
         this.layout = layout;
         this.text = text;
         this.action = action;
-        this.tooltipSupplier = tooltipSupplier;
         tooltipSupplier.accept(tooltips);
     }
 
@@ -193,9 +191,10 @@ public class ButtonWidget extends AbstractButtonWidget {
                 && getY() == that.getY()
                 && getWidth() == that.getWidth()
                 && layout == that.layout
-                && Objects.equals(text, that.text)
+                && isEnable() == that.isEnable()
+                && Objects.equals(getText(), that.getText())
                 && Objects.equals(getAction(), that.getAction())
-                && Objects.equals(tooltipSupplier, that.tooltipSupplier);
+                && Objects.equals(getTooltips(), that.getTooltips());
     }
 
     @Override
@@ -204,8 +203,9 @@ public class ButtonWidget extends AbstractButtonWidget {
                 getY(),
                 getWidth(),
                 layout,
-                text,
+                getText(),
                 getAction(),
-                tooltipSupplier);
+                getTooltips(),
+                isEnable());
     }
 }

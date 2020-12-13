@@ -39,8 +39,8 @@ import static io.github.overrun.mc2d.util.DrawHelper.drawImage;
 public abstract class AbstractButtonWidget extends ScreenWidget {
     public abstract boolean isEnable();
     public abstract Image getUsualTexture();
-    public abstract int getHeight();
     public abstract int getWidth();
+    public abstract int getHeight();
 
     public Point getPrevPos() {
         return new Point(getX(), getY());

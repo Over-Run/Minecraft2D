@@ -24,9 +24,7 @@ dependencies {
     //compile "org.yaml:snakeyaml:$snakeyaml"
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-}
+tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
 
 tasks.withType(Javadoc) {
     options.encoding = 'UTF-8'
@@ -40,18 +38,18 @@ jar {
     }
 }
 
-shadowJar {
-    from 'LICENSE'
-}
+shadowJar { from 'LICENSE' }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     archiveClassifier.set 'sources'
     from sourceSets.main.allSource
+    from 'LICENSE'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     archiveClassifier.set 'javadoc'
     from javadoc.destinationDir
+    from 'LICENSE'
 }
 
 idea {
@@ -59,6 +57,4 @@ idea {
     module.inheritOutputDirs = true
 }
 
-publishing {
-    repositories { mavenLocal() }
-}
+publishing { repositories { mavenLocal() } }

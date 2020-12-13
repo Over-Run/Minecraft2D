@@ -24,10 +24,13 @@
 
 package io.github.overrun.mc2d.util;
 
-import io.github.overrun.mc2d.client.Mc2dClient;
+import com.google.common.collect.Range;
 import org.intellij.lang.annotations.MagicConstant;
 
 import java.awt.Point;
+
+import static io.github.overrun.mc2d.Minecraft2D.getHeight;
+import static io.github.overrun.mc2d.Minecraft2D.getWidth;
 
 /**
  * <div style="font-family:jetbrains mono,consolas,monospace">
@@ -54,34 +57,33 @@ public final class Coordinator {
     public static Point transformation(
             int x, int y,
             @MagicConstant(valuesFromClass = Coordinator.class) int type) {
-        Point pp;
-        final Mc2dClient c = Mc2dClient.getInstance();
+        final Point p;
         if (type == U_L) {
-            pp = new Point(x + 8, y + 30);
+            p = new Point(x + 8, y + 30);
         } else if (type == U_M) {
-            pp = new Point((c.getWidth() >> 1) + x, y + 30);
+            p = new Point((getWidth() >> 1) + x, y + 30);
         } else if (type == U_R) {
-            pp = new Point(c.getWidth() - 8 - x, y + 30);
+            p = new Point(getWidth() - 8 - x, y + 30);
         } else if (type == M_L) {
-            pp = new Point(x + 8, (c.getHeight() - 22 >> 1) + y);
+            p = new Point(x + 8, (getHeight() - 22 >> 1) + y);
         } else if (type == M_M) {
-            pp = new Point((c.getWidth() - 22 >> 1) + x,
-                    (c.getHeight() >> 1) + y);
+            p = new Point((getWidth() - 22 >> 1) + x,
+                    (getHeight() >> 1) + y);
         } else if (type == M_R) {
-            pp = new Point(c.getWidth() - 22 - 8 - x,
-                    (c.getHeight() >> 1) + y);
+            p = new Point(getWidth() - 22 - 8 - x,
+                    (getHeight() >> 1) + y);
         } else if (type == D_L) {
-            pp = new Point(x + 8, c.getHeight() - 8 - y);
+            p = new Point(x + 8, getHeight() - 8 - y);
         } else if (type == D_M) {
-            pp = new Point((c.getWidth() >> 1) + x,
-                    c.getHeight() - 8 - y);
+            p = new Point((getWidth() >> 1) + x,
+                    getHeight() - 8 - y);
         } else if (type == D_R) {
-            pp = new Point(c.getWidth() - 8 - x,
-                    c.getHeight() - 8 - y);
+            p = new Point(getWidth() - 8 - x,
+                    getHeight() - 8 - y);
         } else {
-            pp = new Point();
+            p = new Point();
         }
-        return pp;
+        return p;
     }
 
     public static boolean isUp(int type) {
@@ -93,7 +95,7 @@ public final class Coordinator {
     }
 
     public static boolean isDown(int type) {
-        return type >= D_R && type <= D_R;
+        return type >= D_L && type <= D_R;
     }
 
     public static boolean isLeft(int type) {

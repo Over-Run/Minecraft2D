@@ -27,7 +27,7 @@ package io.github.overrun.mc2d.logger;
 import io.github.overrun.mc2d.option.Options;
 
 import java.io.IOException;
-
+import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 
@@ -41,16 +41,20 @@ public class Logger {
     private final java.util.logging.Logger logger;
 
     public Logger(String name) {
-        this.logger = getLogger(name);
+        logger = getLogger(name);
         logger.setUseParentHandlers(false);
         logger.setLevel(Level.CONFIG);
-        Formatter f = new Formatter();
-        ConsoleHandler ch = new ConsoleHandler();
+        final Formatter f = new Formatter();
+        final ConsoleHandler ch = new ConsoleHandler() {
+            {
+                setOutputStream(System.out);
+            }
+        };
         ch.setLevel(logDebugEnable() ? Level.CONFIG : Level.INFO);
         ch.setFormatter(f);
         logger.addHandler(ch);
         try {
-            FileHandler fh = new FileHandler("latest.log");
+            final FileHandler fh = new FileHandler("latest.log");
             fh.setLevel(Level.INFO);
             fh.setFormatter(f);
             logger.addHandler(fh);
@@ -58,7 +62,7 @@ public class Logger {
             e.printStackTrace();
         }
         try {
-            FileHandler fh = new FileHandler("latest-debug.log");
+            final FileHandler fh = new FileHandler("latest-debug.log");
             fh.setLevel(Level.CONFIG);
             fh.setFormatter(f);
             logger.addHandler(fh);

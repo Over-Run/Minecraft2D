@@ -1,6 +1,6 @@
 ﻿# Minecraft 2D
 
-![Java CI with Gradle](https://github.com/Over-Run/Minecraft2D/workflows/Java%20CI%20with%20Gradle/badge.svg?branch=pre-alpha)  
+![Java CI with Gradle](https://github.com/Over-Run/Minecraft2D/workflows/Java%20CI%20with%20Gradle/badge.svg?branch=alpha)  
 ![GitHub search hit counter](https://img.shields.io/github/search/Over-Run/Minecraft2D/goto)  
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/Over-Run/Minecraft2D?include_prereleases)
 

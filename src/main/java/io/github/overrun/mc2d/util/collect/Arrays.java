@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.util.stream;
+package io.github.overrun.mc2d.util.collect;
 
 import java.util.List;
 import java.util.function.ObjIntConsumer;
@@ -31,11 +31,14 @@ import java.util.function.ObjIntConsumer;
  * @author squid233
  * @since 2020/12/05
  */
-public final class ArrayStream {
+public final class Arrays {
     public static <T> boolean contains(T[] array, T t) {
         for (T t1 : array) {
-            if (t == t1) return true;
-            else if (t != null && t.equals(t1)) return true;
+            if (t == t1) {
+                return true;
+            } else if (t != null && t.equals(t1)) {
+                return true;
+            }
         }
         return false;
     }
@@ -45,7 +48,7 @@ public final class ArrayStream {
     }
 
     public static <T> void forEach(int start, List<T> c, ObjIntConsumer<T> oic) {
-        for (int i = 0; i < c.size(); i++) {
+        for (int i = start; i < c.size(); i++) {
             oic.accept(c.get(i), i);
         }
     }

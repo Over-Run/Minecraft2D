@@ -56,11 +56,11 @@ public final class GameRenderer implements Runnable {
                 //noinspection BusyWait
                 Thread.sleep(getInterval());
             } catch (InterruptedException e) {
-                LOGGER.error("{} {} {}", thread.getName(), "error:", e);
+                LOGGER.error("{} error: {}", thread.getName(), e);
                 exited = true;
             }
         }
-        LOGGER.info("{} {}", thread.getName(), "stop rendering");
+        LOGGER.info("{} stop rendering", thread.getName());
     }
 
     public int getInterval() {

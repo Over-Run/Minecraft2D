@@ -35,7 +35,7 @@ import static io.github.overrun.mc2d.Minecraft2D.getHeight;
 import static io.github.overrun.mc2d.Minecraft2D.getWidth;
 import static io.github.overrun.mc2d.screen.Screens.BG_COLOR;
 import static io.github.overrun.mc2d.util.Coordinator.*;
-import static io.github.overrun.mc2d.util.stream.ArrayStream.notContains;
+import static io.github.overrun.mc2d.util.collect.Arrays.notContains;
 import static java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment;
 
 /**

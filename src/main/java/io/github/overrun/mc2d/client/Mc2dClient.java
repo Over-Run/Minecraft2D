@@ -61,8 +61,8 @@ public final class Mc2dClient extends JFrame {
         setIconImage(readImage("icon.png"));
         final long mem = Runtime.getRuntime().maxMemory() >> 20;
         LOGGER.info("Max memory: {}", mem >= 1024
-                ? (mem >> 10) + "GB"
-                : mem + "MB");
+                ? (mem >> 10) + " GB"
+                : mem + " MB");
     }
 
     @Override

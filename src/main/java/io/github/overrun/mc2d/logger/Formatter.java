@@ -24,6 +24,8 @@
 
 package io.github.overrun.mc2d.logger;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.LocalTime;
 import java.util.logging.LogRecord;
 
@@ -36,7 +38,7 @@ import static io.github.overrun.mc2d.util.Utils.newLine;
 public class Formatter extends java.util.logging.Formatter {
     @Override
     public String format(LogRecord record) {
-        String level;
+        final String level;
         switch (record.getLevel().getName()) {
             case "SEVERE":
                 level = "ERROR";
@@ -56,7 +58,7 @@ public class Formatter extends java.util.logging.Formatter {
                 msg = msg.replaceFirst("\\{}", String.valueOf(o));
             }
         }
-        StringBuilder sb = new StringBuilder("[")
+        final StringBuilder sb = new StringBuilder("[")
                 .append(LocalTime.now().toString().split("\\.")[0])
                 .append("] [")
                 .append(Thread.currentThread().getName())
@@ -66,18 +68,15 @@ public class Formatter extends java.util.logging.Formatter {
                 .append(record.getLoggerName())
                 .append(") ")
                 .append(msg);
+        String throwable = "";
         if (record.getThrown() != null) {
-            Throwable t = record.getThrown();
-            sb.append(" Caused by: ")
-                    .append(t)
-                    .append(newLine());
-            for (StackTraceElement ste : t.getStackTrace()) {
-                sb.append(newLine())
-                        .append("\tat ")
-                        .append(ste);
-            }
+            final StringWriter sw = new StringWriter();
+            final PrintWriter pw = new PrintWriter(sw);
+            pw.println();
+            record.getThrown().printStackTrace(pw);
+            pw.close();
+            throwable = sw.toString();
         }
-        sb.append(newLine());
-        return sb.toString();
+        return sb.append(throwable).append(newLine()).toString();
     }
 }
