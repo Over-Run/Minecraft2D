@@ -47,7 +47,8 @@ public abstract class AbstractButtonWidget extends ScreenWidget {
     }
 
     public boolean isHover() {
-        return getMouseX() > getPrevPos().getX()
+        return isEnable()
+                && getMouseX() > getPrevPos().getX()
                 && getMouseX() < getPrevPos().getX() + getWidth()
                 && getMouseY() > getPrevPos().getY()
                 && getMouseY() < getPrevPos().getY() + getHeight();

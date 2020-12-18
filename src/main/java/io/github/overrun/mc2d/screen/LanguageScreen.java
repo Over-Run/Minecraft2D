@@ -43,7 +43,7 @@ import static io.github.overrun.mc2d.util.DrawHelper.drawCenteredText;
  * @author squid233
  * @since 2020/10/13
  */
-public class LanguageScreen extends Screen {
+public final class LanguageScreen extends Screen {
     private final BiMap<String, IText> map = ImmutableBiMap.of(
             "en_us", genItem("en_us"),
             "zh_cn", genItem("zh_cn")
@@ -54,14 +54,14 @@ public class LanguageScreen extends Screen {
         cbw = new ComboBoxWidget(this,
                 map.get("en_us"),
                 map.get("zh_cn")
-        ).setSelectedItem(map.get(Options.get(Options.LANG, "en_us")));
+        ).setSelectedItem(map.get(Options.get(Options.LANG, Options.DEF_LANG)));
         addWidget(cbw);
         addButton(new ButtonWidget(-210, 30, 200, D_M, new TranslatableText(DONE), w -> {
             Options.setAndSave(Options.LANG, map.inverse().get(cbw.getSelectedItem().getText()));
             close();
         }));
         addButton(new ButtonWidget(10, 30, 200, D_M, new TranslatableText(CANCEL), w -> {
-            cbw.setSelectedItem(map.get(Options.get(Options.LANG, "en_us")));
+            cbw.setSelectedItem(map.get(Options.get(Options.LANG, Options.DEF_LANG)));
             close();
         }));
     }

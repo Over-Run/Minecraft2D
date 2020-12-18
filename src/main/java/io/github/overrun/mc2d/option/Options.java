@@ -39,21 +39,30 @@ import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
  */
 public final class Options {
     private static final Properties OPTIONS = new Properties(5);
-    public static final String DEBUG = "debug";
     public static final String WIDTH = "width";
     public static final String HEIGHT = "height";
     public static final String FPS = "fps";
     public static final String LANG = "lang";
+    public static final String LOGGER_FORMAT = "logger-format";
+    public static final String LOG_LEVEL = "log-level";
+
+    public static final int DEF_WIDTH = 854;
+    public static final int DEF_HEIGHT = 480;
+    public static final int DEF_FPS = 60;
+    public static final String DEF_LANG = "en_us";
+    public static final String DEF_LOGGER_FORMAT = "[%1$tT] [%2$s/%3$s] (%4$s) %5$s%6$s";
+    public static final int DEF_LOG_LEVEL = 700;
 
     static {
         File f = new File("options.properties");
         if (!f.exists()) {
             try (FileWriter fw = new FileWriter(f)) {
-                OPTIONS.put(DEBUG, "false");
-                OPTIONS.put(WIDTH, "854");
-                OPTIONS.put(HEIGHT, "480");
-                OPTIONS.put(FPS, "60");
-                OPTIONS.put(LANG, "en_us");
+                OPTIONS.put(WIDTH, DEF_WIDTH);
+                OPTIONS.put(HEIGHT, DEF_HEIGHT);
+                OPTIONS.put(FPS, DEF_FPS);
+                OPTIONS.put(LANG, DEF_LANG);
+                OPTIONS.put(LOGGER_FORMAT, DEF_LOGGER_FORMAT);
+                OPTIONS.put(LOG_LEVEL, DEF_LOG_LEVEL);
                 OPTIONS.store(fw, null);
             } catch (IOException e) {
                 LOGGER.exception("Cannot write options!", e);

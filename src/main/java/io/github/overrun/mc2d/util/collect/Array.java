@@ -22,19 +22,49 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.screen;
+package io.github.overrun.mc2d.util.collect;
 
-import io.github.overrun.mc2d.Minecraft2D;
-import io.github.overrun.mc2d.text.IText;
-
-import static io.github.overrun.mc2d.util.Coordinator.U_L;
+import java.util.Arrays;
 
 /**
  * @author squid233
- * @since 2020/12/06
+ * @since 2020/12/16
  */
-public class ComboBoxItem extends ButtonWidget {
-    public ComboBoxItem(int y, IText text, PressAction action) {
-        super(0, y, Minecraft2D.getWidth(), U_L, text, action);
+public class Array<T> {
+    private final T[] arr;
+
+    public Array(T[] array) {
+        arr = array;
+    }
+
+    public T[] array() {
+        return arr;
+    }
+
+    public int length() {
+        return arr.length;
+    }
+
+    public void set(int index, T t) {
+        arr[index] = t;
+    }
+
+    public T get(int index) {
+        return arr[index];
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(arr);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Array && Arrays.equals(arr, ((Array<?>) obj).arr);
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.deepToString(arr);
     }
 }

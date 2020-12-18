@@ -25,6 +25,7 @@
 package io.github.overrun.mc2d;
 
 import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.event.EventBus;
 import io.github.overrun.mc2d.logger.Logger;
 
 /**
@@ -32,8 +33,9 @@ import io.github.overrun.mc2d.logger.Logger;
  * @since 2020/09/14
  */
 public final class Minecraft2D {
-    public static final Logger LOGGER = new Logger(Minecraft2D.class);
+    public static final Logger LOGGER = Logger.getLogger(Minecraft2D.class);
     public static final String VERSION = "0.3.0";
+    public static final EventBus EVENT_BUS = new EventBus();
 
     public static int getWidth() {
         return Mc2dClient.getInstance().getWidth();

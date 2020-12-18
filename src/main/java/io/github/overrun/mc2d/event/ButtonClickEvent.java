@@ -22,23 +22,23 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.util.collect;
+package io.github.overrun.mc2d.event;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-
-import java.util.Map;
+import io.github.overrun.mc2d.screen.ButtonWidget;
 
 /**
  * @author squid233
- * @since 2020/12/05
+ * @since 2020/12/16
  */
-public final class FastMap {
-    @SafeVarargs
-    public static <K, V> Object2ObjectArrayMap<K, V> of(Map.Entry<K, V>... entries) {
-        Object2ObjectArrayMap<K, V> m = new Object2ObjectArrayMap<>(entries.length);
-        for (Map.Entry<K, V> entry : entries) {
-            m.put(entry.getKey(), entry.getValue());
-        }
-        return m;
+public class ButtonClickEvent extends Event {
+    private static final long serialVersionUID = 1L;
+
+    public ButtonClickEvent(ButtonWidget widget) {
+        super(widget);
+    }
+
+    @Override
+    public ButtonWidget getSource() {
+        return (ButtonWidget) super.getSource();
     }
 }

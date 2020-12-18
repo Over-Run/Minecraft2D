@@ -1,6 +1,6 @@
 ---
 name: Bug reports
-about: Create a report to help us improve
+about: Create a report to help us to improve
 title: I found a bug
 labels: bug
 assignees: squid233
@@ -15,4 +15,4 @@ Java Version: 1.0
 
 **Information**
 
-How do bugs happen
+How do to let bugs happen

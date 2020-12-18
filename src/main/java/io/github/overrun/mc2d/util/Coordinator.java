@@ -24,7 +24,6 @@
 
 package io.github.overrun.mc2d.util;
 
-import com.google.common.collect.Range;
 import org.intellij.lang.annotations.MagicConstant;
 
 import java.awt.Point;
@@ -59,27 +58,27 @@ public final class Coordinator {
             @MagicConstant(valuesFromClass = Coordinator.class) int type) {
         final Point p;
         if (type == U_L) {
-            p = new Point(x + 8, y + 30);
+            p = new Point(x, y);
         } else if (type == U_M) {
-            p = new Point((getWidth() >> 1) + x, y + 30);
+            p = new Point((getWidth() >> 1) + x, y);
         } else if (type == U_R) {
-            p = new Point(getWidth() - 8 - x, y + 30);
+            p = new Point(getWidth() - x, y);
         } else if (type == M_L) {
-            p = new Point(x + 8, (getHeight() - 22 >> 1) + y);
+            p = new Point(x, (getHeight()  >> 1) + y);
         } else if (type == M_M) {
-            p = new Point((getWidth() - 22 >> 1) + x,
+            p = new Point((getWidth() >> 1) + x,
                     (getHeight() >> 1) + y);
         } else if (type == M_R) {
-            p = new Point(getWidth() - 22 - 8 - x,
+            p = new Point(getWidth() - x,
                     (getHeight() >> 1) + y);
         } else if (type == D_L) {
-            p = new Point(x + 8, getHeight() - 8 - y);
+            p = new Point(x, getHeight() - y);
         } else if (type == D_M) {
             p = new Point((getWidth() >> 1) + x,
-                    getHeight() - 8 - y);
+                    getHeight() - y);
         } else if (type == D_R) {
-            p = new Point(getWidth() - 8 - x,
-                    getHeight() - 8 - y);
+            p = new Point(getWidth() - x,
+                    getHeight() - y);
         } else {
             p = new Point();
         }

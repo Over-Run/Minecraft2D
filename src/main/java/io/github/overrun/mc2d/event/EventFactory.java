@@ -22,19 +22,17 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.screen;
+package io.github.overrun.mc2d.event;
 
 import io.github.overrun.mc2d.Minecraft2D;
-import io.github.overrun.mc2d.text.IText;
-
-import static io.github.overrun.mc2d.util.Coordinator.U_L;
+import io.github.overrun.mc2d.screen.ButtonWidget;
 
 /**
  * @author squid233
- * @since 2020/12/06
+ * @since 2020/12/16
  */
-public class ComboBoxItem extends ButtonWidget {
-    public ComboBoxItem(int y, IText text, PressAction action) {
-        super(0, y, Minecraft2D.getWidth(), U_L, text, action);
+public final class EventFactory {
+    public static void postButtonClickEvent(ButtonWidget button) {
+        Minecraft2D.EVENT_BUS.post(new ButtonClickEvent(button));
     }
 }

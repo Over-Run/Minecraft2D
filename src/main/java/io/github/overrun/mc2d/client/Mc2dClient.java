@@ -24,27 +24,24 @@
 
 package io.github.overrun.mc2d.client;
 
-import io.github.overrun.mc2d.Minecraft2D;
-import io.github.overrun.mc2d.input.KeyInput;
-import io.github.overrun.mc2d.input.MouseInput;
 import io.github.overrun.mc2d.option.Options;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import java.awt.Graphics;
 import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Point;
 
-import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
+import static io.github.overrun.mc2d.option.Options.*;
 import static io.github.overrun.mc2d.screen.Screens.getOpenScreen;
-import static io.github.overrun.mc2d.util.ImgUtil.readImage;
 import static io.github.overrun.mc2d.util.Utils.compute;
 
 /**
  * @author squid233
  * @since 2020/09/14
  */
-public final class Mc2dClient extends JFrame {
+public final class Mc2dClient extends JPanel {
     private static final long serialVersionUID = 1L;
 
     public static final Point NP = new Point();
@@ -52,17 +49,7 @@ public final class Mc2dClient extends JFrame {
     private static Mc2dClient instance;
 
     private Mc2dClient() {
-        super("Minecraft2D " + Minecraft2D.VERSION);
-        setSize(Options.getI(Options.WIDTH, 854), Options.getI(Options.HEIGHT, 480));
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        addKeyListener(new KeyInput());
-        addMouseListener(new MouseInput());
-        setIconImage(readImage("icon.png"));
-        final long mem = Runtime.getRuntime().maxMemory() >> 20;
-        LOGGER.info("Max memory: {}", mem >= 1024
-                ? (mem >> 10) + " GB"
-                : mem + " MB");
+        setSize(getI(Options.WIDTH, DEF_WIDTH) - 16, getI(Options.HEIGHT, DEF_HEIGHT) - 38);
     }
 
     @Override
@@ -76,6 +63,10 @@ public final class Mc2dClient extends JFrame {
     @Override
     public Point getMousePosition() throws HeadlessException {
         return compute(super.getMousePosition(), NP);
+    }
+
+    public JFrame getFrame() {
+        return (JFrame) super.getParent().getParent().getParent().getParent();
     }
 
     public static Mc2dClient getInstance() {

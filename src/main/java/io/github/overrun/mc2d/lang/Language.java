@@ -25,20 +25,18 @@
 package io.github.overrun.mc2d.lang;
 
 import io.github.overrun.mc2d.option.Options;
-import it.unimi.dsi.fastutil.objects.AbstractObject2ObjectMap.BasicEntry;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Map;
 import java.util.Properties;
 
 import static io.github.overrun.mc2d.util.Utils.getResource;
-import static io.github.overrun.mc2d.util.collect.FastMap.of;
 import static java.lang.String.valueOf;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.unmodifiableMap;
 
 /**
  * @author squid233
@@ -48,10 +46,10 @@ public final class Language {
     private static final Map<String, String> K2V_EN_US = new Object2ObjectArrayMap<>(14);
     private static final Map<String, String> K2V_ZH_CN = new Object2ObjectArrayMap<>(14);
     public static final Map<String, Map<String, String>> LANG
-            = unmodifiableMap(of(
-            new BasicEntry<>("en_us", K2V_EN_US),
-            new BasicEntry<>("zh_cn", K2V_ZH_CN)
-    ));
+            = Map.ofEntries(
+            new SimpleEntry<>("en_us", K2V_EN_US),
+            new SimpleEntry<>("zh_cn", K2V_ZH_CN)
+    );
 
     public static void load(String namespace) {
         for (String l : LANG.keySet()) {
@@ -64,7 +62,7 @@ public final class Language {
     }
 
     public static String get(String key, String def) {
-        return getByLocale(Options.get(Options.LANG, "en_us"), key, def);
+        return getByLocale(Options.get(Options.LANG, Options.DEF_LANG), key, def);
     }
 
     public static String get(String key) {

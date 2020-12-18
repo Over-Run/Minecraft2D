@@ -26,6 +26,7 @@ package io.github.overrun.mc2d.util.collect;
 
 import java.util.List;
 import java.util.function.ObjIntConsumer;
+import java.util.function.Predicate;
 
 /**
  * @author squid233
@@ -33,14 +34,7 @@ import java.util.function.ObjIntConsumer;
  */
 public final class Arrays {
     public static <T> boolean contains(T[] array, T t) {
-        for (T t1 : array) {
-            if (t == t1) {
-                return true;
-            } else if (t != null && t.equals(t1)) {
-                return true;
-            }
-        }
-        return false;
+        return java.util.Arrays.stream(array).anyMatch(Predicate.isEqual(t));
     }
 
     public static <T> boolean notContains(T[] array, T t) {

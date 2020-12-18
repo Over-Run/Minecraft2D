@@ -24,6 +24,9 @@
 
 package io.github.overrun.mc2d.screen;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+
 import java.awt.Color;
 
 /**
@@ -33,31 +36,29 @@ import java.awt.Color;
 public final class Screens {
     public static final Color BG_COLOR = new Color(64, 64, 64, 64);
 
-    public static final Screen TITLE_SCREEN;
-    public static final Screen LANG_SCREEN;
-    public static final Screen OPTIONS_SCREEN;
-
-    static {
-        TITLE_SCREEN = new TitleScreen();
-        LANG_SCREEN = new LanguageScreen();
-        OPTIONS_SCREEN = new OptionsScreen();
-    }
+    public static final Screen TITLE_SCREEN = new TitleScreen();
+    public static final Screen LANG_SCREEN = new LanguageScreen();
+    public static final Screen OPTIONS_SCREEN = new OptionsScreen();
+    public static final Screen SAVES_SCREEN = new SavesScreen();
 
     private static Screen screen = TITLE_SCREEN;
-    private static final Screen[] PARENTS = new Screen[127];
-    private static byte parent = 0;
+    private static final ObjectList<Screen> PARENTS = new ObjectArrayList<>(127);
+
+    static {
+        PARENTS.add(0, TITLE_SCREEN);
+    }
 
     static void openScreen(Screen s) {
-        if (s != getParent()) {
-            //TODO;;;
-            parent++;
-            PARENTS[parent] = s;
+        if (PARENTS.size() > 1 && PARENTS.get(1) == s) {
+            PARENTS.remove(0);
+        } else {
+            PARENTS.add(0, s);
         }
         screen = s;
     }
 
     static Screen getParent() {
-        return PARENTS[parent < 0 || parent > 126 ? 0 : parent];
+        return PARENTS.get(1);
     }
 
     public static Screen getOpenScreen() {

@@ -25,101 +25,109 @@
 package io.github.overrun.mc2d.logger;
 
 import io.github.overrun.mc2d.option.Options;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 
-import java.io.IOException;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-
-import static java.util.logging.Logger.getLogger;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.time.LocalTime;
+import java.util.Map;
 
 /**
  * @author squid233
  * @since 2020/10/24
  */
 public class Logger {
-    private final java.util.logging.Logger logger;
+    private static final Map<String, Logger> LOGGERS = new Object2ObjectArrayMap<>(2);
+    private final String name;
 
-    public Logger(String name) {
-        logger = getLogger(name);
-        logger.setUseParentHandlers(false);
-        logger.setLevel(Level.CONFIG);
-        final Formatter f = new Formatter();
-        final ConsoleHandler ch = new ConsoleHandler() {
-            {
-                setOutputStream(System.out);
+    protected Logger(String name) {
+        this.name = name;
+    }
+
+    public void logIfEnable(String msg, Level level, Object... params) {
+        logIfEnable(msg, level, null, params);
+    }
+
+    public void logIfEnable(String msg, Level level, Throwable throwable, Object... params) {
+        if (Options.getI(Options.LOG_LEVEL, Options.DEF_LOG_LEVEL) >= level.getLevel()) {
+            for (Object o : params) {
+                msg = msg.replaceFirst("\\{}", o.toString());
             }
-        };
-        ch.setLevel(logDebugEnable() ? Level.CONFIG : Level.INFO);
-        ch.setFormatter(f);
-        logger.addHandler(ch);
-        try {
-            final FileHandler fh = new FileHandler("latest.log");
-            fh.setLevel(Level.INFO);
-            fh.setFormatter(f);
-            logger.addHandler(fh);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            final FileHandler fh = new FileHandler("latest-debug.log");
-            fh.setLevel(Level.CONFIG);
-            fh.setFormatter(f);
-            logger.addHandler(fh);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public Logger(Class<?> clazz) {
-        this(clazz.getSimpleName());
-    }
-
-    public void info(String msg) {
-        getJavaLogger().info(msg);
-    }
-
-    public void info(String msg, Object... params) {
-        getJavaLogger().log(Level.INFO, msg, params);
-    }
-
-    public void warn(String msg) {
-        getJavaLogger().warning(msg);
-    }
-
-    public void warn(String msg, Object... params) {
-        getJavaLogger().log(Level.WARNING, msg, params);
-    }
-
-    public void error(String msg) {
-        getJavaLogger().severe(msg);
-    }
-
-    public void error(String msg, Object... params) {
-        getJavaLogger().log(Level.SEVERE, msg, params);
-    }
-
-    public void debug(String msg) {
-        if (logDebugEnable()) {
-            getJavaLogger().config(msg);
+            String thr = "";
+            if (throwable != null) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                pw.println();
+                throwable.printStackTrace(pw);
+                pw.close();
+                thr = sw.toString();
+            }
+            System.out.printf(
+                    getFormat() + "\n",
+                    LocalTime.now(),
+                    Thread.currentThread().getName(),
+                    level.getName(),
+                    getName(),
+                    msg,
+                    thr
+            );
         }
     }
 
     public void debug(String msg, Object... params) {
-        if (logDebugEnable()) {
-            getJavaLogger().log(Level.CONFIG, msg, params);
-        }
+        logIfEnable(msg, Level.DEBUG, params);
     }
 
-    public void exception(String msg, Throwable throwable) {
-        getJavaLogger().log(Level.SEVERE, msg, throwable);
+    public void info(String msg, Object... params) {
+        logIfEnable(msg, Level.INFO, params);
     }
 
-    public java.util.logging.Logger getJavaLogger() {
-        return logger;
+    public void warn(String msg, Object... params) {
+        logIfEnable(msg, Level.WARN, params);
     }
 
-    public static boolean logDebugEnable() {
-        return Options.getB(Options.DEBUG);
+    public void error(String msg, Object... params) {
+        logIfEnable(msg, Level.ERROR, params);
+    }
+
+    public void fatal(String msg, Object... params) {
+        logIfEnable(msg, Level.FATAL, params);
+    }
+
+    public void exception(String msg, Level level, Throwable throwable, Object... params) {
+        logIfEnable(msg, level, params, throwable);
+    }
+
+    public void exception(String msg, Throwable throwable, Object... params) {
+        exception(msg, Level.ERROR, throwable, params);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public static Logger getLogger(String name) {
+        return LOGGERS.computeIfAbsent(name, Logger::new);
+    }
+
+    public static Logger getLogger(Class<?> clazz) {
+        return getLogger(clazz.getSimpleName());
+    }
+
+    /**
+     * Format of the logger.<br>
+     * <ol>
+     *     <li>Log time</li>
+     *     <li>Current thread name</li>
+     *     <li>Log level</li>
+     *     <li>Logger name</li>
+     *     <li>Log message</li>
+     *     <li>Threw exception stack trace</li>
+     * </ol>
+     *
+     * @return Format the logger.
+     */
+    public static String getFormat() {
+        return Options.get(Options.LOGGER_FORMAT, Options.DEF_LOGGER_FORMAT);
     }
 }

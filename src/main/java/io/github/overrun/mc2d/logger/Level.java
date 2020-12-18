@@ -22,19 +22,32 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.screen;
-
-import io.github.overrun.mc2d.Minecraft2D;
-import io.github.overrun.mc2d.text.IText;
-
-import static io.github.overrun.mc2d.util.Coordinator.U_L;
+package io.github.overrun.mc2d.logger;
 
 /**
  * @author squid233
- * @since 2020/12/06
+ * @since 2020/12/16
  */
-public class ComboBoxItem extends ButtonWidget {
-    public ComboBoxItem(int y, IText text, PressAction action) {
-        super(0, y, Minecraft2D.getWidth(), U_L, text, action);
+public final class Level {
+    public static final Level FATAL = new Level("FATAL", 1000);
+    public static final Level ERROR = new Level("ERROR", 900);
+    public static final Level WARN = new Level("WARN", 800);
+    public static final Level INFO = new Level("INFO", 700);
+    public static final Level DEBUG = new Level("DEBUG", 600);
+
+    private final String name;
+    private final int level;
+
+    Level(String name, int level) {
+        this.name = name;
+        this.level = level;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getLevel() {
+        return level;
     }
 }

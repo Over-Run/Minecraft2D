@@ -115,9 +115,8 @@ public class ButtonWidget extends AbstractButtonWidget {
         );
     }
 
-    public ButtonWidget setEnable(boolean enable) {
+    public void setEnable(boolean enable) {
         isEnable = enable;
-        return this;
     }
 
     public IText getText() {

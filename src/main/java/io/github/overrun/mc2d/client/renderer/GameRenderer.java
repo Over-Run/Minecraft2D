@@ -24,8 +24,9 @@
 
 package io.github.overrun.mc2d.client.renderer;
 
-import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.option.Options;
+
+import javax.swing.JFrame;
 
 import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
 
@@ -34,14 +35,14 @@ import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
  * @since 2020/09/15
  */
 public final class GameRenderer implements Runnable {
-    private final Mc2dClient client;
+    private final JFrame gameFrame;
     private Thread thread;
     private boolean exited;
     public int fps;
 
-    public GameRenderer(Mc2dClient client) {
-        this.client = client;
-        fps = Options.getI(Options.FPS, 60);
+    public GameRenderer(JFrame gameFrame) {
+        this.gameFrame = gameFrame;
+        fps = Options.getI(Options.FPS, Options.DEF_FPS);
         LOGGER.info("Created render thread");
         LOGGER.info("FPS: {}", fps);
         LOGGER.info("Render interval: {}ms", getInterval());
@@ -51,7 +52,7 @@ public final class GameRenderer implements Runnable {
     public void run() {
         LOGGER.info("Start rendering");
         while (!exited) {
-            client.repaint();
+            gameFrame.repaint();
             try {
                 //noinspection BusyWait
                 Thread.sleep(getInterval());

@@ -24,7 +24,7 @@
 
 package io.github.overrun.mc2d.screen;
 
-import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.event.EventFactory;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 
@@ -43,11 +43,8 @@ import static java.awt.event.KeyEvent.VK_ESCAPE;
 public abstract class Screen {
     protected final ObjectList<ScreenWidget> widgets = new ObjectArrayList<>(6);
     protected final ObjectList<ButtonWidget> buttons = new ObjectArrayList<>(6);
-    protected Mc2dClient client;
 
-    protected Screen() {
-        this.client = Mc2dClient.getInstance();
-    }
+    protected Screen() {}
 
     public void render(Graphics g) {
         drawDirtBackground(g);
@@ -73,22 +70,23 @@ public abstract class Screen {
         return (ButtonWidget) addWidget(widget);
     }
 
+    protected final Screen getParent() {
+        return Screens.getParent();
+    }
+
     protected void close() {
-        open(Screens.getParent());
+        open(getParent());
     }
 
     protected void open(Screen screen) {
         openScreen(screen);
     }
 
-    public Mc2dClient getClient() {
-        return client;
-    }
-
-    public void onMouseClicked() {
+    public final void onMouseClicked() {
         for (ButtonWidget b : buttons) {
-            if (b.isHover() && b.isEnable()) {
+            if (b.isHover()) {
                 b.getAction().onPress(b);
+                EventFactory.postButtonClickEvent(b);
                 break;
             }
         }
