@@ -22,32 +22,26 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.util;
+package io.github.overrun.mc2d.event;
 
-import javax.swing.ImageIcon;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
+import io.github.overrun.mc2d.client.gui.screen.widget.TextFieldWidget;
 
 /**
+ * This is the 3rd event.
+ * <p>This event will post on change text field.</p>
+ *
  * @author squid233
- * @since 2020/11/24
+ * @since 2020/12/25
  */
-public final class Images {
-    public static final Image EMPTY = new ImageIcon().getImage();
-    public static final BufferedImage WIDGETS = guiImg("widgets");
-    public static final BufferedImage OPTIONS_BACKGROUND = guiImg("options_background");
-    public static final BufferedImage LOGO = guiImg("logo");
-    public static final BufferedImage BUTTON_DISABLE = widgetImg(0, 46, 200, 20);
-    public static final BufferedImage BUTTON = widgetImg(0, 66, 200, 20);
-    public static final BufferedImage BUTTON_HOVER = widgetImg(0, 86, 200, 20);
-    public static final BufferedImage LANG_BUTTON = widgetImg(0, 106, 20, 20);
-    public static final BufferedImage LANG_BUTTON_HOVER = widgetImg(0, 126, 20, 20);
+@FunctionalInterface
+public interface TextFieldChangeCallback {
+    Event<TextFieldChangeCallback> EVENT = EventFactory.createArrayBacked(
+            listeners -> textField -> { for (TextFieldChangeCallback callback : listeners) { callback.onChange(textField); } }
+    );
 
-    private static BufferedImage guiImg(String nm) {
-        return ImgUtil.readImage(new ResourceLocation("textures/gui/" + nm + ".png"));
+    static void post(TextFieldWidget textField) {
+        EVENT.invoker().onChange(textField);
     }
 
-    private static BufferedImage widgetImg(int x, int y, int w, int h) {
-        return WIDGETS.getSubimage(x, y, w, h);
-    }
+    void onChange(TextFieldWidget textField);
 }

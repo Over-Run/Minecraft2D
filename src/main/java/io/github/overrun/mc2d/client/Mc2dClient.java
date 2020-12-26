@@ -24,7 +24,9 @@
 
 package io.github.overrun.mc2d.client;
 
-import io.github.overrun.mc2d.option.Options;
+import io.github.overrun.mc2d.client.gui.screen.Screen;
+import io.github.overrun.mc2d.client.gui.screen.TitleScreen;
+import io.github.overrun.mc2d.client.renderer.GameRenderer;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -32,9 +34,10 @@ import java.awt.Graphics;
 import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Point;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-import static io.github.overrun.mc2d.option.Options.*;
-import static io.github.overrun.mc2d.screen.Screens.getOpenScreen;
+import static io.github.overrun.mc2d.Minecraft2D.VERSION;
 import static io.github.overrun.mc2d.util.Utils.compute;
 
 /**
@@ -42,21 +45,45 @@ import static io.github.overrun.mc2d.util.Utils.compute;
  * @since 2020/09/14
  */
 public final class Mc2dClient extends JPanel {
-    private static final long serialVersionUID = 1L;
+    private GameRenderer renderer;
+    private Screen screen = new TitleScreen();
+
+    private static final class Holder {
+        private static final Mc2dClient INSTANCE = new Mc2dClient();
+    }
 
     public static final Point NP = new Point();
 
-    private static Mc2dClient instance;
+    private Mc2dClient() {}
 
-    private Mc2dClient() {
-        setSize(getI(Options.WIDTH, DEF_WIDTH) - 16, getI(Options.HEIGHT, DEF_HEIGHT) - 38);
+    public void openScreen(Screen screen) {
+        this.screen = screen;
+    }
+
+    public Screen getScreen() {
+        return screen;
+    }
+
+    public void initRenderer(GameRenderer renderer) {
+        if (this.renderer == null) {
+            this.renderer = renderer;
+        }
+    }
+
+    public GameRenderer getRenderer() {
+        return renderer;
+    }
+
+    public JFrame getFrame() {
+        return (JFrame) super.getParent().getParent().getParent().getParent();
     }
 
     @Override
     public void paint(Graphics g) {
         Image buf = createImage(getWidth(), getHeight());
         Graphics gg = buf.getGraphics();
-        getOpenScreen().render(gg);
+        screen.render(gg);
+        getFrame().setTitle(String.format(System.getProperty("mc2d.title", "Minecraft2D %1s"), VERSION, LocalDateTime.now().format(DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss")), renderer.getFps()));
         g.drawImage(buf, 0, 0, null);
     }
 
@@ -65,14 +92,7 @@ public final class Mc2dClient extends JPanel {
         return compute(super.getMousePosition(), NP);
     }
 
-    public JFrame getFrame() {
-        return (JFrame) super.getParent().getParent().getParent().getParent();
-    }
-
     public static Mc2dClient getInstance() {
-        if (instance == null) {
-            instance = new Mc2dClient();
-        }
-        return instance;
+        return Holder.INSTANCE;
     }
 }

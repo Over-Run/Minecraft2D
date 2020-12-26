@@ -22,17 +22,21 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.screen;
-
-import java.awt.Graphics;
+package io.github.overrun.mc2d.text;
 
 /**
+ * A text without {@link String#format(String, Object...) String.format}
+ *
  * @author squid233
- * @since 2020/10/16
+ * @since 2020/12/22
  */
-public abstract class ScreenWidget {
-    public abstract int getX();
-    public abstract int getY();
+public final class UnformatText extends BaseText {
+    public UnformatText(String text) {
+        super(text);
+    }
 
-    public void render(Graphics g) {}
+    @Override
+    public String asString() {
+        return super.toString();
+    }
 }

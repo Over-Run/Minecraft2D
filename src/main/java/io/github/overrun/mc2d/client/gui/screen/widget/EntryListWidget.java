@@ -22,32 +22,37 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.logger;
+package io.github.overrun.mc2d.client.gui.screen.widget;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static io.github.overrun.mc2d.Minecraft2D.getHeight;
 
 /**
  * @author squid233
- * @since 2020/12/16
+ * @since 2020/10/16
  */
-public final class Level {
-    public static final Level FATAL = new Level("FATAL", 1000);
-    public static final Level ERROR = new Level("ERROR", 900);
-    public static final Level WARN = new Level("WARN", 800);
-    public static final Level INFO = new Level("INFO", 700);
-    public static final Level DEBUG = new Level("DEBUG", 600);
+public class EntryListWidget<E extends EntryListWidget.Entry> implements Element {
+    private final List<E> entries;
 
-    private final String name;
-    private final int level;
-
-    Level(String name, int level) {
-        this.name = name;
-        this.level = level;
+    @SafeVarargs
+    public EntryListWidget(E... entries) {
+        this.entries = new ArrayList<>(entries.length);
+        for (E entry : entries) {
+            if (entry != null) { this.entries.add(entry); }
+        }
     }
 
-    public String getName() {
-        return name;
+    public static abstract class Entry implements Element {}
+
+    @Override
+    public int getX() {
+        return 0;
     }
 
-    public int getLevel() {
-        return level;
+    @Override
+    public int getY() {
+        return getHeight() / 6;
     }
 }

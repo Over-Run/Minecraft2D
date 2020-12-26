@@ -22,32 +22,30 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.util;
+package io.github.overrun.mc2d.world;
 
-import javax.swing.ImageIcon;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
+import com.google.common.annotations.Beta;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * @author squid233
- * @since 2020/11/24
+ * @since 2020/12/22
  */
-public final class Images {
-    public static final Image EMPTY = new ImageIcon().getImage();
-    public static final BufferedImage WIDGETS = guiImg("widgets");
-    public static final BufferedImage OPTIONS_BACKGROUND = guiImg("options_background");
-    public static final BufferedImage LOGO = guiImg("logo");
-    public static final BufferedImage BUTTON_DISABLE = widgetImg(0, 46, 200, 20);
-    public static final BufferedImage BUTTON = widgetImg(0, 66, 200, 20);
-    public static final BufferedImage BUTTON_HOVER = widgetImg(0, 86, 200, 20);
-    public static final BufferedImage LANG_BUTTON = widgetImg(0, 106, 20, 20);
-    public static final BufferedImage LANG_BUTTON_HOVER = widgetImg(0, 126, 20, 20);
-
-    private static BufferedImage guiImg(String nm) {
-        return ImgUtil.readImage(new ResourceLocation("textures/gui/" + nm + ".png"));
-    }
-
-    private static BufferedImage widgetImg(int x, int y, int w, int h) {
-        return WIDGETS.getSubimage(x, y, w, h);
+public final class SavesManager {
+    @Beta
+    public static String[] getAllSaveName() {
+        File saves = new File("saves");
+        if (!saves.exists()) {
+            try {
+                Files.createDirectory(Path.of("saves"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return saves.list();
     }
 }

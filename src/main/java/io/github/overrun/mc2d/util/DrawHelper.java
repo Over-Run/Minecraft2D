@@ -26,14 +26,20 @@ package io.github.overrun.mc2d.util;
 
 import io.github.overrun.mc2d.text.IText;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.function.Consumer;
 
 import static io.github.overrun.mc2d.Minecraft2D.getHeight;
 import static io.github.overrun.mc2d.Minecraft2D.getWidth;
-import static io.github.overrun.mc2d.screen.Screens.BG_COLOR;
 import static io.github.overrun.mc2d.util.Coordinator.*;
 import static io.github.overrun.mc2d.util.collect.Arrays.notContains;
 import static java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment;
@@ -43,15 +49,19 @@ import static java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment;
  * @since 2020/09/15
  */
 public final class DrawHelper {
+    public static final Color BG_COLOR = new Color(64, 64, 64, 64);
+    public static final Color TOOLTIP_COLOR = new Color(64, 0, 128, 128);
+    public static final Color TOOLTIP_BG_COLOR = new Color(0, 0, 0, 192);
     public static Font simsunb;
-    public static final Font SIMSUN = new Font("新宋体", Font.PLAIN, 18);
+    public static final Font SIMSUN = new Font("新宋体", Font.PLAIN, 21);
 
     static {
         try {
-            if (notContains(getLocalGraphicsEnvironment().getAvailableFontFamilyNames(), "新宋体")) {
+            if (notContains(getLocalGraphicsEnvironment().getAvailableFontFamilyNames(),
+                    "新宋体")) {
                 simsunb = Font.createFont(Font.TRUETYPE_FONT,
                         new File("simsun.ttc"))
-                        .deriveFont(18f);
+                        .deriveFont(21f);
             }
         } catch (FontFormatException | IOException e) {
             e.printStackTrace();
@@ -79,19 +89,7 @@ public final class DrawHelper {
     }
 
     public static void drawCenterImage(Graphics g, Image image, int y, int width, int height) {
-        drawImage(g, image, transformation(-(image.getWidth(null) >> 1), y, U_M), width, height);
-    }
-
-    public static void drawDefaultBackground(Graphics g) {
-        drawWithColor(g, BG_COLOR, gg -> gg.fillRect(0, 0, getWidth(), getHeight()));
-    }
-
-    public static void drawDirtBackground(Graphics g) {
-        for (int i = 0, h = getHeight(); i < h; i += 16) {
-            for (int j = 0, w = getWidth(); j < w; j += 16) {
-                drawImage(g, Images.OPTIONS_BACKGROUND, j, i);
-            }
-        }
+        drawImage(g, image, transformation(-(width >> 1), y, U_M), width, height);
     }
 
     public static void drawCenteredText(Graphics g, IText text, int y) {
@@ -104,6 +102,10 @@ public final class DrawHelper {
 
     public static void drawText(Graphics g, IText text, Point point) {
         drawText(g, text, point.x, point.y);
+    }
+
+    public static void drawText(Graphics g, IText text, int x, int y, int layout) {
+        drawText(g, text, transformation(x, y, layout));
     }
 
     public static void drawText(Graphics g, IText text, int x, int y) {
@@ -127,6 +129,10 @@ public final class DrawHelper {
         });
     }
 
+    public static void drawRect(Graphics g, Color color, int x, int y, int width, int height) {
+        drawWithColor(g, color, gg -> gg.drawRect(x, y, width, height));
+    }
+
     public static void fillRect(Graphics g, Color color, int x, int y, int width, int height, int layout) {
         drawWithColor(g, color, gg -> {
             Point p = transformation(x, y, layout);
@@ -135,10 +141,41 @@ public final class DrawHelper {
     }
 
     public static void fillRect(Graphics g, Color color, int x, int y, int width, int height) {
-        fillRect(g, color, x, y, width, height, U_L);
+        drawWithColor(g, color, gg -> gg.fillRect(x, y, width, height));
     }
 
     public static FontMetrics getSimsunMetrics(Graphics g) {
         return g.getFontMetrics(simsunb == null ? SIMSUN : simsunb);
+    }
+
+    public static void renderTooltips(Graphics g, List<IText> tooltips, int x, int y) {
+        if (!tooltips.isEmpty()) {
+            int w = 0;
+            int h = 0;
+            for (IText text : tooltips) {
+                if (text.getPrevWidth(g) > w) { w = text.getPrevWidth(g); }
+                if (text.getPrevHeight(g) > h) { h = text.getPrevHeight(g); }
+            }
+            w += 12;
+            h += 12;
+            int sX;
+            int sY;
+            if (x + w > getWidth()) { sX = -10; } else { sX = 10; }
+            if (y + h > getHeight()) { sY = -10; } else { sY = 10; }
+            // Draw top
+            fillRect(g, TOOLTIP_BG_COLOR, x + 2 + sX, y + sY, w - 4, 2);
+            // Draw left
+            fillRect(g, TOOLTIP_BG_COLOR, x + sX, y + 2 + sY, 2, h - 4);
+            // Draw right
+            fillRect(g, TOOLTIP_BG_COLOR, x + w - 2 + sX, y + 2 + sY, 2, h - 4);
+            // Draw bottom
+            fillRect(g, TOOLTIP_BG_COLOR, x + 2 + sX, y + h - 2 + sY, w - 4, 2);
+            // Draw center
+            fillRect(g, TOOLTIP_BG_COLOR, x + 3 + sX, y + 3 + sY, w - 6, h - 6);
+            drawRect(g, TOOLTIP_COLOR, x + 2 + sX, y + 2 + sY, w - 5, h - 5);
+            for (int i = 0; i < tooltips.size(); i++) {
+                drawText(g, tooltips.get(i), x + 4 + sX, y + 2 + i * tooltips.get(i).getPrevHeight(g) + 2 + sY);
+            }
+        }
     }
 }

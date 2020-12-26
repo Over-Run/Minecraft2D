@@ -47,8 +47,7 @@ public class DefaultedRegistry<T> extends BaseRegistry<T> {
 
     @Override
     public T register(Identifier id, T entry) {
-        if (nextId < rawId2entry.size())
-            nextId = rawId2entry.size();
+        if (nextId < rawId2entry.size()) { nextId = rawId2entry.size(); }
         rawId2entry.put(nextId++, entry);
         id2entry.put(id, entry);
         return entry;

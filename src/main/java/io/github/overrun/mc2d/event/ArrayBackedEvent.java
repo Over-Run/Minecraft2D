@@ -30,31 +30,44 @@ import java.util.function.Function;
 
 /**
  * @author squid233
- * @since 2020/12/16
+ * @since 2020/12/20
  */
-public final class EventFactory {
-    private static final List<ArrayBackedEvent<?>> ARRAY_BACKED_EVENTS = new ArrayList<>();
+final class ArrayBackedEvent<T> extends Event<T> {
+    private final Function<List<T>, T> invokerFactory;
+    private final T dummyInvoker;
+    private List<T> handlers;
 
-    private EventFactory() {}
-
-    public static void invalidate() {
-        ARRAY_BACKED_EVENTS.forEach(ArrayBackedEvent::update);
+    ArrayBackedEvent(T dummyInvoker, Function<List<T>, T> invokerFactory) {
+        this.dummyInvoker = dummyInvoker;
+        this.invokerFactory = invokerFactory;
+        update();
     }
 
-    /**
-     * Create an {@link Event} object.
-     *
-     * @param invokerFactory The list to an event class. You can traverse the list to execute the event callback.
-     * @param <T> The event class. Maybe an interface.
-     * @return The array backed event.
-     */
-    public static <T> Event<T> createArrayBacked(Function<List<T>, T> invokerFactory) {
-        return createArrayBacked(null, invokerFactory);
+    void update() {
+        if (handlers == null) {
+            if (dummyInvoker != null) {
+                invoker = dummyInvoker;
+            } else {
+                invoker = invokerFactory.apply(List.of());
+            }
+        } else if (handlers.size() == 1) {
+            invoker = handlers.get(0);
+        } else {
+            invoker = invokerFactory.apply(handlers);
+        }
     }
 
-    public static <T> Event<T> createArrayBacked(T emptyInvoker, Function<List<T>, T> invokerFactory) {
-        ArrayBackedEvent<T> event = new ArrayBackedEvent<>(emptyInvoker, invokerFactory);
-        ARRAY_BACKED_EVENTS.add(event);
-        return event;
+    @Override
+    public void register(T listener) {
+        if (listener == null) {
+            throw new NullPointerException("Tried to register a null listener!");
+        }
+        if (handlers == null) {
+            handlers = List.of(listener);
+        } else {
+            handlers = new ArrayList<>(handlers);
+            handlers.set(handlers.size() - 1, listener);
+        }
+        update();
     }
 }

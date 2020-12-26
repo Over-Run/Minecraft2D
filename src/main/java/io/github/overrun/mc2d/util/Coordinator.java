@@ -57,9 +57,7 @@ public final class Coordinator {
             int x, int y,
             @MagicConstant(valuesFromClass = Coordinator.class) int type) {
         final Point p;
-        if (type == U_L) {
-            p = new Point(x, y);
-        } else if (type == U_M) {
+        if (type == U_M) {
             p = new Point((getWidth() >> 1) + x, y);
         } else if (type == U_R) {
             p = new Point(getWidth() - x, y);
@@ -80,7 +78,7 @@ public final class Coordinator {
             p = new Point(getWidth() - x,
                     getHeight() - y);
         } else {
-            p = new Point();
+            p = new Point(x, y);
         }
         return p;
     }

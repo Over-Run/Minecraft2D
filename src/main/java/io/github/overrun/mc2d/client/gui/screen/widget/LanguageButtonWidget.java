@@ -22,23 +22,36 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.event;
+package io.github.overrun.mc2d.client.gui.screen.widget;
 
-import io.github.overrun.mc2d.screen.ButtonWidget;
+import io.github.overrun.mc2d.text.IText;
+
+import java.awt.*;
+
+import static io.github.overrun.mc2d.util.Images.LANG_BUTTON;
+import static io.github.overrun.mc2d.util.Images.LANG_BUTTON_HOVER;
 
 /**
  * @author squid233
- * @since 2020/12/16
+ * @since 2020/10/13
  */
-public class ButtonClickEvent extends Event {
-    private static final long serialVersionUID = 1L;
-
-    public ButtonClickEvent(ButtonWidget widget) {
-        super(widget);
+public class LanguageButtonWidget extends ButtonWidget {
+    public LanguageButtonWidget(int x, int y, int layout, PressAction action) {
+        super(x, y, 20, layout, IText.of(), action);
     }
 
     @Override
-    public ButtonWidget getSource() {
-        return (ButtonWidget) super.getSource();
+    public int getHeight() {
+        return 20;
+    }
+
+    @Override
+    public Image getUsualTexture() {
+        return LANG_BUTTON;
+    }
+
+    @Override
+    public Image getHoverTexture() {
+        return LANG_BUTTON_HOVER;
     }
 }

@@ -22,46 +22,58 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.screen;
+package io.github.overrun.mc2d.util.math;
 
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectList;
-
-import java.awt.Color;
+import java.util.Objects;
+import java.util.StringJoiner;
 
 /**
  * @author squid233
- * @since 2020/10/01
+ * @since 2020/12/22
  */
-public final class Screens {
-    public static final Color BG_COLOR = new Color(64, 64, 64, 64);
+public final class BlockPos {
+    private final int x;
+    private final int y;
+    private final boolean isDown;
 
-    public static final Screen TITLE_SCREEN = new TitleScreen();
-    public static final Screen LANG_SCREEN = new LanguageScreen();
-    public static final Screen OPTIONS_SCREEN = new OptionsScreen();
-    public static final Screen SAVES_SCREEN = new SavesScreen();
-
-    private static Screen screen = TITLE_SCREEN;
-    private static final ObjectList<Screen> PARENTS = new ObjectArrayList<>(127);
-
-    static {
-        PARENTS.add(0, TITLE_SCREEN);
+    public BlockPos(int x, int y, boolean isDown) {
+        this.x = x;
+        this.y = y;
+        this.isDown = isDown;
     }
 
-    static void openScreen(Screen s) {
-        if (PARENTS.size() > 1 && PARENTS.get(1) == s) {
-            PARENTS.remove(0);
-        } else {
-            PARENTS.add(0, s);
-        }
-        screen = s;
+    public BlockPos() {
+        this(0, 0, false);
     }
 
-    static Screen getParent() {
-        return PARENTS.get(1);
+    public int getX() {
+        return x;
     }
 
-    public static Screen getOpenScreen() {
-        return screen;
+    public int getY() {
+        return y;
+    }
+
+    public boolean isDown() {
+        return isDown;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        BlockPos blockPos = (BlockPos) o;
+        return getX() == blockPos.getX() && getY() == blockPos.getY() && isDown() == blockPos.isDown();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getX(), getY(), isDown());
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BlockPos.class.getSimpleName() + "[", "]")
+                .add("x=" + x).add("y=" + y).add("isDown=" + isDown).toString();
     }
 }

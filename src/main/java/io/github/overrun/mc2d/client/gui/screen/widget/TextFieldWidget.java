@@ -22,36 +22,52 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.screen;
+package io.github.overrun.mc2d.client.gui.screen.widget;
 
+import io.github.overrun.mc2d.event.TextFieldChangeCallback;
 import io.github.overrun.mc2d.text.IText;
+import io.github.overrun.mc2d.text.UnformatText;
 
-import java.awt.*;
+import javax.swing.JOptionPane;
+import java.awt.Image;
 
-import static io.github.overrun.mc2d.util.Images.LANG_BUTTON;
-import static io.github.overrun.mc2d.util.Images.LANG_BUTTON_HOVER;
+import static io.github.overrun.mc2d.util.Coordinator.U_M;
+import static io.github.overrun.mc2d.util.Images.BUTTON_DISABLE;
 
 /**
  * @author squid233
- * @since 2020/10/13
+ * @since 2020/12/24
  */
-public class LanguageButtonWidget extends ButtonWidget {
-    public LanguageButtonWidget(int x, int y, int layout, PressAction action) {
-        super(x, y, 40, layout, IText.of(), action);
+public class TextFieldWidget extends ButtonWidget {
+    public TextFieldWidget(int x, int y, int width, int layout, IText initValue) {
+        super(x, y, width, layout, initValue);
+        setAction(b -> {
+            IText t = getText();
+            String s = JOptionPane.showInputDialog("", t);
+            setText(new UnformatText(s != null ? s : ""));
+            if (!t.equals(getText())) { TextFieldChangeCallback.post(this); }
+        });
+    }
+
+    public TextFieldWidget(int x, int y, int width, IText initValue) {
+        this(x, y, width, U_M, initValue);
+    }
+
+    public TextFieldWidget(int x, int y, int width, int layout) {
+        this(x, y, width, layout, IText.of());
+    }
+
+    public TextFieldWidget(int x, int y, int width) {
+        this(x, y, width, U_M);
     }
 
     @Override
-    public int getHeight() {
-        return 40;
+    public Image getTexture() {
+        return BUTTON_DISABLE;
     }
 
     @Override
-    public Image getUsualTexture() {
-        return LANG_BUTTON;
-    }
-
-    @Override
-    public Image getHoverTexture() {
-        return LANG_BUTTON_HOVER;
+    public boolean isEnable() {
+        return true;
     }
 }

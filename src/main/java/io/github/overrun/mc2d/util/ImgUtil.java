@@ -25,10 +25,11 @@
 package io.github.overrun.mc2d.util;
 
 import javax.imageio.ImageIO;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
+import static io.github.overrun.mc2d.Minecraft2D.logger;
 
 /**
  * @author squid233
@@ -39,12 +40,16 @@ public final class ImgUtil {
         try {
             return ImageIO.read(ClassLoader.getSystemResource(name));
         } catch (IOException e) {
-            LOGGER.exception("Cannot read image!", e);
+            logger.error("Cannot read image!", e);
             return null;
         }
     }
 
     public static BufferedImage readImage(ResourceLocation location) {
         return readImage(location.toString());
+    }
+
+    public static Image getSubImage(Image img, int x, int y, int w, int h) {
+        return img instanceof BufferedImage ? ((BufferedImage) img).getSubimage(x, y, w, h) : Images.EMPTY;
     }
 }

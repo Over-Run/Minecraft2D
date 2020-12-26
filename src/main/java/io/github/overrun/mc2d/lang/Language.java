@@ -43,8 +43,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @since 2020/10/13
  */
 public final class Language {
-    private static final Map<String, String> K2V_EN_US = new Object2ObjectArrayMap<>(14);
-    private static final Map<String, String> K2V_ZH_CN = new Object2ObjectArrayMap<>(14);
+    private static final Map<String, String> K2V_EN_US = new Object2ObjectArrayMap<>(12);
+    private static final Map<String, String> K2V_ZH_CN = new Object2ObjectArrayMap<>(12);
     public static final Map<String, Map<String, String>> LANG
             = Map.ofEntries(
             new SimpleEntry<>("en_us", K2V_EN_US),

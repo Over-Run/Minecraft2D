@@ -27,6 +27,9 @@ package io.github.overrun.mc2d.text;
 import io.github.overrun.mc2d.lang.Language;
 
 /**
+ * A text auto replace by translation key to value
+ * when use {@link TranslatableText#asString()}
+ *
  * @author squid233
  * @since 2020/10/12
  */

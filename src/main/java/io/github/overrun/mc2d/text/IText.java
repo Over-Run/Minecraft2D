@@ -33,10 +33,36 @@ import static io.github.overrun.mc2d.util.DrawHelper.getSimsunMetrics;
  * @since 2020/09/18
  */
 public interface IText {
+    /**
+     * Convert the text to <b>formatted</b> string.
+     *
+     * @return The formatted string.
+     * @apiNote Override this method to format string, override
+     * {@link IText#toString()} to the <b>un-formatted</b> string.
+     * @see IText#toString()
+     */
     String asString();
 
+    /**
+     * Convert the text to <b>un-formatted</b> string.
+     *
+     * @return The un-formatted string.
+     * @apiNote Override this method to un-formatted string, override
+     * {@link IText#asString()} to the <b>formatted</b> string.
+     * @see IText#asString()
+     */
+    @Override
+    String toString();
+
+    IText EMPTY = new LiteralText("");
+
+    /**
+     * Create a text without any string.
+     *
+     * @return The empty text.
+     */
     static IText of() {
-        return new LiteralText("");
+        return EMPTY;
     }
 
     default int getPrevWidth(Graphics g) {

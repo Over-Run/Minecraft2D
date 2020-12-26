@@ -31,55 +31,49 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Properties;
 
-import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
+import static io.github.overrun.mc2d.Minecraft2D.logger;
 
 /**
  * @author squid233
  * @since 2020/09/15
  */
 public final class Options {
-    private static final Properties OPTIONS = new Properties(5);
+    private static final Properties OPTIONS = new Properties(3);
     public static final String WIDTH = "width";
     public static final String HEIGHT = "height";
-    public static final String FPS = "fps";
     public static final String LANG = "lang";
-    public static final String LOGGER_FORMAT = "logger-format";
-    public static final String LOG_LEVEL = "log-level";
+    public static final String FPS = "fps";
 
     public static final int DEF_WIDTH = 854;
     public static final int DEF_HEIGHT = 480;
-    public static final int DEF_FPS = 60;
     public static final String DEF_LANG = "en_us";
-    public static final String DEF_LOGGER_FORMAT = "[%1$tT] [%2$s/%3$s] (%4$s) %5$s%6$s";
-    public static final int DEF_LOG_LEVEL = 700;
+    public static final int DEF_FPS = 60;
 
     static {
-        File f = new File("options.properties");
+        File f = new File("options.txt");
         if (!f.exists()) {
             try (FileWriter fw = new FileWriter(f)) {
                 OPTIONS.put(WIDTH, DEF_WIDTH);
                 OPTIONS.put(HEIGHT, DEF_HEIGHT);
-                OPTIONS.put(FPS, DEF_FPS);
                 OPTIONS.put(LANG, DEF_LANG);
-                OPTIONS.put(LOGGER_FORMAT, DEF_LOGGER_FORMAT);
-                OPTIONS.put(LOG_LEVEL, DEF_LOG_LEVEL);
+                OPTIONS.put(FPS, DEF_FPS);
                 OPTIONS.store(fw, null);
             } catch (IOException e) {
-                LOGGER.exception("Cannot write options!", e);
+                logger.error("Cannot write options!", e);
             }
         }
         try (FileReader fr = new FileReader(f)) {
             OPTIONS.load(fr);
         } catch (IOException e) {
-            LOGGER.exception("Cannot read options!", e);
+            logger.error("Cannot read options!", e);
         }
     }
 
     public static void save() {
-        try (Writer w = new FileWriter("options.properties")) {
+        try (Writer w = new FileWriter("options.txt")) {
             OPTIONS.store(w, null);
         } catch (IOException e) {
-            LOGGER.exception("Cannot save options!", e);
+            logger.error("Cannot save options!", e);
         }
     }
 
@@ -98,10 +92,6 @@ public final class Options {
 
     public static String get(String k ,String def) {
         return OPTIONS.getProperty(k, def);
-    }
-
-    public static boolean getB(String k) {
-        return Boolean.parseBoolean(get(k));
     }
 
     public static int getI(String k, int def) {

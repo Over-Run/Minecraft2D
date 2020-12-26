@@ -24,10 +24,10 @@
 
 package io.github.overrun.mc2d.input;
 
-import io.github.overrun.mc2d.screen.Screens;
-
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import static io.github.overrun.mc2d.Minecraft2D.getOpenScreen;
 
 /**
  * @author squid233
@@ -36,6 +36,6 @@ import java.awt.event.MouseEvent;
 public final class MouseInput extends MouseAdapter {
     @Override
     public void mouseClicked(MouseEvent e) {
-        Screens.getOpenScreen().onMouseClicked();
+        getOpenScreen().onMouseClicked();
     }
 }

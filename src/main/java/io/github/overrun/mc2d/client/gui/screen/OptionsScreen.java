@@ -22,38 +22,35 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.screen;
+package io.github.overrun.mc2d.client.gui.screen;
 
-import io.github.overrun.mc2d.text.LiteralText;
+import io.github.overrun.mc2d.client.gui.screen.widget.ButtonWidget;
 import io.github.overrun.mc2d.text.TranslatableText;
 
 import java.awt.Graphics;
 
-import static io.github.overrun.mc2d.screen.Screens.*;
+import static io.github.overrun.mc2d.util.Constants.BACK;
 import static io.github.overrun.mc2d.util.Coordinator.U_M;
-import static io.github.overrun.mc2d.util.DrawHelper.drawCenterImage;
-import static io.github.overrun.mc2d.util.Images.LOGO;
 
 /**
  * @author squid233
- * @since 2020/10/12
+ * @since 2020/12/12
  */
-public final class TitleScreen extends Screen {
-    public TitleScreen() {
-        addButton(new ButtonWidget(-100, 62, 200, U_M, new TranslatableText("button.mc2d.singleplayer"),
-                w -> open(SAVES_SCREEN)));
-        addButton(new ButtonWidget(-100, 88, 200, U_M, new TranslatableText("button.mc2d.multiplayer")));
-        addButton(new ButtonWidget(-100, 114, 200, U_M, new LiteralText("Mods")));
-        addButton(new ButtonWidget(-100, 140, 200, U_M, new TranslatableText("button.mc2d.options"),
-                w -> open(OPTIONS_SCREEN)));
-        addButton(new ButtonWidget(-100, 166, 200, U_M, new TranslatableText("button.mc2d.exit_game"),
-                w -> System.exit(0)));
-        addButton(new LanguageButtonWidget(60, 192, U_M, w -> open(LANG_SCREEN)));
+public final class OptionsScreen extends Screen {
+    public OptionsScreen(Screen parent) {
+        super(new TranslatableText("button.mc2d.options"), parent);
+    }
+
+    @Override
+    protected void init() {
+        addButton(new ButtonWidget(-200, 60, 200, new TranslatableText(BACK), w -> close()));
+        addButton(new ButtonWidget(-210, 55, 100, U_M, new TranslatableText("button.mc2d.language"),
+                w -> open(new LanguageScreen(this))));
     }
 
     @Override
     public void render(Graphics g) {
+        renderBackground(g);
         super.render(g);
-        drawCenterImage(g, LOGO, 10);
     }
 }

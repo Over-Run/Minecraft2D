@@ -25,17 +25,17 @@
 package io.github.overrun.mc2d;
 
 import io.github.overrun.mc2d.client.Mc2dClient;
-import io.github.overrun.mc2d.event.EventBus;
-import io.github.overrun.mc2d.logger.Logger;
+import io.github.overrun.mc2d.client.gui.screen.Screen;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author squid233
  * @since 2020/09/14
  */
 public final class Minecraft2D {
-    public static final Logger LOGGER = Logger.getLogger(Minecraft2D.class);
+    public static final Logger logger = LogManager.getLogger(Minecraft2D.class.getSimpleName());
     public static final String VERSION = "0.3.0";
-    public static final EventBus EVENT_BUS = new EventBus();
 
     public static int getWidth() {
         return Mc2dClient.getInstance().getWidth();
@@ -51,5 +51,13 @@ public final class Minecraft2D {
 
     public static int getMouseY() {
         return Mc2dClient.getInstance().getMousePosition().y;
+    }
+
+    public static void openScreen(Screen screen) {
+        Mc2dClient.getInstance().openScreen(screen);
+    }
+
+    public static Screen getOpenScreen() {
+        return Mc2dClient.getInstance().getScreen();
     }
 }

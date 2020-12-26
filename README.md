@@ -15,11 +15,6 @@ Some assets are producing by Mojang Studios.
 
 最低要求JRE11，低于此版本会导致不能正常启动
 
-## 预览图 Preview
-
-0.1.0.40-pre-alpha  
-![0-1-0-40-0](/img/0-1-0-40-0.png)![0-1-0-40-1](/img/0-1-0-40-1.png)
-
 ## 使用方法 Use Guide
 
 1. go to [itch.io](https://squid233.itch.io/minecraft2d) to download。  
@@ -34,6 +29,9 @@ Some assets are producing by Mojang Studios.
 java -jar *.jar
 pause
 ```
+
+### Startup params
+title: Set game title.
 
 ## 贡献 Contributing
 

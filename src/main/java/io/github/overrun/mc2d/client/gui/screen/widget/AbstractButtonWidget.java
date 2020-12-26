@@ -22,36 +22,64 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.screen;
+package io.github.overrun.mc2d.client.gui.screen.widget;
 
-import java.awt.Graphics;
+import io.github.overrun.mc2d.client.gui.screen.Screen;
+import io.github.overrun.mc2d.client.util.BuiltinGraphics;
+import io.github.overrun.mc2d.text.IText;
+
 import java.awt.Image;
 import java.awt.Point;
+import java.util.List;
 
 import static io.github.overrun.mc2d.Minecraft2D.getMouseX;
 import static io.github.overrun.mc2d.Minecraft2D.getMouseY;
-import static io.github.overrun.mc2d.util.DrawHelper.drawImage;
 
 /**
  * @author squid233
  * @since 2020/12/02
  */
-public abstract class AbstractButtonWidget extends ScreenWidget {
+public abstract class AbstractButtonWidget implements Element {
+    public abstract AbstractButtonWidget setEnable(boolean enable);
+
+    /**
+     * If the button is enable, the button can click
+     *
+     * @return Is the button enable
+     */
     public abstract boolean isEnable();
+    public abstract IText getText();
     public abstract Image getUsualTexture();
     public abstract int getWidth();
     public abstract int getHeight();
+
+    /**
+     *
+     *
+     * @return A list collect the tooltips.
+     */
+    public abstract List<IText> getTooltips();
 
     public Point getPrevPos() {
         return new Point(getX(), getY());
     }
 
+    /**
+     * Render the tooltips. Invoke by {@link Screen}.
+     *
+     * @param g The Graphics object.
+     */
+    public void renderTooltips(BuiltinGraphics g) {
+        if (isHover()) {
+            g.renderTooltips(getTooltips(), getMouseX(), getMouseY());
+        }
+    }
+
     public boolean isHover() {
-        return isEnable()
-                && getMouseX() > getPrevPos().getX()
-                && getMouseX() < getPrevPos().getX() + getWidth()
+        return getMouseX() > getPrevPos().getX()
+                && getMouseX() < getPrevPos().getX() + (getWidth() << 1)
                 && getMouseY() > getPrevPos().getY()
-                && getMouseY() < getPrevPos().getY() + getHeight();
+                && getMouseY() < getPrevPos().getY() + (getHeight() << 1);
     }
 
     public Image getHoverTexture() {
@@ -69,11 +97,6 @@ public abstract class AbstractButtonWidget extends ScreenWidget {
     public abstract PressAction getAction();
 
     public interface PressAction {
-        void onPress(AbstractButtonWidget widget);
-    }
-
-    @Override
-    public void render(Graphics g) {
-        drawImage(g, getTexture(), getPrevPos(), getWidth(), getHeight());
+        void onPress(AbstractButtonWidget button);
     }
 }

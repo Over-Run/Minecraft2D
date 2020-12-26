@@ -25,47 +25,50 @@
 package io.github.overrun.mc2d.client.renderer;
 
 import io.github.overrun.mc2d.option.Options;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.JFrame;
-
-import static io.github.overrun.mc2d.Minecraft2D.LOGGER;
 
 /**
  * @author squid233
  * @since 2020/09/15
  */
 public final class GameRenderer implements Runnable {
+    private static final Logger logger = LogManager.getLogger("Minecraft2D|GameRenderer");
     private final JFrame gameFrame;
     private Thread thread;
     private boolean exited;
-    public int fps;
+    private int fps;
+    public static final int INTERVAL = 1000 / Options.getI(Options.FPS, Options.DEF_FPS);
 
     public GameRenderer(JFrame gameFrame) {
         this.gameFrame = gameFrame;
-        fps = Options.getI(Options.FPS, Options.DEF_FPS);
-        LOGGER.info("Created render thread");
-        LOGGER.info("FPS: {}", fps);
-        LOGGER.info("Render interval: {}ms", getInterval());
+        logger.info("Created render thread");
     }
 
     @Override
     public void run() {
-        LOGGER.info("Start rendering");
+        logger.info("Start rendering");
+        // The render time
+        long update;
+        // The sleep time
+        long sleep;
         while (!exited) {
+            long before = System.nanoTime();
             gameFrame.repaint();
+            update = (System.nanoTime() - before) / 1000000L;
+            sleep = Math.max(2, INTERVAL - update);
             try {
                 //noinspection BusyWait
-                Thread.sleep(getInterval());
+                Thread.sleep(sleep);
             } catch (InterruptedException e) {
-                LOGGER.error("{} error: {}", thread.getName(), e);
+                logger.error("{} error: {}", thread.getName(), e);
                 exited = true;
             }
+            fps = (int) (1000 / (update + sleep));
         }
-        LOGGER.info("{} stop rendering", thread.getName());
-    }
-
-    public int getInterval() {
-        return 1000 / fps;
+        logger.info("Stop rendering");
     }
 
     public void start() {
@@ -73,5 +76,13 @@ public final class GameRenderer implements Runnable {
             thread = new Thread(this, "RenderThread");
             thread.start();
         }
+    }
+
+    public void stop() {
+        exited = true;
+    }
+
+    public int getFps() {
+        return fps;
     }
 }

@@ -20,34 +20,16 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- */
+ *
 
-package io.github.overrun.mc2d.util;
+package io.github.overrun.mc2d.util.math;
 
-import javax.swing.ImageIcon;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-
-/**
+/
  * @author squid233
- * @since 2020/11/24
- */
-public final class Images {
-    public static final Image EMPTY = new ImageIcon().getImage();
-    public static final BufferedImage WIDGETS = guiImg("widgets");
-    public static final BufferedImage OPTIONS_BACKGROUND = guiImg("options_background");
-    public static final BufferedImage LOGO = guiImg("logo");
-    public static final BufferedImage BUTTON_DISABLE = widgetImg(0, 46, 200, 20);
-    public static final BufferedImage BUTTON = widgetImg(0, 66, 200, 20);
-    public static final BufferedImage BUTTON_HOVER = widgetImg(0, 86, 200, 20);
-    public static final BufferedImage LANG_BUTTON = widgetImg(0, 106, 20, 20);
-    public static final BufferedImage LANG_BUTTON_HOVER = widgetImg(0, 126, 20, 20);
+ * @since 2020/10/12
 
-    private static BufferedImage guiImg(String nm) {
-        return ImgUtil.readImage(new ResourceLocation("textures/gui/" + nm + ".png"));
+public final class MathHelper {
+    public static int ceilDivision(int a, int b) {
+        return a % b == 0 ? a / b : a / b + 1;
     }
-
-    private static BufferedImage widgetImg(int x, int y, int w, int h) {
-        return WIDGETS.getSubimage(x, y, w, h);
-    }
-}
+}*/

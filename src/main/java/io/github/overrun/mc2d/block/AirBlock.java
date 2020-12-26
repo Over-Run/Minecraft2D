@@ -22,13 +22,11 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.screen;
+package io.github.overrun.mc2d.block;
 
 /**
- * TODO
  * @author squid233
- * @since 2020/12/18
+ * @since 2020/12/22
  */
-public final class SavesScreen extends Screen {
-    public SavesScreen() {}
+public class AirBlock extends Block {
 }

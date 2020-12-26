@@ -22,17 +22,30 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.event;
+package io.github.overrun.mc2d.block;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import io.github.overrun.mc2d.util.Utils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * @author squid233
- * @since 2020/12/18
+ * @since 2020/12/22
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface SubscribeEvent {}
+public class BlockModel {
+    private static final Logger logger = LogManager.getLogger("Minecraft2D|BlockModelLoader");
+    private final Properties model;
+
+    public BlockModel(String id) {
+        model = new Properties(1);
+        try (InputStream is = Utils.getResource(id)) {
+            model.load(is);
+        } catch (IOException e) {
+            logger.warn("Can't load block model! Skipped", e);
+        }
+    }
+}

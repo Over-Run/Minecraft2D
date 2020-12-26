@@ -22,19 +22,13 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.screen;
+package io.github.overrun.mc2d.world;
 
-import io.github.overrun.mc2d.Minecraft2D;
-import io.github.overrun.mc2d.text.IText;
-
-import static io.github.overrun.mc2d.util.Coordinator.U_L;
+import java.io.Serializable;
 
 /**
  * @author squid233
- * @since 2020/12/06
+ * @since 2020/09/15
  */
-public class ComboBoxItem extends ButtonWidget {
-    public ComboBoxItem(int y, IText text, PressAction action) {
-        super(0, y, Minecraft2D.getWidth(), U_L, text, action);
-    }
+public interface IWorld extends Serializable {
 }

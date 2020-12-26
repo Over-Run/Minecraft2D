@@ -22,10 +22,12 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.screen;
+package io.github.overrun.mc2d.client.gui.screen;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
+import io.github.overrun.mc2d.client.gui.screen.widget.ButtonWidget;
+import io.github.overrun.mc2d.client.gui.screen.widget.EntryListWidget;
 import io.github.overrun.mc2d.option.Options;
 import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.text.LiteralText;
@@ -34,9 +36,7 @@ import io.github.overrun.mc2d.text.TranslatableText;
 import java.awt.Graphics;
 
 import static io.github.overrun.mc2d.lang.Language.getByLocale;
-import static io.github.overrun.mc2d.util.Constants.CANCEL;
-import static io.github.overrun.mc2d.util.Constants.DONE;
-import static io.github.overrun.mc2d.util.Coordinator.D_M;
+import static io.github.overrun.mc2d.util.Constants.BACK;
 import static io.github.overrun.mc2d.util.DrawHelper.drawCenteredText;
 
 /**
@@ -44,43 +44,35 @@ import static io.github.overrun.mc2d.util.DrawHelper.drawCenteredText;
  * @since 2020/10/13
  */
 public final class LanguageScreen extends Screen {
-    private final BiMap<String, IText> map = ImmutableBiMap.of(
+    public static final BiMap<String, IText> MAP = ImmutableBiMap.of(
             "en_us", genItem("en_us"),
             "zh_cn", genItem("zh_cn")
     );
-    private final ComboBoxWidget cbw;
+    private EntryListWidget cbw;
 
-    public LanguageScreen() {
-        cbw = new ComboBoxWidget(this,
-                map.get("en_us"),
-                map.get("zh_cn")
-        ).setSelectedItem(map.get(Options.get(Options.LANG, Options.DEF_LANG)));
-        addWidget(cbw);
-        addButton(new ButtonWidget(-210, 30, 200, D_M, new TranslatableText(DONE), w -> {
-            Options.setAndSave(Options.LANG, map.inverse().get(cbw.getSelectedItem().getText()));
-            close();
-        }));
-        addButton(new ButtonWidget(10, 30, 200, D_M, new TranslatableText(CANCEL), w -> {
-            cbw.setSelectedItem(map.get(Options.get(Options.LANG, Options.DEF_LANG)));
-            close();
-        }));
+    public LanguageScreen(Screen parent) {
+        super(new TranslatableText("narrator.mc2d.chooseLang"), parent);
     }
 
-    private IText genItem(String locale) {
-        return new LiteralText(getByLocale(locale, "language.name")
-                + " ("
-                + getByLocale(locale, "language.region")
-                + ")"
-        );
+    @Override
+    protected void init() {
+        cbw = new EntryListWidget(
+                MAP.get("en_us"),
+                MAP.get("zh_cn")
+        ).setSelectedItem(MAP.get(Options.get(Options.LANG, Options.DEF_LANG)))
+                .setAction(b -> Options.setAndSave(Options.LANG, MAP.inverse().get(cbw.getSelectedItem().getText())));
+        addChild(cbw);
+        addButton(new ButtonWidget(-200, 60, 200, new TranslatableText(BACK), b -> close()));
+    }
+
+    private static IText genItem(String locale) {
+        return new LiteralText(String.format("%s (%s)", getByLocale(locale, "language.name"), getByLocale(locale, "language.region")));
     }
 
     @Override
     public void render(Graphics g) {
+        renderBackground(g);
         super.render(g);
-        drawCenteredText(g, new TranslatableText("options.mc2d.choose_lang"), 5);
-        drawCenteredText(g,
-                new TranslatableText("options.mc2d.current_lang", cbw.getSelectedItem().getText()),
-                25);
-        drawCenteredText(g, new TranslatableText("options.mc2d.lang_warning"), 45);
+        drawCenteredText(g, new TranslatableText("narrator.mc2d.langWarning"), 25);
     }
 }

@@ -24,13 +24,13 @@
 
 package io.github.overrun.mc2d.input;
 
-import io.github.overrun.mc2d.screen.GameScreen;
+import io.github.overrun.mc2d.client.gui.screen.GameScreen;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import static io.github.overrun.mc2d.Minecraft2D.getOpenScreen;
 import static io.github.overrun.mc2d.input.KeyBinding.*;
-import static io.github.overrun.mc2d.screen.Screens.getOpenScreen;
 
 /**
  * @author squid233

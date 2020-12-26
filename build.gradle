@@ -1,14 +1,16 @@
 plugins {
     id 'java'
     id 'idea'
-    id 'maven-publish'
+    // id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_11
 
+final String guava = '30.1'
+
 group 'io.github.over-run'
-archivesBaseName = "minecraft2d"
+archivesBaseName = 'minecraft2d'
 version '0.3.0'
 
 repositories {
@@ -17,11 +19,11 @@ repositories {
 }
 
 dependencies {
-    compileOnly "org.jetbrains:annotations:$annotations"
-    implementation "it.unimi.dsi:fastutil:$fastutil"
+    compileOnly 'org.jetbrains:annotations:20.1.0'
+    implementation 'it.unimi.dsi:fastutil:8.4.4'
+    // implementation 'com.google.code.gson:gson:2.8.6'
     implementation "com.google.guava:guava:$guava-jre"
-    //compile "org.apache.commons:commons-lang3:$lang3"
-    //compile "org.yaml:snakeyaml:$snakeyaml"
+    implementation 'org.apache.logging.log4j:log4j-core:2.14.0'
 }
 
 tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
@@ -33,16 +35,27 @@ tasks.withType(Javadoc) {
 
 jar {
     from 'LICENSE'
+    from (sourceSets.main.resources) {
+        exclude('log4j2-test.xml')
+    }
     manifest {
         attributes 'Main-Class': 'io.github.overrun.mc2d.Main'
     }
 }
 
-shadowJar { from 'LICENSE' }
+shadowJar {
+    from 'LICENSE'
+    from (sourceSets.main.resources) {
+        exclude('log4j2-test.xml')
+    }
+}
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     archiveClassifier.set 'sources'
     from sourceSets.main.allSource
+    from (sourceSets.main.resources) {
+        exclude('log4j2-test.xml')
+    }
     from 'LICENSE'
 }
 
@@ -57,4 +70,4 @@ idea {
     module.inheritOutputDirs = true
 }
 
-publishing { repositories { mavenLocal() } }
+// publishing { repositories { mavenLocal() } }

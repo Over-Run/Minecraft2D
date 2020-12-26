@@ -22,31 +22,18 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.screen;
+package io.github.overrun.mc2d.client.gui.screen.widget;
 
-import io.github.overrun.mc2d.text.TranslatableText;
-
-import java.awt.Graphics;
-
-import static io.github.overrun.mc2d.util.Constants.BACK;
-import static io.github.overrun.mc2d.util.Coordinator.D_M;
-import static io.github.overrun.mc2d.util.Coordinator.U_M;
-import static io.github.overrun.mc2d.util.DrawHelper.drawCenteredText;
+import io.github.overrun.mc2d.client.gui.Drawable;
+import io.github.overrun.mc2d.client.util.BuiltinGraphics;
 
 /**
  * @author squid233
- * @since 2020/12/12
+ * @since 2020/10/16
  */
-public class OptionsScreen extends Screen {
-    public OptionsScreen() {
-        addButton(new ButtonWidget(-100, 30, 200, D_M, new TranslatableText(BACK), w -> close()));
-        addButton(new ButtonWidget(-210, 55, 200, U_M, new TranslatableText("button.mc2d.language"),
-                w -> open(Screens.LANG_SCREEN)));
-    }
+public interface Element extends Drawable {
+    int getX();
+    int getY();
 
-    @Override
-    public void render(Graphics g) {
-        super.render(g);
-        drawCenteredText(g, new TranslatableText("button.mc2d.options"), 5);
-    }
+    default void render(BuiltinGraphics g) {}
 }

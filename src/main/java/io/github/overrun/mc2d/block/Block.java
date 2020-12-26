@@ -22,11 +22,38 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.screen;
+package io.github.overrun.mc2d.block;
 
 /**
  * @author squid233
- * @since 2020/11/24
+ * @since 2020/12/22
  */
-public final class GameScreen extends Screen {
+public class Block extends AbstractBlock {
+    public int x;
+    public int y;
+    public boolean isDown;
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public void setDown(boolean down) {
+        isDown = down;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public boolean isDown() {
+        return isDown;
+    }
 }

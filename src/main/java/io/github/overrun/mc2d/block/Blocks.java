@@ -22,32 +22,18 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.util;
+package io.github.overrun.mc2d.block;
 
-import javax.swing.ImageIcon;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
+import io.github.overrun.mc2d.util.registry.Registry;
 
 /**
  * @author squid233
- * @since 2020/11/24
+ * @since 2020/12/22
  */
-public final class Images {
-    public static final Image EMPTY = new ImageIcon().getImage();
-    public static final BufferedImage WIDGETS = guiImg("widgets");
-    public static final BufferedImage OPTIONS_BACKGROUND = guiImg("options_background");
-    public static final BufferedImage LOGO = guiImg("logo");
-    public static final BufferedImage BUTTON_DISABLE = widgetImg(0, 46, 200, 20);
-    public static final BufferedImage BUTTON = widgetImg(0, 66, 200, 20);
-    public static final BufferedImage BUTTON_HOVER = widgetImg(0, 86, 200, 20);
-    public static final BufferedImage LANG_BUTTON = widgetImg(0, 106, 20, 20);
-    public static final BufferedImage LANG_BUTTON_HOVER = widgetImg(0, 126, 20, 20);
+public final class Blocks {
+    public static final Block AIR = register("air", new AirBlock());
 
-    private static BufferedImage guiImg(String nm) {
-        return ImgUtil.readImage(new ResourceLocation("textures/gui/" + nm + ".png"));
-    }
-
-    private static BufferedImage widgetImg(int x, int y, int w, int h) {
-        return WIDGETS.getSubimage(x, y, w, h);
+    public static Block register(String id, Block block) {
+        return Registry.register(Registry.BLOCK, id, block);
     }
 }

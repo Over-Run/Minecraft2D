@@ -1,0 +1,44 @@
+<Configuration status="WARN" packages="io.github.overrun.mc2d.util.console">
+    <Appenders>
+        <!-- 	System out	 -->
+        <Console name="SysOut" target="SYSTEM_OUT">
+            <PatternLayout>
+                <LoggerNamePatternSelector defaultPattern="%style{[%d{HH:mm:ss}]}{blue} %highlight{[%t/%level]}{FATAL=red, ERROR=red, WARN=yellow, INFO=green, DEBUG=green, TRACE=blue} %style{(%logger{1})}{cyan} %highlight{%msg%n}{FATAL=red, ERROR=red, WARN=normal, INFO=normal, DEBUG=normal, TRACE=normal}" disableAnsi="${sys:mc2d.log.disableAnsi:-true}">
+                    <!--  Don't show the logger name for mc2d classes -->
+                    <PatternMatch key="io.github.overrun.mc2d." pattern="%style{[%d{HH:mm:ss}]}{blue} %highlight{[%t/%level]}{FATAL=red, ERROR=red, WARN=yellow, INFO=green, DEBUG=green, TRACE=blue} %style{(Minecraft2D)}{cyan} %highlight{%msg%n}{FATAL=red, ERROR=red, WARN=normal, INFO=normal, DEBUG=normal, TRACE=normal}"/>
+                </LoggerNamePatternSelector>
+            </PatternLayout>
+        </Console>
+        <!-- 	latest.log same as vanilla	 -->
+        <RollingRandomAccessFile name="LatestFile" fileName="logs/latest.log" filePattern="logs/%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <LoggerNamePatternSelector defaultPattern="[%d{HH:mm:ss}] [%t/%level] (%logger{1}) %msg%n">
+                    <!--  Don't show the logger name for mc2d classes -->
+                    <PatternMatch key="io.github.overrun.mc2d." pattern="[%d{HH:mm:ss}] [%t/%level] (Minecraft2D) %msg%n"/>
+                </LoggerNamePatternSelector>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <OnStartupTriggeringPolicy/>
+            </Policies>
+        </RollingRandomAccessFile>
+        <!-- 	Debug log file	 -->
+        <RollingRandomAccessFile name="DebugFile" fileName="logs/debug.log" filePattern="logs/debug-%i.log.gz">
+            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level] (%logger) %msg%n"/>
+            <!-- 	Keep 5 files max	 -->
+            <DefaultRolloverStrategy max="5" fileIndex="min"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+                <OnStartupTriggeringPolicy/>
+            </Policies>
+        </RollingRandomAccessFile>
+    </Appenders>
+    <Loggers>
+        <Logger level="${sys:mc2d.log.level:-info}" name="io.github.overrun.mc2d"/>
+        <Root level="all">
+            <AppenderRef ref="DebugFile" level="${sys:mc2d.log.debug.level:-debug}"/>
+            <AppenderRef ref="SysOut" level="${sys:mc2d.log.level:-info}"/>
+            <AppenderRef ref="LatestFile" level="${sys:mc2d.log.level:-info}"/>
+        </Root>
+    </Loggers>
+</Configuration>

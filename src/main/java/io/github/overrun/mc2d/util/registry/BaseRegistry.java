@@ -34,4 +34,8 @@ public abstract class BaseRegistry<T> implements Iterable<T> {
     public abstract T register(Identifier id, T entry);
     public abstract T get(Identifier id);
     public abstract Identifier getId(T entry);
+
+    public T register(String id, T entry) {
+        return register(new Identifier(id), entry);
+    }
 }

@@ -24,18 +24,27 @@
 
 package io.github.overrun.mc2d.util.registry;
 
+import io.github.overrun.mc2d.block.Block;
+import io.github.overrun.mc2d.block.Blocks;
 import io.github.overrun.mc2d.util.Identifier;
 
 /**
+ * Register an object to entry table.<br>
+ * The registry api has 2 methods to register the entries:<br>
+ * <ol><li>{@code Registry.register(Registry.BLOCK, "mc2d:air", Blocks.AIR);}</li>
+ * <li>{@code Registry.BLOCK.register("mc2d:air", Blocks.AIR);}</li></ol>
+ *
  * @author squid233
  * @since 2020/10/06
  */
 public final class Registry {
+    public static final DefaultedRegistry<Block> BLOCK = new DefaultedRegistry<>(Blocks.AIR);
+
     public static <T> T register(BaseRegistry<T> registry, Identifier id, T entry) {
         return registry.register(id, entry);
     }
 
     public static <T> T register(BaseRegistry<T> registry, String id, T entry) {
-        return register(registry, new Identifier(id), entry);
+        return registry.register(id, entry);
     }
 }
