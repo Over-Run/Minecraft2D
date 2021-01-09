@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+    id 'idea'
+}
+
+group 'io.github.over-run'
+version '0.1.0'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.aliyun.com/repository/central' }
+}
+
+project.ext.lwjglVersion = '3.2.3'
+
+dependencies {
+    implementation 'com.google.guava:guava:30.1-jre'
+    implementation 'it.unimi.dsi:fastutil:8.4.4'
+    implementation 'org.apache.logging.log4j:log4j-core:2.14.0'
+    compileOnly 'org.jetbrains:annotations:20.1.0'
+    // Lwjgl libraries
+    implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+    String[] lwjglDepends = ['org.lwjgl:lwjgl', 'org.lwjgl:lwjgl-glfw', 'org.lwjgl:lwjgl-opengl']
+    String[] lwjglPlatforms = ['windows', 'windows-x86', 'linux-arm64', 'linux-arm32', 'linux', 'macos']
+    lwjglDepends.each {
+        implementation it
+    }
+    lwjglDepends.each {
+        depend -> lwjglPlatforms.each {
+            runtimeOnly "$depend::natives-$it"
+        }
+    }
+}
+
+idea.module.inheritOutputDirs true
