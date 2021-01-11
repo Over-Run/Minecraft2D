@@ -22,32 +22,53 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.block;
+package io.github.overrun.mc2d.util;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import it.unimi.dsi.fastutil.bytes.Byte2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author squid233
- * @since 2021/01/09
+ * @since 2021/01/11
  */
-public final class Blocks {
-    public static final BiMap<String, Block> BLOCKS = HashBiMap.create(3);
-    public static final Byte2ObjectMap<Block> RAW_ID_BLOCKS = new Byte2ObjectLinkedOpenHashMap<>(3);
-    public static final int BLOCK_SIZE = 32;
-    public static final Block AIR = register("air", 0);
-    public static final Block GRASS_BLOCK = register("grass_block", 1);
-    public static final Block DIRT = register("dirt", 2);
-    public static final Block COBBLESTONE = register("cobblestone", 3);
-    public static final Block BEDROCK = register("bedrock", 4);
+public final class TextureDrawer {
+    private static TextureDrawer instance;
+    private TextureDrawer() {}
 
-    public static Block register(String id, int rawId) {
-        Block b = new Block(rawId);
-        BLOCKS.putIfAbsent(id, b);
-        RAW_ID_BLOCKS.putIfAbsent(b.getRawId(), b);
-        return b;
+    /**
+     * Starting draw texture.
+     * <p>Call {@link TextureDrawer#end()} when end.</p>
+     *
+     * @param texture The texture id.
+     * @return This
+     */
+    public static TextureDrawer begin(int texture) {
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        ImageReader.bindTexture(texture);
+        glBegin(GL_QUADS);
+        return instance != null
+                ? instance
+                : (instance = new TextureDrawer());
+    }
+
+    public TextureDrawer color3f(float r, float g, float b) {
+        glColor3f(r, g, b);
+        return this;
+    }
+
+    public TextureDrawer tex2dVertex2d(double s, double t, double x, double y) {
+        glTexCoord2d(s, t);
+        glVertex2d(x, y);
+        return this;
+    }
+
+    public TextureDrawer bind(int texture) {
+        end();
+        return begin(texture);
+    }
+
+    public void end() {
+        glEnd();
     }
 }
-

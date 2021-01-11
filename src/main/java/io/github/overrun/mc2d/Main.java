@@ -27,6 +27,7 @@ package io.github.overrun.mc2d;
 import io.github.overrun.mc2d.level.World;
 import io.github.overrun.mc2d.util.ImageReader;
 import io.github.overrun.mc2d.util.ModelManager;
+import io.github.overrun.mc2d.util.TextureDrawer;
 import io.github.overrun.mc2d.util.WindowUtils;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectArrayMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
@@ -46,8 +47,7 @@ import java.nio.IntBuffer;
 import java.util.Objects;
 import java.util.Properties;
 
-import static io.github.overrun.mc2d.block.Blocks.DIRT;
-import static io.github.overrun.mc2d.block.Blocks.GRASS_BLOCK;
+import static io.github.overrun.mc2d.block.Blocks.*;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -58,21 +58,29 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  * @since 2021/01/07
  */
 public final class Main {
+    public static final String VERSION = "0.4.0";
     private static final Logger logger = LogManager.getLogger();
     private static final Byte2ObjectMap<Object2IntMap<String>> BLOCK_CUSTOM_MODELS = new Byte2ObjectArrayMap<>(1);
     private static final Main INSTANCE = new Main();
+    private final Player player = new Player();
     private World world;
     private long window;
 
     private void run() {
-        logger.info("Loading for game Minecraft2D 0.3.0");
+        logger.info("Loading for game Minecraft2D {}", VERSION);
         init();
         GL.createCapabilities();
         resizeGl(896, 512);
         glClearColor(.4f, .6f, .9f, .1f);
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         while (!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            Dimension wSize = WindowUtils.getWindowSize(window);
+            player.render(wSize.width, wSize.height);
             render();
+            player.move(window, world);
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
@@ -88,7 +96,7 @@ public final class Main {
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
-        window = glfwCreateWindow(896, 512, "Minecraft2D 0.3.0", NULL, NULL);
+        window = glfwCreateWindow(896, 512, "Minecraft2D " + VERSION, NULL, NULL);
         if (window == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
         }
@@ -103,20 +111,20 @@ public final class Main {
                 world.save();
             }
             if (key == GLFW_KEY_1) {
-                Player.handledBlock = 1;
+                player.handledBlock = 1;
             }
             if (key == GLFW_KEY_2) {
-                Player.handledBlock = 2;
+                player.handledBlock = 2;
+            }
+            if (key == GLFW_KEY_3) {
+                player.handledBlock = 3;
+            }
+            if (key == GLFW_KEY_4) {
+                player.handledBlock = 4;
             }
         });
         glfwSetWindowCloseCallback(window, window -> world.save());
         glfwSetWindowSizeCallback(window, (window, width, height) -> resizeGl(width, height));
-        glfwSetMouseButtonCallback(window, (w, b, a, m) -> {
-            Point p = WindowUtils.getMousePos(window);
-            if (a == GLFW_PRESS) {
-                world.mousePressed(b, p.x, p.y);
-            }
-        });
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer pWidth = stack.mallocInt(1);
             IntBuffer pHeight = stack.mallocInt(1);
@@ -131,15 +139,23 @@ public final class Main {
             }
         }
         glfwMakeContextCurrent(window);
-        world = new World(64, 64);
+        world = new World(player, 64, 64);
         // generate the terrain
-        for (int j = 0; j < world.getWidth(); j++) {
-            world.setBlock(j, 5, GRASS_BLOCK.getRawId());
+        for (int i = 0; i < world.getWidth(); i++) {
+            world.setBlock(i, 0, BEDROCK);
         }
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 2; i++) {
             for (int j = 0; j < world.getWidth(); j++) {
-                world.setBlock(j, i, DIRT.getRawId());
+                world.setBlock(j, i + 1, COBBLESTONE);
             }
+        }
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < world.getWidth(); j++) {
+                world.setBlock(j, i + 3, DIRT);
+            }
+        }
+        for (int i = 0; i < world.getWidth(); i++) {
+            world.setBlock(i, 5, GRASS_BLOCK);
         }
         glfwSwapInterval(1);
         glfwShowWindow(window);
@@ -149,55 +165,49 @@ public final class Main {
         Point p = WindowUtils.getMousePos(window);
         world.render(p.x, p.y);
         Dimension wSize = WindowUtils.getWindowSize(window);
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         Properties model = new Properties(3);
-        if (!BLOCK_CUSTOM_MODELS.containsKey(Player.handledBlock)) {
+        if (!BLOCK_CUSTOM_MODELS.containsKey(player.handledBlock)) {
             try (InputStream is = ClassLoader.getSystemResourceAsStream(
-                    ModelManager.getModelPath(Player.handledBlock) + ".txt")) {
+                    ModelManager.getModelPath(player.handledBlock) + ".txt")) {
                 model.load(is);
                 Object2IntMap<String> map = new Object2IntArrayMap<>(3);
-                String s = String.valueOf(model.getOrDefault("top", ModelManager.getModelPath(Player.handledBlock)));
-                map.put("top", ImageReader.loadTexture(s.contains(".png") ? s : s + ".png", GL_NEAREST));
-                s = String.valueOf(model.getOrDefault("left", ModelManager.getModelPath(Player.handledBlock)));
-                map.put("left", ImageReader.loadTexture(s.contains(".png") ? s : s + ".png", GL_NEAREST));
-                s = String.valueOf(model.getOrDefault("right", ModelManager.getModelPath(Player.handledBlock)));
-                map.put("right", ImageReader.loadTexture(s.contains(".png") ? s : s + ".png", GL_NEAREST));
-                BLOCK_CUSTOM_MODELS.put(Player.handledBlock, map);
+                putModel(map, model, "top");
+                putModel(map, model, "left");
+                putModel(map, model, "right");
+                BLOCK_CUSTOM_MODELS.put(player.handledBlock, map);
             } catch (Throwable ignored) { }
         }
-        Object2IntMap<String> map = BLOCK_CUSTOM_MODELS.get(Player.handledBlock);
-        ImageReader.bindTexture(map != null
-                ? map.getOrDefault("top", ModelManager.getModelId(Player.handledBlock))
-                : ModelManager.getModelId(Player.handledBlock));
-        glBegin(GL_QUADS);
-        glColor3f(1, 1, 1);
-        glTexCoord2f(0, 1); glVertex2f(wSize.width - 69,  wSize.height - 69);
-        glTexCoord2f(1, 1); glVertex2f(wSize.width - 5,   wSize.height - 37);
-        glTexCoord2f(1, 0); glVertex2f(wSize.width - 69,  wSize.height - 5);
-        glTexCoord2f(0, 0); glVertex2f(wSize.width - 133, wSize.height - 37);
-        glEnd();
-        ImageReader.bindTexture(map != null
-                ? map.getOrDefault("left", ModelManager.getModelId(Player.handledBlock))
-                : ModelManager.getModelId(Player.handledBlock));
-        glBegin(GL_QUADS);
-        glTexCoord2f(1, 0); glVertex2f(wSize.width - 69,  wSize.height - 69);
-        glTexCoord2f(0, 0); glVertex2f(wSize.width - 133, wSize.height - 37);
-        glTexCoord2f(0, 1); glVertex2f(wSize.width - 133, wSize.height - 101);
-        glTexCoord2f(1, 1); glVertex2f(wSize.width - 69,  wSize.height - 133);
-        glEnd();
-        ImageReader.bindTexture(map != null
-                ? map.getOrDefault("right", ModelManager.getModelId(Player.handledBlock))
-                : ModelManager.getModelId(Player.handledBlock));
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex2f(wSize.width - 69,  wSize.height - 69);
-        glTexCoord2f(0, 1); glVertex2f(wSize.width - 69,  wSize.height - 133);
-        glTexCoord2f(1, 1); glVertex2f(wSize.width - 5,   wSize.height - 101);
-        glTexCoord2f(1, 0); glVertex2f(wSize.width - 5,   wSize.height - 37);
-        glEnd();
-        glDisable(GL_BLEND);
-        glDisable(GL_TEXTURE_2D);
+        Object2IntMap<String> map = BLOCK_CUSTOM_MODELS.get(player.handledBlock);
+        TextureDrawer.begin(getModelId(map, "top"))
+                .color3f(1, 1, 1)
+                .tex2dVertex2d(1, 0, 13, wSize.height - 21)
+                .tex2dVertex2d(0, 0, 5, wSize.height - 13)
+                //todo
+                .tex2dVertex2d(1, 0, wSize.width - 69, wSize.height - 69)
+                .tex2dVertex2d(0, 0, wSize.width - 5, wSize.height - 37)
+                .tex2dVertex2d(0, 1, wSize.width - 69, wSize.height - 5)
+                .tex2dVertex2d(1, 1, wSize.width - 133, wSize.height - 37)
+                .bind(getModelId(map, "left"))
+                .tex2dVertex2d(1, 0, wSize.width - 69, wSize.height - 69)
+                .tex2dVertex2d(0, 0, wSize.width - 133, wSize.height - 37)
+                .tex2dVertex2d(0, 1, wSize.width - 133, wSize.height - 101)
+                .tex2dVertex2d(1, 1, wSize.width - 69, wSize.height - 133)
+                .bind(getModelId(map, "right"))
+                .tex2dVertex2d(0, 0, wSize.width - 69, wSize.height - 69)
+                .tex2dVertex2d(0, 1, wSize.width - 69, wSize.height - 133)
+                .tex2dVertex2d(1, 1, wSize.width - 5, wSize.height - 101)
+                .tex2dVertex2d(1, 0, wSize.width - 5, wSize.height - 37)
+                .end();
+    }
+
+    private void putModel(Object2IntMap<String> map, Properties model, String key) {
+        String s = String.valueOf(model.getOrDefault(key, ModelManager.getModelPath(player.handledBlock)));
+        map.put(key, ImageReader.loadTexture(s.contains(".png") ? s : s + ".png", GL_NEAREST));
+    }
+
+    private int getModelId(Object2IntMap<String> map, String key) {
+        int id = ModelManager.getModelId(player.handledBlock);
+        return map != null ? map.getOrDefault(key, id) : id;
     }
 
     private void resizeGl(int width, int height) {

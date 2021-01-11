@@ -22,32 +22,22 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.block;
+package io.github.overrun.mc2d.util;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import it.unimi.dsi.fastutil.bytes.Byte2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
+import org.intellij.lang.annotations.MagicConstant;
+import org.lwjgl.glfw.GLFW;
 
 /**
  * @author squid233
- * @since 2021/01/09
+ * @since 2021/01/10
  */
-public final class Blocks {
-    public static final BiMap<String, Block> BLOCKS = HashBiMap.create(3);
-    public static final Byte2ObjectMap<Block> RAW_ID_BLOCKS = new Byte2ObjectLinkedOpenHashMap<>(3);
-    public static final int BLOCK_SIZE = 32;
-    public static final Block AIR = register("air", 0);
-    public static final Block GRASS_BLOCK = register("grass_block", 1);
-    public static final Block DIRT = register("dirt", 2);
-    public static final Block COBBLESTONE = register("cobblestone", 3);
-    public static final Block BEDROCK = register("bedrock", 4);
-
-    public static Block register(String id, int rawId) {
-        Block b = new Block(rawId);
-        BLOCKS.putIfAbsent(id, b);
-        RAW_ID_BLOCKS.putIfAbsent(b.getRawId(), b);
-        return b;
+public final class GlfwUtils {
+    public static boolean isKeyPress(long window,
+                                     @MagicConstant(flagsFromClass = GLFW.class) int key) {
+        return GLFW.glfwGetKey(window, key) == GLFW.GLFW_PRESS;
+    }
+    public static boolean isMousePress(long window,
+                                      @MagicConstant(flagsFromClass = GLFW.class) int button) {
+        return GLFW.glfwGetMouseButton(window, button) == GLFW.GLFW_PRESS;
     }
 }
-
