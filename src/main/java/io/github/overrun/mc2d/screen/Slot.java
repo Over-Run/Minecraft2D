@@ -22,38 +22,19 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.util;
-
-import org.lwjgl.glfw.GLFW;
-
-import java.awt.Dimension;
-import java.awt.Point;
-import java.nio.DoubleBuffer;
-import java.nio.IntBuffer;
-
-import static org.lwjgl.BufferUtils.createDoubleBuffer;
-import static org.lwjgl.BufferUtils.createIntBuffer;
+package io.github.overrun.mc2d.screen;
 
 /**
  * @author squid233
- * @since 2021/01/08
+ * @since 2021/01/23
  */
-public final class WindowUtils {
-    /**
-     * You may convert the position.
-     *
-     * @param window The window handler.
-     * @return The mouse position relative top and left.
-     */
-    public static Point getMousePos(long window) {
-        DoubleBuffer x = createDoubleBuffer(1), y = createDoubleBuffer(1);
-        GLFW.glfwGetCursorPos(window, x, y);
-        return new Point((int) Math.floor(x.get(0)), (int) Math.floor(y.get(0)));
-    }
+public final class Slot {
+    public final int x;
+    public final int y;
+    public byte item;
 
-    public static Dimension getWindowSize(long window) {
-        IntBuffer w = createIntBuffer(1), h = createIntBuffer(1);
-        GLFW.glfwGetWindowSize(window, w, h);
-        return new Dimension(w.get(0), h.get(0));
+    public Slot(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 }

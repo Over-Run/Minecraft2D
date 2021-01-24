@@ -34,8 +34,8 @@ import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
  * @since 2021/01/09
  */
 public final class Blocks {
-    public static final BiMap<String, Block> BLOCKS = HashBiMap.create(3);
-    public static final Byte2ObjectMap<Block> RAW_ID_BLOCKS = new Byte2ObjectLinkedOpenHashMap<>(3);
+    public static final BiMap<String, Block> BLOCKS = HashBiMap.create(5);
+    public static final Byte2ObjectMap<Block> RAW_ID_BLOCKS = new Byte2ObjectLinkedOpenHashMap<>(5);
     public static final int BLOCK_SIZE = 32;
     public static final Block AIR = register("air", 0);
     public static final Block GRASS_BLOCK = register("grass_block", 1);

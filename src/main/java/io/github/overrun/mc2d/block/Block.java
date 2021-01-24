@@ -35,7 +35,25 @@ public final class Block {
         this.rawId = (byte) rawId;
     }
 
-    public byte getRawId() {
+    public final byte getRawId() {
         return rawId;
+    }
+
+    @Override
+    public int hashCode() {
+        return getRawId();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        Block block = (Block) o;
+        return getRawId() == block.getRawId();
+    }
+
+    @Override
+    public String toString() {
+        return Blocks.BLOCKS.inverse().get(this);
     }
 }

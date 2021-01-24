@@ -77,10 +77,6 @@ public final class LoggerNamePatternSelector implements PatternSelector {
             this.formatters = formatters;
         }
 
-        private PatternFormatter[] get() {
-            return formatters;
-        }
-
         private boolean test(String s) {
             return isPackage ? s.startsWith(name) : s.equals(name);
         }
@@ -126,7 +122,7 @@ public final class LoggerNamePatternSelector implements PatternSelector {
         if (loggerName != null) {
             for (LoggerNameSelector selector : formatters) {
                 if (selector.test(loggerName)) {
-                    return selector.get();
+                    return selector.formatters;
                 }
             }
         }

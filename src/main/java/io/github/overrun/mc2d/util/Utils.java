@@ -24,38 +24,17 @@
 
 package io.github.overrun.mc2d.util;
 
-import io.github.overrun.mc2d.block.Block;
-import io.github.overrun.mc2d.block.Blocks;
-import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import org.lwjgl.opengl.GL11;
+import java.nio.ByteBuffer;
 
 /**
  * @author squid233
- * @since 2021/01/09
+ * @since 2021/01/23
  */
-public final class ModelManager {
-    public static final Object2IntMap<Block> BLOCK_MODELS = new Object2IntArrayMap<>(2);
-
-    public static int putModel(Block block) {
-        int id = ImageReader.loadTexture(getModelPath(block), GL11.GL_NEAREST);
-        BLOCK_MODELS.put(block, id);
-        return id;
-    }
-
-    public static String getModelPath(int rawId) {
-        return getModelPath(Blocks.RAW_ID_BLOCKS.get((byte) rawId));
-    }
-
-    public static String getModelPath(Block block) {
-        return Blocks.BLOCKS.inverse().get(block) + ".png";
-    }
-
-    public static int getModelId(Block block) {
-        return BLOCK_MODELS.getOrDefault(block, 0);
-    }
-
-    public static int getModelId(int rawId) {
-        return getModelId(Blocks.RAW_ID_BLOCKS.get((byte) rawId));
+public final class Utils {
+    public static ByteBuffer putInt(ByteBuffer buffer, int[] values) {
+        for (int value : values) {
+            buffer.putInt(value);
+        }
+        return buffer;
     }
 }

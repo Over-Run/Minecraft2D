@@ -27,20 +27,21 @@ package io.github.overrun.mc2d.level;
 import io.github.overrun.mc2d.Main;
 import io.github.overrun.mc2d.Player;
 import io.github.overrun.mc2d.block.Block;
+import io.github.overrun.mc2d.option.Options;
 import io.github.overrun.mc2d.util.GlUtils;
-import io.github.overrun.mc2d.util.ModelManager;
+import io.github.overrun.mc2d.util.ImageReader;
 import io.github.overrun.mc2d.util.TextureDrawer;
-import io.github.overrun.mc2d.util.WindowUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.awt.Dimension;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -48,7 +49,7 @@ import static io.github.overrun.mc2d.block.Blocks.*;
 import static io.github.overrun.mc2d.util.GlfwUtils.isMousePress;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
-import static org.lwjgl.opengl.GL11.glFinish;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author squid233
@@ -59,22 +60,37 @@ public final class World implements Serializable {
     private static final long serialVersionUID = 1L;
     private final byte[] blocks;
     private final Player player;
-    private final transient int width;
-    private final transient int height;
+    public final transient int width;
+    public final transient int height;
 
     public World(Player player, int w, int h) {
-        blocks = new byte[w * h];
         this.player = player;
+        blocks = new byte[w * h];
         width = w;
         height = h;
         Arrays.fill(blocks, AIR.getRawId());
-        if (new File("level.dat").exists()) {
-            load();
+        // generate the terrain
+        for (int i = 0; i < w; i++) {
+            setBlock(i, 0, BEDROCK);
         }
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < w; j++) {
+                setBlock(j, i + 1, COBBLESTONE);
+            }
+        }
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < w; j++) {
+                setBlock(j, i + 3, DIRT);
+            }
+        }
+        for (int i = 0; i < w; i++) {
+            setBlock(i, 5, GRASS_BLOCK);
+        }
+        load();
     }
 
-    public void setBlock(int x, int y, int type) {
-        blocks[x % width + y * width] = (byte) type;
+    public void setBlock(int x, int y, byte type) {
+        blocks[x % width + y * width] = type;
     }
 
     public void setBlock(int x, int y, Block block) {
@@ -89,40 +105,50 @@ public final class World implements Serializable {
         }
     }
 
-    public void render(int mouseX, int mouseY) {
-        Dimension wSize = WindowUtils.getWindowSize(Main.getInstance().getWindow());
-        mouseY = wSize.height - mouseY;
+    public void render(int mouseX, int mouseY, int windowW, int windowH) {
+        mouseY = windowH - mouseY;
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 Block b = getBlock(j, i);
-                double ltX = (wSize.width >> 1) + (j * BLOCK_SIZE - player.x * BLOCK_SIZE),
-                        ltY = (wSize.height >> 1) + ((i + 1) * BLOCK_SIZE - player.y * BLOCK_SIZE),
-                        rdX = (wSize.width >> 1) + ((j + 1) * BLOCK_SIZE - player.x * BLOCK_SIZE),
-                        rdY = (wSize.height >> 1) + (i * BLOCK_SIZE - player.y * BLOCK_SIZE);
+                double ltX = ((windowW >> 1) - 1) + (j * BLOCK_SIZE - player.x * BLOCK_SIZE),
+                        ltY = ((windowH >> 1) - 1) + ((i + 1) * BLOCK_SIZE - player.y * BLOCK_SIZE),
+                        rdX = ((windowW >> 1) - 1) + ((j + 1) * BLOCK_SIZE - player.x * BLOCK_SIZE),
+                        rdY = ((windowH >> 1) - 1) + (i * BLOCK_SIZE - player.y * BLOCK_SIZE);
                 if (b != AIR) {
-                    if (!ModelManager.BLOCK_MODELS.containsKey(b)) {
-                        ModelManager.putModel(b);
-                    }
-                    TextureDrawer.begin(ModelManager.getModelId(b))
-                            .color3f(1, 1, 1)
+                    TextureDrawer.begin(ImageReader.loadTexture(BLOCKS.inverse().get(b) + ".png"))
+                            .color4f(1, 1, 1, 1)
                             .tex2dVertex2d(0, 1,
-                                    (wSize.width >> 1) + (j * BLOCK_SIZE - player.x * BLOCK_SIZE),
-                                    (wSize.height >> 1) + (i * BLOCK_SIZE - player.y * BLOCK_SIZE))
+                                    ((windowW >> 1) - 1) + (j * BLOCK_SIZE - player.x * BLOCK_SIZE),
+                                    ((windowH >> 1) - 1) + (i * BLOCK_SIZE - player.y * BLOCK_SIZE))
                             .tex2dVertex2d(1, 1, rdX, rdY)
                             .tex2dVertex2d(1, 0,
-                                    (wSize.width >> 1) + ((j + 1) * BLOCK_SIZE - player.x * BLOCK_SIZE),
-                                    (wSize.height >> 1) + ((i + 1) * BLOCK_SIZE - player.y * BLOCK_SIZE))
+                                    ((windowW >> 1) - 1) + ((j + 1) * BLOCK_SIZE - player.x * BLOCK_SIZE),
+                                    ((windowH >> 1) - 1) + ((i + 1) * BLOCK_SIZE - player.y * BLOCK_SIZE))
                             .tex2dVertex2d(0, 0, ltX, ltY)
                             .end();
                 }
-                if (mouseX >= ltX && mouseX < rdX && mouseY <= ltY && mouseY > rdY) {
-                    GlUtils.drawRect((int) ltX, (int) ltY, (int) rdX, (int) rdY, 0, false);
-                    long window = Main.getInstance().getWindow();
+                if (!Main.openingGroup
+                        && mouseX >= ltX
+                        && mouseX < rdX
+                        && mouseY <= ltY
+                        && mouseY > rdY) {
+                    if (
+                            Options.getB(Options.BLOCK_HIGHLIGHT,
+                                    System.getProperty("mc2d.block.highlight",
+                                            "false"))
+                    ) {
+                        glDisable(GL_TEXTURE_2D);
+                        GlUtils.fillRect(ltX, ltY, rdX, rdY, 0x7fffffff, true);
+                        glEnable(GL_TEXTURE_2D);
+                    }
+                    else {
+                        GlUtils.drawRect(ltX, ltY, rdX, rdY, 0, false);
+                    }
                     if (getBlock(j, i) != AIR
-                            && isMousePress(window, GLFW_MOUSE_BUTTON_LEFT)) {
+                            && isMousePress(GLFW_MOUSE_BUTTON_LEFT)) {
                         setBlock(j, i, AIR);
                     } else if (getBlock(j, i) == AIR
-                            && isMousePress(window, GLFW_MOUSE_BUTTON_RIGHT)) {
+                            && isMousePress(GLFW_MOUSE_BUTTON_RIGHT)) {
                         setBlock(j, i, player.handledBlock);
                     }
                 }
@@ -132,32 +158,26 @@ public final class World implements Serializable {
     }
 
     public void load() {
-        try (ObjectInputStream is = new ObjectInputStream(
-                new FileInputStream("level.dat")
-        )) {
-            World world = (World) is.readObject();
-            System.arraycopy(world.blocks, 0, blocks, 0, blocks.length);
-            player.x = world.player.x;
-            player.y = world.player.y;
-        } catch (IOException | ClassNotFoundException e) {
-            logger.catching(e);
+        File file = new File("level.dat");
+        if (file.exists()) {
+            try (InputStream is = new FileInputStream(file);
+                 ObjectInputStream ois = new ObjectInputStream(is)) {
+                World world = (World) ois.readObject();
+                System.arraycopy(world.blocks, 0, blocks, 0, blocks.length);
+                player.x = world.player.x;
+                player.y = world.player.y;
+            } catch (IOException | ClassNotFoundException e) {
+                logger.catching(e);
+            }
         }
     }
 
     public void save() {
-        try (ObjectOutputStream os = new ObjectOutputStream(
-                new FileOutputStream("level.dat"))) {
-            os.writeObject(this);
+        try (OutputStream os = new FileOutputStream("level.dat");
+             ObjectOutputStream oos = new ObjectOutputStream(os)) {
+            oos.writeObject(this);
         } catch (IOException e) {
             logger.catching(e);
         }
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
     }
 }

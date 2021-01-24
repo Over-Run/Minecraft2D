@@ -52,15 +52,19 @@ public final class TextureDrawer {
                 : (instance = new TextureDrawer());
     }
 
-    public TextureDrawer color3f(float r, float g, float b) {
-        glColor3f(r, g, b);
+    public TextureDrawer color4f(float r, float g, float b, float a) {
+        glColor4f(r, g, b, a);
+        return this;
+    }
+
+    public TextureDrawer vertex2d(double x, double y) {
+        glVertex2d(x, y);
         return this;
     }
 
     public TextureDrawer tex2dVertex2d(double s, double t, double x, double y) {
         glTexCoord2d(s, t);
-        glVertex2d(x, y);
-        return this;
+        return vertex2d(x, y);
     }
 
     public TextureDrawer bind(int texture) {
@@ -68,7 +72,8 @@ public final class TextureDrawer {
         return begin(texture);
     }
 
-    public void end() {
+    public TextureDrawer end() {
         glEnd();
+        return this;
     }
 }

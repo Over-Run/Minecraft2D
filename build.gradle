@@ -1,10 +1,14 @@
 plugins {
     id 'java'
     id 'idea'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
 
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_11
+
 group 'io.github.over-run'
-version '0.1.0'
+archivesBaseName = 'mc2d'
+version '0.4.0'
 
 repositories {
     mavenCentral()
@@ -20,16 +24,42 @@ dependencies {
     compileOnly 'org.jetbrains:annotations:20.1.0'
     // Lwjgl libraries
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
-    String[] lwjglDepends = ['org.lwjgl:lwjgl', 'org.lwjgl:lwjgl-glfw', 'org.lwjgl:lwjgl-opengl']
+    String[] lwjglDepends = ['', '-glfw', '-opengl']
     String[] lwjglPlatforms = ['windows', 'windows-x86', 'linux-arm64', 'linux-arm32', 'linux', 'macos']
-    lwjglDepends.each {
-        implementation it
-    }
-    lwjglDepends.each {
-        depend -> lwjglPlatforms.each {
-            runtimeOnly "$depend::natives-$it"
+    for (String depend in lwjglDepends) {
+        implementation "org.lwjgl:lwjgl$depend"
+        for (String platform in lwjglPlatforms) {
+            runtimeOnly "org.lwjgl:lwjgl$depend::natives-$platform"
         }
     }
 }
 
-idea.module.inheritOutputDirs true
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+jar {
+    from 'LICENSE'
+    manifest {
+        attributes 'Main-Class': 'io.github.overrun.mc2d.Main',
+                'Specification-Title': 'lwjgl3',
+                'Specification-Vendor': 'LWJGL',
+                'Specification-Version': '3.2.3',
+                'Implementation-Title': 'Minecraft2D',
+                'Implementation-Vendor': 'Over-Run Organization',
+                'Implementation-Version': archiveVersion,
+                'Multi-Release': true
+    }
+}
+
+shadowJar {
+    from 'LICENSE'
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier.set 'sources'
+    from sourceSets.main.allSource
+    from 'LICENSE'
+}
+
+idea.module.inheritOutputDirs = true

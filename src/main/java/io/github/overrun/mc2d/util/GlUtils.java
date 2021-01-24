@@ -24,25 +24,34 @@
 
 package io.github.overrun.mc2d.util;
 
+import org.lwjgl.opengl.GL;
+
 import java.awt.Color;
 import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.glGenerateMipmap;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
  * @author squid233
  * @since 2021/01/08
  */
 public final class GlUtils {
-    public static void generateMipmap(int target, int width, int height, ByteBuffer pixels) {
-        glTexImage2D(target,
-                0,
-                GL_RGBA,
-                width, height,
-                0,
-                GL_RGBA,
-                GL_UNSIGNED_BYTE,
-                pixels);
+    public static void generateMipmap(int target,
+                                      int components,
+                                      int width,
+                                      int height,
+                                      int format,
+                                      int type,
+                                      ByteBuffer pixels) {
+        if (GL.getCapabilities().glGenerateMipmap != NULL) {
+            glGenerateMipmap(target);
+        } else {
+            glTexImage2D(target, 0, components,
+                    width, height, 0,
+                    format, type, pixels);
+        }
     }
 
     /**
@@ -58,33 +67,64 @@ public final class GlUtils {
      * @param color The color. RGBA if {@code alpha} is {@code true}, else RGB.
      * @param alpha The alpha value.
      */
-    public static void drawRect(int x1, int y1, int x2, int y2, int color, boolean alpha) {
+    public static void drawRect(double x1, double y1, double x2, double y2, int color, boolean alpha) {
         glBegin(GL_LINE_STRIP);
         Color c = new Color(color, alpha);
         if (alpha) {
-            glColor4f(c.getRed() / 255f,
-                    c.getGreen() / 255f,
-                    c.getBlue() / 255f,
+            glColor4f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f,
                     c.getAlpha() / 255f);
         } else {
-            glColor3f(c.getRed() / 255f,
-                    c.getGreen() / 255f,
-                    c.getBlue() / 255f);
+            glColor3f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f);
         }
         // Left top
-        glVertex2f(x1, y1 - 1);
+        glVertex2d(x1, y1 - 1);
         // Left down
-        glVertex2f(x1 + 1, y2);
+        glVertex2d(x1 + 1, y2);
         // Right down
-        glVertex2f(x2 - 1, y2);
+        glVertex2d(x2 - 1, y2);
         // Right up
-        glVertex2f(x2, y1 - 1);
+        glVertex2d(x2, y1 - 1);
         // Origin point
-        glVertex2f(x1, y1);
+        glVertex2d(x1, y1);
         glEnd();
     }
 
-    public static void drawRect(int x1, int y1, int x2, int y2, Color color) {
+    public static void drawRect(double x1, double y1, double x2, double y2, Color color) {
         drawRect(x1, y1, x2, y2, color.getRGB(), true);
+    }
+
+    public static void fillRect(double x1, double y1, double x2, double y2, int color, boolean alpha) {
+        glBegin(GL_QUADS);
+        Color c = new Color(color, alpha);
+        if (alpha) {
+            glColor4f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f,
+                    c.getAlpha() / 255f);
+        } else {
+            glColor3f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f);
+        }
+        // Left top
+        glVertex2d(x1, y1);
+        // Left down
+        glVertex2d(x1, y2);
+        // Right down
+        glVertex2d(x2, y2);
+        // Right up
+        glVertex2d(x2, y1);
+        glEnd();
+    }
+
+    public static void drawText(int x, int y, String text) {
+        TextureDrawer drawer = TextureDrawer.begin(ImageReader.loadTexture("ascii.png"))
+                .color4f(1, 1, 1, 1);
+        char[] chars = text.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            double texX = (int) chars[i] * .0078125;
+            double resultX = x + (i << 4);
+            drawer.tex2dVertex2d(texX, 0, resultX, y)
+                    .tex2dVertex2d(texX, 1, resultX, y - 32)
+                    .tex2dVertex2d(texX + .0078125, 1, resultX + 16, y - 32)
+                    .tex2dVertex2d(texX + .0078125, 0, resultX + 16, y);
+        }
+        drawer.end();
     }
 }

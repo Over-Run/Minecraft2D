@@ -30,11 +30,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWImage;
+import org.lwjgl.system.MemoryStack;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.function.Consumer;
@@ -59,62 +59,95 @@ public final class ImageReader {
     public static BufferedImage read(String path) {
         try {
             return ImageIO.read(ClassLoader.getSystemResource(path));
-        } catch (IOException e) {
-            logger.catching(e);
-            return new BufferedImage(0, 0, 6);
+        } catch (Throwable t) {
+            logger.catching(t);
+            return null;
         }
     }
 
     public static Texture readImg(String path) {
-        BufferedImage img = read(path);
-        int width = img.getWidth();
-        int height = img.getHeight();
-        ByteBuffer buf = BufferUtils.createByteBuffer(width * height << 2);
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                ColorModel cm = img.getColorModel();
-                Object o = img.getRaster().getDataElements(j, i, null);
-                buf.putInt(cm.getAlpha(o) << 24 | cm.getBlue(o) << 16 | cm.getGreen(o) << 8 | cm.getRed(o));
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            BufferedImage img = read(path);
+            if (img == null) {
+                return new Texture(2, 2, Utils.putInt(stack.malloc(16),
+                        new int[]{
+                                0xfff800f8, 0xff000000,
+                                0xff000000, 0xfff800f8
+                        }).flip());
+            } else {
+                int width = img.getWidth();
+                int height = img.getHeight();
+                ByteBuffer buf = BufferUtils.createByteBuffer(width * height << 2);
+                for (int i = 0; i < height; i++) {
+                    for (int j = 0; j < width; j++) {
+                        ColorModel cm = img.getColorModel();
+                        Object o = img.getRaster().getDataElements(j, i, null);
+                        buf.putInt(cm.getAlpha(o) << 24 | cm.getBlue(o) << 16 | cm.getGreen(o) << 8 | cm.getRed(o));
+                    }
+                }
+                buf.flip();
+                return new Texture(width, height, buf);
             }
         }
-        buf.flip();
-        return new Texture(width, height, buf);
     }
 
     /**
      * Read an image as {@link GLFWImage.Buffer}.
      * <p>You should call {@link GLFWImage.Buffer#free() free()} or
-     * {@link GLFWImage.Buffer#close() close()} before use.</p>
+     * {@link GLFWImage.Buffer#close() close()} after use.</p>
      *
      * @param path The image path.
      * @return An image as {@link GLFWImage.Buffer}.
      */
     public static GLFWImage.Buffer readGlfwImg(String path) {
-        try (GLFWImage image = GLFWImage.malloc()) {
-            Texture buf = readImg(path);
-            image.set(buf.getWidth(), buf.getHeight(), buf.getBuffer());
-            GLFWImage.Buffer images = GLFWImage.malloc(1);
-            images.put(0, image);
-            return images;
+        try (final GLFWImage image = GLFWImage.malloc()) {
+            final Texture buf = readImg(path);
+            return GLFWImage.malloc(1).put(0, image.set(buf.getWidth(), buf.getHeight(), buf.getBuffer()));
         }
+    }
+
+    public static int loadTexture(String path) {
+        return loadTexture(path, GL_NEAREST);
     }
 
     public static int loadTexture(String path, int mode) {
         if (ID_MAP.containsKey(path)) {
             return ID_MAP.getInt(path);
         } else {
-            IntBuffer ib = BufferUtils.createIntBuffer(1);
-            glGenTextures(ib);
-            int id = ib.get(0);
-            bindTexture(id);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mode);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mode);
-            GLFWImage.Buffer buf = readGlfwImg(path);
-            int w = buf.width();
-            int h = buf.height();
-            GlUtils.generateMipmap(GL_TEXTURE_2D, w, h, buf.pixels(w * h << 2));
-            ID_MAP.put(path, id);
-            return id;
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                final IntBuffer ib = stack.mallocInt(1);
+                glGenTextures(ib);
+                final int id = ib.get(0);
+                bindTexture(id);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mode);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mode);
+                BufferedImage img = read(path);
+                if (img == null) {
+                    ByteBuffer pixels = stack.malloc(16);
+                    pixels.asIntBuffer().put(new int[]{
+                            0xfff800f8, 0xff000000,
+                            0xff000000, 0xfff800f8
+                    });
+                    GlUtils.generateMipmap(GL_TEXTURE_2D, GL_RGBA, 2, 2, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+                } else {
+                    final int w = img.getWidth();
+                    final int h = img.getHeight();
+                    final ByteBuffer pixels = BufferUtils.createByteBuffer(w * h * 4);
+                    final int[] rawPixels = new int[w * h];
+                    img.getRGB(0, 0, w, h, rawPixels, 0, w);
+                    for (int i = 0; i < rawPixels.length; ++i) {
+                        final int a = rawPixels[i] >> 24 & 255;
+                        final int r = rawPixels[i] >> 16 & 255;
+                        final int g = rawPixels[i] >> 8 & 255;
+                        final int b = rawPixels[i] & 255;
+                        rawPixels[i] = a << 24 | b << 16 | g << 8 | r;
+                    }
+                    pixels.asIntBuffer().put(rawPixels);
+                    GlUtils.generateMipmap(GL_TEXTURE_2D, GL_RGBA, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+                }
+                ID_MAP.put(path, id);
+                return id;
+            }
         }
     }
 
@@ -131,14 +164,15 @@ public final class ImageReader {
      *
      * @param img      The image buffer.
      * @param consumer The operator with {@code img}.
-     * @see ImageReader#operateWithGlfwImg(String, Consumer)
+     * @see ImageReader#withGlfwImg(String, Consumer)
      */
-    public static void operateWithGlfwImg(GLFWImage.Buffer img, Consumer<GLFWImage.Buffer> consumer) {
-        consumer.accept(img);
-        img.free();
+    public static void withGlfwImg(GLFWImage.Buffer img, Consumer<GLFWImage.Buffer> consumer) {
+        try (img) {
+            consumer.accept(img);
+        }
     }
 
-    public static void operateWithGlfwImg(String path, Consumer<GLFWImage.Buffer> consumer) {
-        operateWithGlfwImg(readGlfwImg(path), consumer);
+    public static void withGlfwImg(String path, Consumer<GLFWImage.Buffer> consumer) {
+        withGlfwImg(readGlfwImg(path), consumer);
     }
 }
