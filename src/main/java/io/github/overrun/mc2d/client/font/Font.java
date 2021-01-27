@@ -22,38 +22,39 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.block;
+package io.github.overrun.mc2d.client.font;
 
 /**
  * @author squid233
- * @since 2021/01/09
+ * @since 2021/01/26
  */
-public final class Block {
-    private final byte rawId;
+public interface Font {
+    int width();
 
-    public Block(int rawId) {
-        this.rawId = (byte) rawId;
+    int height();
+
+    default int width(String text) {
+        return text.length() * width();
     }
 
-    public final byte getRawId() {
-        return rawId;
+    default char[] availableChars() {
+        return new char[0];
     }
 
-    @Override
-    public int hashCode() {
-        return getRawId();
+    default int textureWidth() {
+        return availableChars().length * width();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-        Block block = (Block) o;
-        return getRawId() == block.getRawId();
+    default int textureHeight() {
+        return height();
     }
 
-    @Override
-    public String toString() {
-        return Blocks.BLOCK2ID.get(this);
+    default boolean contains(char c) {
+        for (char ch : availableChars()) {
+            if (ch == c) {
+                return true;
+            }
+        }
+        return false;
     }
 }

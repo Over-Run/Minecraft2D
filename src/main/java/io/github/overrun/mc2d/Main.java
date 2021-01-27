@@ -24,13 +24,11 @@
 
 package io.github.overrun.mc2d;
 
-import io.github.overrun.mc2d.block.Blocks;
-import io.github.overrun.mc2d.level.World;
+import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.client.WindowEventHandler;
+import io.github.overrun.mc2d.event.KeyCallback;
 import io.github.overrun.mc2d.option.Options;
-import io.github.overrun.mc2d.screen.CreativeTabScreen;
-import io.github.overrun.mc2d.util.GlfwUtils;
 import io.github.overrun.mc2d.util.ImageReader;
-import io.github.overrun.mc2d.util.TextureDrawer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -38,106 +36,88 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
+import java.io.Closeable;
 import java.nio.IntBuffer;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
+import static org.lwjgl.system.MemoryUtil.memUTF8;
 
 /**
  * @author squid233
  * @since 2021/01/07
  */
-public final class Main {
+public final class Main implements Runnable, Closeable {
     public static final String VERSION = "0.4.0";
-    public static boolean openingGroup;
     private static final Logger logger = LogManager.getLogger();
-    private final Player player = new Player();
-    private World world;
+    private static final List<WindowEventHandler> WINDOW_EVENT_HANDLERS = new ArrayList<>(1);
+    private final Mc2dClient client = registerWindowEventHandler(Mc2dClient.getInstance());
     private long window;
-    private int width = 896;
-    private int height = 512;
-    private int mouseX;
-    private int mouseY;
 
-    private void run() {
+    public <T extends WindowEventHandler> T registerWindowEventHandler(T handler) {
+        WINDOW_EVENT_HANDLERS.add(handler);
+        return handler;
+    }
+
+    @Override
+    public void run() {
         logger.info("Loading for game Minecraft2D {}", VERSION);
         init();
-        resize(width, height);
         glClearColor(.4f, .6f, .9f, .1f);
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         while (!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            render();
-            if (!openingGroup) {
-                player.move();
-            }
+            client.render();
+            client.tick();
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
-        logger.info("Stopping!");
-        glfwFreeCallbacks(window);
-        glfwDestroyWindow(window);
-        glfwTerminate();
-        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
     }
 
     private void init() {
-        GLFWErrorCallback.createPrint(System.err).set();
+        GLFWErrorCallback.create((error, description) -> {
+            String desc = memUTF8(description);
+            logger.error("########## GL ERROR ##########");
+            logger.error("{}: {}", error, desc);
+        });
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-        window = glfwCreateWindow(width, height, "Minecraft2D " + VERSION, NULL, NULL);
+        window = glfwCreateWindow(896, 512, "Minecraft2D " + VERSION, NULL, NULL);
         if (window == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
         }
-        ImageReader.withGlfwImg("icon.png",
+        ImageReader.withGlfwImg("assets/mc2d/icon.png",
                 imgs -> glfwSetWindowIcon(window, imgs));
         glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
+            KeyCallback.post(new KeyCallback.Context(window, key, scancode, action, mods));
             if (action == GLFW_PRESS) {
-                if (key == GLFW_KEY_ESCAPE) {
-                    if (openingGroup) {
-                        openingGroup = false;
-                    } else {
-                        world.save();
-                        glfwSetWindowShouldClose(window, true);
-                    }
-                }
-                if (key == (int) Options.get(Options.KEY_CREATIVE_TAB,
-                        "E").toUpperCase().toCharArray()[0]) {
-                    openingGroup = !openingGroup;
-                    if (!openingGroup) {
-                        GlfwUtils.setDefaultCursor();
-                    }
-                }
-                if (key == GLFW_KEY_ENTER) {
-                    world.save();
-                }
-                if (key == GLFW_KEY_1) {
-                    player.handledBlock = 1;
-                }
-                if (key == GLFW_KEY_2) {
-                    player.handledBlock = 2;
-                }
-                if (key == GLFW_KEY_3) {
-                    player.handledBlock = 3;
-                }
-                if (key == GLFW_KEY_4) {
-                    player.handledBlock = 4;
-                }
+                client.screen.keyPressed(key, scancode, mods);
             }
         });
-        glfwSetWindowCloseCallback(window, window -> world.save());
+        glfwSetMouseButtonCallback(window, (window, button, action, mods) -> {
+            if (action == GLFW_PRESS) {
+                client.screen.mouseClicked(client.mouseX, client.mouseY, button);
+            }
+        });
+        glfwSetWindowCloseCallback(window, window -> {
+            if (client.world != null) {
+                client.world.save();
+            }
+        });
         glfwSetWindowSizeCallback(window, (window, width, height) -> resize(width, height));
         glfwSetCursorPosCallback(window, (window, x, y) -> {
-            mouseX = (int) Math.floor(x);
-            mouseY = (int) Math.floor(y);
+            for (WindowEventHandler handler : WINDOW_EVENT_HANDLERS) {
+                handler.onMouseMove((int) Math.floor(x), (int) Math.floor(y));
+            }
         });
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer pWidth = stack.mallocInt(1);
@@ -154,46 +134,44 @@ public final class Main {
         }
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
-        world = new World(player, 64, 64);
+        client.player = new Player();
         glfwSwapInterval(1);
         glfwShowWindow(window);
-        GlfwUtils.setDefaultCursor();
-    }
-
-    private void render() {
-        world.render(mouseX, mouseY, width, height);
-        if (openingGroup) {
-            CreativeTabScreen.render(mouseX, mouseY, height, player);
-        } else {
-            glPushMatrix();
-            glTranslatef(width, height, 0);
-            TextureDrawer.begin(ImageReader.loadTexture(
-                    Blocks.RAW_ID_BLOCKS.get(player.handledBlock).toString() + ".png"))
-                    .color4f(1, 1, 1, 1)
-                    .tex2dVertex2d(0, 0, -64, 0)
-                    .tex2dVertex2d(0, 1, -64, -64)
-                    .tex2dVertex2d(1, 1, 0, -64)
-                    .tex2dVertex2d(1, 0, 0, 0)
-                    .end();
-            glPopMatrix();
-        }
     }
 
     private void resize(int width, int height) {
         int w = Math.max(width, 1);
         int h = Math.max(height, 1);
-        CreativeTabScreen.init(w, h);
-        this.width = w;
-        this.height = h;
+        if (client.screen == null) {
+            client.openScreen(null);
+        }
+        for (WindowEventHandler handler : WINDOW_EVENT_HANDLERS) {
+            handler.onResize(w, h);
+        }
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, w, 0, h, 1, -1);
+        glOrtho(0, w, h, 0, 1, -1);
         glMatrixMode(GL_MODELVIEW);
         glViewport(0, 0, w, h);
     }
 
+    @Override
+    public void close() {
+        client.close();
+        logger.info("Stopping!");
+        glfwFreeCallbacks(window);
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        GLFWErrorCallback gec = glfwSetErrorCallback(null);
+        if (gec != null) {
+            gec.free();
+        }
+    }
+
     public static void main(String[] args) {
         Options.init();
-        new Main().run();
+        try (Main main = new Main()) {
+            main.run();
+        }
     }
 }

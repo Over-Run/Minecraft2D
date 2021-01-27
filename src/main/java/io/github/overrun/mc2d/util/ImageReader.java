@@ -24,8 +24,6 @@
 
 package io.github.overrun.mc2d.util;
 
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
@@ -36,18 +34,13 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.function.Consumer;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author squid233
  * @since 2021/01/07
  */
 public final class ImageReader {
-    private static final Object2IntMap<String> ID_MAP = new Object2IntOpenHashMap<>(16);
-    private static int lastId = -999999;
     private static final Logger logger = LogManager.getLogger();
 
     /**
@@ -103,58 +96,6 @@ public final class ImageReader {
         try (final GLFWImage image = GLFWImage.malloc()) {
             final Texture buf = readImg(path);
             return GLFWImage.malloc(1).put(0, image.set(buf.getWidth(), buf.getHeight(), buf.getBuffer()));
-        }
-    }
-
-    public static int loadTexture(String path) {
-        return loadTexture(path, GL_NEAREST);
-    }
-
-    public static int loadTexture(String path, int mode) {
-        if (ID_MAP.containsKey(path)) {
-            return ID_MAP.getInt(path);
-        } else {
-            try (MemoryStack stack = MemoryStack.stackPush()) {
-                final IntBuffer ib = stack.mallocInt(1);
-                glGenTextures(ib);
-                final int id = ib.get(0);
-                bindTexture(id);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mode);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mode);
-                BufferedImage img = read(path);
-                if (img == null) {
-                    ByteBuffer pixels = stack.malloc(16);
-                    pixels.asIntBuffer().put(new int[]{
-                            0xfff800f8, 0xff000000,
-                            0xff000000, 0xfff800f8
-                    });
-                    GlUtils.generateMipmap(GL_TEXTURE_2D, GL_RGBA, 2, 2, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-                } else {
-                    final int w = img.getWidth();
-                    final int h = img.getHeight();
-                    final ByteBuffer pixels = BufferUtils.createByteBuffer(w * h * 4);
-                    final int[] rawPixels = new int[w * h];
-                    img.getRGB(0, 0, w, h, rawPixels, 0, w);
-                    for (int i = 0; i < rawPixels.length; ++i) {
-                        final int a = rawPixels[i] >> 24 & 255;
-                        final int r = rawPixels[i] >> 16 & 255;
-                        final int g = rawPixels[i] >> 8 & 255;
-                        final int b = rawPixels[i] & 255;
-                        rawPixels[i] = a << 24 | b << 16 | g << 8 | r;
-                    }
-                    pixels.asIntBuffer().put(rawPixels);
-                    GlUtils.generateMipmap(GL_TEXTURE_2D, GL_RGBA, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-                }
-                ID_MAP.put(path, id);
-                return id;
-            }
-        }
-    }
-
-    public static void bindTexture(int id) {
-        if (lastId != id) {
-            glBindTexture(GL_TEXTURE_2D, id);
-            lastId = id;
         }
     }
 

@@ -24,17 +24,19 @@
 
 package io.github.overrun.mc2d.screen;
 
+import io.github.overrun.mc2d.screen.slot.Slot;
+
 /**
  * @author squid233
- * @since 2021/01/23
+ * @since 2021/01/25
  */
-public final class Slot {
-    public final int x;
-    public final int y;
-    public byte item;
-
-    public Slot(int x, int y) {
-        this.x = x;
-        this.y = y;
+public final class CreativeTabScreenHandler extends ScreenHandler {
+    @Override
+    public void init() {
+        super.init();
+        for (int i = 0; i < 4; i++) {
+            Slot slot = addSlot(new Slot(18 + i * 36, 36));
+            slot.item = (byte) (i + 1);
+        }
     }
 }

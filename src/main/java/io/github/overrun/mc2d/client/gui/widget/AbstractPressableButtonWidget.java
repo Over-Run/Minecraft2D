@@ -22,38 +22,22 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.block;
+package io.github.overrun.mc2d.client.gui.widget;
 
 /**
  * @author squid233
- * @since 2021/01/09
+ * @since 2021/01/25
  */
-public final class Block {
-    private final byte rawId;
-
-    public Block(int rawId) {
-        this.rawId = (byte) rawId;
+public abstract class AbstractPressableButtonWidget extends AbstractButtonWidget {
+    public AbstractPressableButtonWidget(int x, int y, int width, int height, String message) {
+        super(x, y, width, height, message);
     }
 
-    public final byte getRawId() {
-        return rawId;
-    }
+    public abstract void onPress();
 
     @Override
-    public int hashCode() {
-        return getRawId();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-        Block block = (Block) o;
-        return getRawId() == block.getRawId();
-    }
-
-    @Override
-    public String toString() {
-        return Blocks.BLOCK2ID.get(this);
+    public void onClick(int mouseX, int mouseY) {
+        super.onClick(mouseX, mouseY);
+        onPress();
     }
 }

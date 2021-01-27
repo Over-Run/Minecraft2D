@@ -37,4 +37,13 @@ public final class Utils {
         }
         return buffer;
     }
+
+    public static boolean isParsableNumber(String s) {
+        try {
+            Integer.parseInt(s);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }

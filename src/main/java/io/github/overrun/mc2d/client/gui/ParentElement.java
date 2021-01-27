@@ -22,38 +22,41 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.block;
+package io.github.overrun.mc2d.client.gui;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author squid233
- * @since 2021/01/09
+ * @since 2021/01/25
  */
-public final class Block {
-    private final byte rawId;
+public interface ParentElement extends Element {
+    List<? extends Element> children();
 
-    public Block(int rawId) {
-        this.rawId = (byte) rawId;
-    }
-
-    public final byte getRawId() {
-        return rawId;
-    }
-
-    @Override
-    public int hashCode() {
-        return getRawId();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-        Block block = (Block) o;
-        return getRawId() == block.getRawId();
+    default Optional<Element> hoveredElement(int mouseX, int mouseY) {
+        Iterator<? extends Element> iterator = children().iterator();
+        Element element;
+        do {
+            if (!iterator.hasNext()) {
+                return Optional.empty();
+            }
+            element = iterator.next();
+        } while (!element.isMouseOver(mouseX, mouseY));
+        return Optional.of(element);
     }
 
     @Override
-    public String toString() {
-        return Blocks.BLOCK2ID.get(this);
+    default boolean mouseClicked(int mouseX, int mouseY, int button) {
+        Iterator<? extends Element> iterator = children().iterator();
+        Element element;
+        do {
+            if (!iterator.hasNext()) {
+                return false;
+            }
+            element = iterator.next();
+        } while (!element.mouseClicked(mouseX, mouseY, button));
+        return true;
     }
 }

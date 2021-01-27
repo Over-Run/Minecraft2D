@@ -1,0 +1,110 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2020-2021 Over-Run
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package io.github.overrun.mc2d.client;
+
+import io.github.overrun.mc2d.Player;
+import io.github.overrun.mc2d.client.font.TextRenderer;
+import io.github.overrun.mc2d.client.gui.screen.Screen;
+import io.github.overrun.mc2d.client.gui.screen.TitleScreen;
+import io.github.overrun.mc2d.client.texture.TextureManager;
+import io.github.overrun.mc2d.level.World;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.Closeable;
+
+/**
+ * @author squid233
+ * @since 2021/01/25
+ */
+public final class Mc2dClient implements Closeable, WindowEventHandler {
+    private static final Mc2dClient INSTANCE = new Mc2dClient();
+    public final TextRenderer textRenderer;
+    private final TextureManager textureManager;
+    public Screen screen;
+    public @Nullable World world;
+    public Player player;
+    private int width, height;
+    public int mouseX, mouseY;
+
+    private Mc2dClient() {
+        textRenderer = new TextRenderer(this);
+        textureManager = new TextureManager();
+    }
+
+    public void openScreen(@Nullable Screen screen) {
+        if (this.screen != null) {
+            this.screen.removed(screen);
+        }
+        if (screen == null && world == null) {
+            screen = new TitleScreen();
+        }
+        this.screen = screen;
+        if (screen != null) {
+            screen.init(this, width, height);
+        }
+    }
+
+    public void render() {
+        screen.render(mouseX, mouseY);
+    }
+
+    public void tick() {
+        screen.tick();
+    }
+
+    public TextureManager getTextureManager() {
+        return textureManager;
+    }
+
+    public int width() {
+        return width;
+    }
+
+    public int height() {
+        return height;
+    }
+
+    public static Mc2dClient getInstance() {
+        return INSTANCE;
+    }
+
+    @Override
+    public void close() {
+        textureManager.close();
+    }
+
+    @Override
+    public void onResize(int newWidth, int newHeight) {
+        width = newWidth;
+        height = newHeight;
+        screen.init(this, width, height);
+    }
+
+    @Override
+    public void onMouseMove(int newX, int newY) {
+        mouseX = newX;
+        mouseY = newY;
+    }
+}

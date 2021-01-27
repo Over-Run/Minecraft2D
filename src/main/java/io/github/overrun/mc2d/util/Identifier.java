@@ -24,56 +24,57 @@
 
 package io.github.overrun.mc2d.util;
 
-import static org.lwjgl.opengl.GL11.*;
+import java.util.Objects;
 
 /**
  * @author squid233
- * @since 2021/01/11
+ * @since 2021/01/25
  */
-public final class TextureDrawer {
-    private static TextureDrawer instance;
-    private TextureDrawer() {}
+public final class Identifier {
+    private final String namespace;
+    private final String path;
 
-    /**
-     * Starting draw texture.
-     * <p>Call {@link TextureDrawer#end()} when end.</p>
-     *
-     * @param texture The texture id.
-     * @return This
-     */
-    public static TextureDrawer begin(int texture) {
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        ImageReader.bindTexture(texture);
-        glBegin(GL_QUADS);
-        return instance != null
-                ? instance
-                : (instance = new TextureDrawer());
+    protected Identifier(String[] id) {
+        if (id.length > 1) {
+            namespace = id[0];
+            path = id[1];
+        } else {
+            namespace = "mc2d";
+            path = id[0];
+        }
     }
 
-    public TextureDrawer color4f(float r, float g, float b, float a) {
-        glColor4f(r, g, b, a);
-        return this;
+    public Identifier(String namespace, String path) {
+        this(new String[]{namespace, path});
     }
 
-    public TextureDrawer vertex2d(double x, double y) {
-        glVertex2d(x, y);
-        return this;
+    public Identifier(String id) {
+        this(id.split(":", 2));
     }
 
-    public TextureDrawer tex2dVertex2d(double s, double t, double x, double y) {
-        glTexCoord2d(s, t);
-        return vertex2d(x, y);
+    public String getNamespace() {
+        return namespace;
     }
 
-    public TextureDrawer bind(int texture) {
-        end();
-        return begin(texture);
+    public String getPath() {
+        return path;
     }
 
-    public TextureDrawer end() {
-        glEnd();
-        return this;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        Identifier that = (Identifier) o;
+        return Objects.equals(getNamespace(), that.getNamespace()) && Objects.equals(getPath(), that.getPath());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getNamespace(), getPath());
+    }
+
+    @Override
+    public String toString() {
+        return namespace + ":" + path;
     }
 }

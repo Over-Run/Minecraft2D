@@ -25,12 +25,12 @@
 package io.github.overrun.mc2d.util;
 
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.Color;
 import java.nio.ByteBuffer;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL30.glGenerateMipmap;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
@@ -45,20 +45,20 @@ public final class GlUtils {
                                       int format,
                                       int type,
                                       ByteBuffer pixels) {
+        // If support to generate mipmap, use
         if (GL.getCapabilities().glGenerateMipmap != NULL) {
             glGenerateMipmap(target);
-        } else {
-            glTexImage2D(target, 0, components,
-                    width, height, 0,
-                    format, type, pixels);
+        }
+        else {
+            glTexImage2D(target, 0, components, width, height, 0, format, type, pixels);
         }
     }
 
     /**
      * Draw a rect.
      * <p>If {@code alpha} is {@code true}, you should
-     * {@link org.lwjgl.opengl.GL11#glEnable(int) enable}
-     * {@link org.lwjgl.opengl.GL11#GL_BLEND blend} before using.</p>
+     * {@link GL11#glEnable(int) enable}
+     * {@link GL11#GL_BLEND blend} before using.</p>
      *
      * @param x1 The left top coord x.
      * @param y1 The left top coord y.
@@ -71,36 +71,30 @@ public final class GlUtils {
         glBegin(GL_LINE_STRIP);
         Color c = new Color(color, alpha);
         if (alpha) {
-            glColor4f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f,
-                    c.getAlpha() / 255f);
+            glColor4f(c);
         } else {
-            glColor3f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f);
+            glColor3f(c);
         }
         // Left top
-        glVertex2d(x1, y1 - 1);
+        glVertex2d(x1, y1 + 1);
         // Left down
         glVertex2d(x1 + 1, y2);
         // Right down
         glVertex2d(x2 - 1, y2);
         // Right up
-        glVertex2d(x2, y1 - 1);
+        glVertex2d(x2, y1 + 1);
         // Origin point
-        glVertex2d(x1, y1);
+        glVertex2d(x1, y1 + 1);
         glEnd();
-    }
-
-    public static void drawRect(double x1, double y1, double x2, double y2, Color color) {
-        drawRect(x1, y1, x2, y2, color.getRGB(), true);
     }
 
     public static void fillRect(double x1, double y1, double x2, double y2, int color, boolean alpha) {
         glBegin(GL_QUADS);
         Color c = new Color(color, alpha);
         if (alpha) {
-            glColor4f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f,
-                    c.getAlpha() / 255f);
+            glColor4f(c);
         } else {
-            glColor3f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f);
+            glColor3f(c);
         }
         // Left top
         glVertex2d(x1, y1);
@@ -113,18 +107,11 @@ public final class GlUtils {
         glEnd();
     }
 
-    public static void drawText(int x, int y, String text) {
-        TextureDrawer drawer = TextureDrawer.begin(ImageReader.loadTexture("ascii.png"))
-                .color4f(1, 1, 1, 1);
-        char[] chars = text.toCharArray();
-        for (int i = 0; i < chars.length; i++) {
-            double texX = (int) chars[i] * .0078125;
-            double resultX = x + (i << 4);
-            drawer.tex2dVertex2d(texX, 0, resultX, y)
-                    .tex2dVertex2d(texX, 1, resultX, y - 32)
-                    .tex2dVertex2d(texX + .0078125, 1, resultX + 16, y - 32)
-                    .tex2dVertex2d(texX + .0078125, 0, resultX + 16, y);
-        }
-        drawer.end();
+    public static void glColor4f(Color c) {
+        GL11.glColor4f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, c.getAlpha() / 255f);
+    }
+
+    public static void glColor3f(Color c) {
+        GL11.glColor3f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f);
     }
 }

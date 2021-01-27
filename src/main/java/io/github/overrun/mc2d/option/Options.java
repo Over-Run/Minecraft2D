@@ -24,6 +24,7 @@
 
 package io.github.overrun.mc2d.option;
 
+import io.github.overrun.mc2d.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,6 +36,8 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.util.Properties;
 
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
+
 /**
  * @author squid233
  * @since 2021/01/23
@@ -45,11 +48,15 @@ public final class Options {
     public static final String KEY_CREATIVE_TAB = "key.creativeTab";
     private static final Logger logger = LogManager.getLogger();
 
+    private static void put(String key, int value) {
+        OPTIONS.put(key, String.valueOf(value));
+    }
+
     public static void init() {
         File file = new File("options.txt");
         if (!file.exists()) {
             try (OutputStream os = new FileOutputStream(file)) {
-                OPTIONS.put(KEY_CREATIVE_TAB, "E");
+                put(KEY_CREATIVE_TAB, GLFW_KEY_E);
                 OPTIONS.put(BLOCK_HIGHLIGHT, "false");
                 OPTIONS.store(os, null);
             } catch (IOException e) {
@@ -67,6 +74,11 @@ public final class Options {
         return OPTIONS.containsKey(key)
                 ? Boolean.parseBoolean(OPTIONS.getProperty(key))
                 : Boolean.parseBoolean(def);
+    }
+
+    public static int getI(String key, int def) {
+        String value = OPTIONS.getProperty(key, String.valueOf(def));
+        return Utils.isParsableNumber(value) ? Integer.parseInt(value) : def;
     }
 
     public static String get(String key, String def) {

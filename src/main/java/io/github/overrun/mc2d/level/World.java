@@ -27,10 +27,12 @@ package io.github.overrun.mc2d.level;
 import io.github.overrun.mc2d.Main;
 import io.github.overrun.mc2d.Player;
 import io.github.overrun.mc2d.block.Block;
+import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.client.gui.screen.ingame.InGameScreen;
+import io.github.overrun.mc2d.event.KeyCallback;
 import io.github.overrun.mc2d.option.Options;
 import io.github.overrun.mc2d.util.GlUtils;
-import io.github.overrun.mc2d.util.ImageReader;
-import io.github.overrun.mc2d.util.TextureDrawer;
+import io.github.overrun.mc2d.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,9 +48,9 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import static io.github.overrun.mc2d.block.Blocks.*;
-import static io.github.overrun.mc2d.util.GlfwUtils.isMousePress;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
+import static io.github.overrun.mc2d.client.gui.DrawableHelper.drawTexture;
+import static io.github.overrun.mc2d.util.GlfwUtils.*;
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
@@ -62,6 +64,15 @@ public final class World implements Serializable {
     private final Player player;
     public final transient int width;
     public final transient int height;
+    private static boolean debug;
+
+    static {
+        KeyCallback.EVENT.register(context -> {
+            if (context.key == GLFW_KEY_F3 && context.action == GLFW_PRESS) {
+                debug = !debug;
+            }
+        });
+    }
 
     public World(Player player, int w, int h) {
         this.player = player;
@@ -90,7 +101,9 @@ public final class World implements Serializable {
     }
 
     public void setBlock(int x, int y, byte type) {
-        blocks[x % width + y * width] = type;
+        if (x >= 0 && x < width && y >= 0 && y < height) {
+            blocks[x % width + y * width] = type;
+        }
     }
 
     public void setBlock(int x, int y, Block block) {
@@ -98,50 +111,44 @@ public final class World implements Serializable {
     }
 
     public Block getBlock(int x, int y) {
-        try {
+        if (x >= 0 && x < width && y >= 0 && y < height) {
             return RAW_ID_BLOCKS.get(blocks[x % width + y * width]);
-        } catch (Exception e) {
+        } else {
             return AIR;
         }
     }
 
-    public void render(int mouseX, int mouseY, int windowW, int windowH) {
-        mouseY = windowH - mouseY;
+    public void render(Mc2dClient client, int mouseX, int mouseY, int windowW, int windowH) {
+        byte pointBlock = 0;
+        int pointBlockX = 0, pointBlockY = 0;
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 Block b = getBlock(j, i);
-                double ltX = ((windowW >> 1) - 1) + (j * BLOCK_SIZE - player.x * BLOCK_SIZE),
-                        ltY = ((windowH >> 1) - 1) + ((i + 1) * BLOCK_SIZE - player.y * BLOCK_SIZE),
-                        rdX = ((windowW >> 1) - 1) + ((j + 1) * BLOCK_SIZE - player.x * BLOCK_SIZE),
-                        rdY = ((windowH >> 1) - 1) + (i * BLOCK_SIZE - player.y * BLOCK_SIZE);
-                if (b != AIR) {
-                    TextureDrawer.begin(ImageReader.loadTexture(BLOCKS.inverse().get(b) + ".png"))
-                            .color4f(1, 1, 1, 1)
-                            .tex2dVertex2d(0, 1,
-                                    ((windowW >> 1) - 1) + (j * BLOCK_SIZE - player.x * BLOCK_SIZE),
-                                    ((windowH >> 1) - 1) + (i * BLOCK_SIZE - player.y * BLOCK_SIZE))
-                            .tex2dVertex2d(1, 1, rdX, rdY)
-                            .tex2dVertex2d(1, 0,
-                                    ((windowW >> 1) - 1) + ((j + 1) * BLOCK_SIZE - player.x * BLOCK_SIZE),
-                                    ((windowH >> 1) - 1) + ((i + 1) * BLOCK_SIZE - player.y * BLOCK_SIZE))
-                            .tex2dVertex2d(0, 0, ltX, ltY)
-                            .end();
+                double ltX = (windowW >> 1) - 1 + (j - player.x) * BLOCK_SIZE,
+                        ltY = (windowH >> 1) - 1 - (i - player.y) * BLOCK_SIZE,
+                        rdX = ltX + BLOCK_SIZE,
+                        rdY = ltY + BLOCK_SIZE;
+                if (b != AIR && rdX >= 0 && rdY >= 0 && ltX < windowW && ltY < windowH) {
+                    client.getTextureManager().bindTexture(new Identifier("textures/block/" + BLOCK2ID.get(b) + ".png"));
+                    drawTexture(ltX, ltY, BLOCK_SIZE, BLOCK_SIZE);
                 }
-                if (!Main.openingGroup
+                if (client.screen instanceof InGameScreen
                         && mouseX >= ltX
                         && mouseX < rdX
-                        && mouseY <= ltY
-                        && mouseY > rdY) {
+                        && mouseY >= ltY
+                        && mouseY < rdY) {
+                    pointBlock = b.getRawId();
+                    pointBlockX = j;
+                    pointBlockY = i;
                     if (
                             Options.getB(Options.BLOCK_HIGHLIGHT,
                                     System.getProperty("mc2d.block.highlight",
                                             "false"))
                     ) {
                         glDisable(GL_TEXTURE_2D);
-                        GlUtils.fillRect(ltX, ltY, rdX, rdY, 0x7fffffff, true);
+                        GlUtils.fillRect(ltX, ltY, rdX, rdY, 0x80ffffff, true);
                         glEnable(GL_TEXTURE_2D);
-                    }
-                    else {
+                    } else {
                         GlUtils.drawRect(ltX, ltY, rdX, rdY, 0, false);
                     }
                     if (getBlock(j, i) != AIR
@@ -154,10 +161,18 @@ public final class World implements Serializable {
                 }
             }
         }
+        if (debug) {
+            client.textRenderer.draw(0, 0, "Minecraft2D " + Main.VERSION);
+            client.textRenderer.draw(0, 30, String.format("Pos: %.4f, %.4f", player.x, player.y));
+            client.textRenderer.draw(0, 60, "Handled block: " + RAW_ID_BLOCKS.get(player.handledBlock));
+            client.textRenderer.draw(0, 90, "Point block pos: " + pointBlockX + ", " + pointBlockY);
+            client.textRenderer.draw(0, 120, "Point block: " + RAW_ID_BLOCKS.get(pointBlock));
+        }
         glFinish();
     }
 
     public void load() {
+        logger.info("Loading world");
         File file = new File("level.dat");
         if (file.exists()) {
             try (InputStream is = new FileInputStream(file);
@@ -173,6 +188,7 @@ public final class World implements Serializable {
     }
 
     public void save() {
+        logger.info("Saving world");
         try (OutputStream os = new FileOutputStream("level.dat");
              ObjectOutputStream oos = new ObjectOutputStream(os)) {
             oos.writeObject(this);

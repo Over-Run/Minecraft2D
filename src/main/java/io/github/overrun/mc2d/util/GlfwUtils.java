@@ -25,24 +25,21 @@
 package io.github.overrun.mc2d.util;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
  * @author squid233
  * @since 2021/01/10
  */
 public final class GlfwUtils {
-    public static final long HAND_CURSOR = glfwCreateStandardCursor(GLFW_HAND_CURSOR);
-
     public static boolean isKeyPress(int key) {
         return glfwGetKey(glfwGetCurrentContext(), key) == GLFW_PRESS;
     }
 
-    public static boolean isMousePress(int button) {
-        return glfwGetMouseButton(glfwGetCurrentContext(), button) == GLFW_PRESS;
+    public static boolean isKeyRelease(int key) {
+        return glfwGetKey(glfwGetCurrentContext(), key) == GLFW_RELEASE;
     }
 
-    public static void setDefaultCursor() {
-        glfwSetCursor(glfwGetCurrentContext(), NULL);
+    public static boolean isMousePress(int button) {
+        return glfwGetMouseButton(glfwGetCurrentContext(), button) == GLFW_PRESS;
     }
 }

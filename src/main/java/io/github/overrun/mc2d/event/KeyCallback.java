@@ -22,38 +22,36 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.block;
+package io.github.overrun.mc2d.event;
 
 /**
  * @author squid233
- * @since 2021/01/09
+ * @since 2021/01/26
  */
-public final class Block {
-    private final byte rawId;
+public interface KeyCallback extends EventPublisher<KeyCallback.Context> {
+    Event<KeyCallback, Context> EVENT = new Event<>(listeners -> context -> {
+        for (KeyCallback callback : listeners) {
+            callback.publish(context);
+        }
+    });
 
-    public Block(int rawId) {
-        this.rawId = (byte) rawId;
-    }
-
-    public final byte getRawId() {
-        return rawId;
-    }
-
-    @Override
-    public int hashCode() {
-        return getRawId();
+    static void post(Context context) {
+        EVENT.invoker.invoke(EVENT.listeners).publish(context);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-        Block block = (Block) o;
-        return getRawId() == block.getRawId();
-    }
+    void publish(Context context);
 
-    @Override
-    public String toString() {
-        return Blocks.BLOCK2ID.get(this);
+    final class Context implements EventContext {
+        public final long window;
+        public final int key, scancode, action, mods;
+
+        public Context(long window, int key, int scancode, int action, int mods) {
+            this.window = window;
+            this.key = key;
+            this.scancode = scancode;
+            this.action = action;
+            this.mods = mods;
+        }
     }
 }

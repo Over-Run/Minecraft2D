@@ -22,38 +22,38 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.block;
+package io.github.overrun.mc2d.client.gui.screen.world;
+
+import io.github.overrun.mc2d.client.gui.screen.DirtScreen;
+import io.github.overrun.mc2d.client.gui.screen.TitleScreen;
 
 /**
  * @author squid233
- * @since 2021/01/09
+ * @since 2021/01/26
  */
-public final class Block {
-    private final byte rawId;
-
-    public Block(int rawId) {
-        this.rawId = (byte) rawId;
-    }
-
-    public final byte getRawId() {
-        return rawId;
+public final class SavingWorldScreen extends DirtScreen {
+    public SavingWorldScreen() {
+        super("Saving World");
     }
 
     @Override
-    public int hashCode() {
-        return getRawId();
+    public void tick() {
+        super.tick();
+        if (client.world != null) {
+            client.world.save();
+        }
+        onClose();
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-        Block block = (Block) o;
-        return getRawId() == block.getRawId();
+    public void onClose() {
+        super.onClose();
+        client.openScreen(new TitleScreen());
+        client.world = null;
     }
 
     @Override
-    public String toString() {
-        return Blocks.BLOCK2ID.get(this);
+    public boolean shouldCloseOnEsc() {
+        return false;
     }
 }
