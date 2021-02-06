@@ -27,7 +27,9 @@ package io.github.overrun.mc2d.client.gui.screen.ingame;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
 import io.github.overrun.mc2d.client.gui.screen.world.SavingWorldScreen;
 import io.github.overrun.mc2d.client.gui.widget.ButtonWidget;
+import io.github.overrun.mc2d.text.Style;
 import io.github.overrun.mc2d.text.TextColor;
+import io.github.overrun.mc2d.text.TranslatableText;
 
 /**
  * @author squid233
@@ -37,7 +39,7 @@ public final class PauseScreen extends Screen {
     private final Screen parent;
 
     public PauseScreen(Screen parent) {
-        super("Pausing");
+        super(new TranslatableText("Pausing"));
         this.parent = parent;
     }
 
@@ -48,16 +50,16 @@ public final class PauseScreen extends Screen {
             client.world.save();
         }
         addButton(new ButtonWidget((width >> 1) - 300,
-                80,
+                90,
                 300,
                 20,
-                "Back to Game",
+                new TranslatableText("Back.to.Game"),
                 b -> onClose()));
         addButton(new ButtonWidget((width >> 1) - 300,
-                130,
+                140,
                 300,
                 20,
-                "Save and Back to Title Screen",
+                new TranslatableText("Save.and.Back.to.Title.Screen"),
                 b -> client.openScreen(new SavingWorldScreen())));
     }
 
@@ -65,7 +67,7 @@ public final class PauseScreen extends Screen {
     public void render(int mouseX, int mouseY) {
         renderBackground();
         super.render(mouseX, mouseY);
-        drawCenteredText(textRenderer, title, width >> 1, 50, TextColor.WHITE);
+        drawCenteredText(textRenderer, title.setStyle(Style.EMPTY.withColor(TextColor.WHITE)), width >> 1, 50);
     }
 
     @Override

@@ -26,7 +26,7 @@ package io.github.overrun.mc2d.client.font;
 
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.gui.DrawableHelper;
-import io.github.overrun.mc2d.text.TextColor;
+import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.util.Identifier;
 
 /**
@@ -34,8 +34,6 @@ import io.github.overrun.mc2d.util.Identifier;
  * @since 2021/01/26
  */
 public final class TextRenderer {
-    public static final Identifier ASCII_FONT_ID = new Identifier("textures/font/ascii.png");
-    private static final AsciiFont ASCII_FONT = new AsciiFont();
     private final Mc2dClient client;
 
     public TextRenderer(Mc2dClient client) {
@@ -43,46 +41,54 @@ public final class TextRenderer {
     }
 
     public void draw(int x, int y, char c, int rgba) {
-        if (ASCII_FONT.contains(c)) {
-            client.getTextureManager().bindTexture(ASCII_FONT_ID);
-            DrawableHelper.drawTexture(x,
-                    y,
-                    (int) c * width(c),
-                    0,
-                    width(c),
-                    height(c),
-                    width(c),
-                    height(c),
-                    ASCII_FONT.textureWidth(),
-                    ASCII_FONT.textureHeight(),
-                    rgba);
+        client.getTextureManager().bindTexture(new Identifier("textures/font/utf8_" + (int) c / 625 + ".png"));
+        int charIndex = (int) c % 625;
+        DrawableHelper.drawTexture(x,
+                y,
+                charIndex % 25 * width(c),
+                charIndex / 25 * height(),
+                width(c),
+                height(),
+                width(c) >> 1,
+                height() >> 1,
+                400,
+                400,
+                rgba);
+    }
+
+    public void drawWithShadow(int x, int y, IText text) {
+        draw(x, y, text, true);
+    }
+
+    public void draw(int x, int y, IText text, boolean shadow) {
+        final char[] chars = text.asString().toCharArray();
+        int finalX = x;
+        for (char c : chars) {
+            if (shadow) {
+                draw(finalX + 1, y + 1, c, text.getStyle().getColor().getBgColor());
+            }
+            draw(finalX, y, c, text.getStyle().getColor().getFgColor());
+            finalX += width(c);
         }
     }
 
-    public void draw(int x, int y, String text) {
-        draw(x, y, text, TextColor.WHITE);
+    public void draw(int x, int y, IText text) {
+        draw(x, y, text, false);
     }
 
-    public void draw(int x, int y, String text, int rgba) {
-        char[] chars = text.toCharArray();
-        for (int i = 0, len = chars.length; i < len; i++) {
-            draw(x + i * width(chars[i]) * 2, y, chars[i], rgba);
-        }
-    }
-
-    public int width(char c) {
+    public int width(IText text) {
         int width = 0;
-        if (ASCII_FONT.contains(c)) {
-            width = ASCII_FONT.width();
+        for (char c : text.asString().toCharArray()) {
+            width += width(c);
         }
         return width;
     }
 
-    public int height(char c) {
-        int height = 0;
-        if (ASCII_FONT.contains(c)) {
-            height = ASCII_FONT.height();
-        }
-        return height;
+    public int width(char c) {
+        return c < 256 ? 8 : 16;
+    }
+
+    public int height() {
+        return 16;
     }
 }

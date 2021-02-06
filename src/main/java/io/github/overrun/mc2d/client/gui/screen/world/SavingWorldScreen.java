@@ -26,6 +26,7 @@ package io.github.overrun.mc2d.client.gui.screen.world;
 
 import io.github.overrun.mc2d.client.gui.screen.DirtScreen;
 import io.github.overrun.mc2d.client.gui.screen.TitleScreen;
+import io.github.overrun.mc2d.text.TranslatableText;
 
 /**
  * @author squid233
@@ -33,7 +34,7 @@ import io.github.overrun.mc2d.client.gui.screen.TitleScreen;
  */
 public final class SavingWorldScreen extends DirtScreen {
     public SavingWorldScreen() {
-        super("Saving World");
+        super(new TranslatableText("Saving World"));
     }
 
     @Override

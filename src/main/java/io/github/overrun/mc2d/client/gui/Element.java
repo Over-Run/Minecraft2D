@@ -29,7 +29,7 @@ package io.github.overrun.mc2d.client.gui;
  * @since 2021/01/25
  */
 public interface Element {
-    default boolean mouseClicked(int mouseX, int mouseY, int button) {
+    default boolean mousePressed(int mouseX, int mouseY, int button) {
         return false;
     }
 

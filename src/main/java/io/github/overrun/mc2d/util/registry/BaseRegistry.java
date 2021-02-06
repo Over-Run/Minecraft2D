@@ -22,12 +22,22 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.event;
+package io.github.overrun.mc2d.util.registry;
+
+import io.github.overrun.mc2d.util.Identifier;
 
 /**
  * @author squid233
- * @since 2021/01/26
+ * @since 2021/01/27
  */
-public interface EventPublisher<T extends EventContext> {
-    void publish(T context);
+public abstract class BaseRegistry<T> {
+    public abstract Identifier getId(T entry);
+
+    public abstract T getById(Identifier id);
+
+    public abstract int getRawId(T entry);
+
+    public abstract T getByRawId(int rawId);
+
+    public abstract T register(Identifier id, T entry);
 }

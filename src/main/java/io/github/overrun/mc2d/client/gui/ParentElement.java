@@ -48,7 +48,7 @@ public interface ParentElement extends Element {
     }
 
     @Override
-    default boolean mouseClicked(int mouseX, int mouseY, int button) {
+    default boolean mousePressed(int mouseX, int mouseY, int button) {
         Iterator<? extends Element> iterator = children().iterator();
         Element element;
         do {
@@ -56,7 +56,7 @@ public interface ParentElement extends Element {
                 return false;
             }
             element = iterator.next();
-        } while (!element.mouseClicked(mouseX, mouseY, button));
+        } while (!element.mousePressed(mouseX, mouseY, button));
         return true;
     }
 }

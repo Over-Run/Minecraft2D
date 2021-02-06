@@ -28,6 +28,7 @@ import io.github.overrun.mc2d.Player;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
 import io.github.overrun.mc2d.screen.CreativeTabScreenHandler;
 import io.github.overrun.mc2d.screen.slot.Slot;
+import io.github.overrun.mc2d.text.TranslatableText;
 import io.github.overrun.mc2d.util.Identifier;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
@@ -42,7 +43,7 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
     private final Player player;
 
     public CreativeTabScreen(Player player, Screen parent) {
-        super(new CreativeTabScreenHandler(), "Creative Tab");
+        super(new CreativeTabScreenHandler(), new TranslatableText("Creative.Tab"));
         this.player = player;
         this.parent = parent;
     }

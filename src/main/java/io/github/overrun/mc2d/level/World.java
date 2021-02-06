@@ -28,11 +28,18 @@ import io.github.overrun.mc2d.Main;
 import io.github.overrun.mc2d.Player;
 import io.github.overrun.mc2d.block.Block;
 import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.client.Window;
+import io.github.overrun.mc2d.client.gui.Drawable;
 import io.github.overrun.mc2d.client.gui.screen.ingame.InGameScreen;
 import io.github.overrun.mc2d.event.KeyCallback;
-import io.github.overrun.mc2d.option.Options;
+import io.github.overrun.mc2d.mod.ModLoader;
+import io.github.overrun.mc2d.text.IText;
+import io.github.overrun.mc2d.text.TranslatableText;
 import io.github.overrun.mc2d.util.GlUtils;
 import io.github.overrun.mc2d.util.Identifier;
+import io.github.overrun.mc2d.util.registry.Registry;
+import io.github.overrun.mc2d.util.shape.VoxelSet;
+import io.github.overrun.mc2d.util.shape.VoxelShape;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -48,8 +55,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import static io.github.overrun.mc2d.block.Blocks.*;
-import static io.github.overrun.mc2d.client.gui.DrawableHelper.drawTexture;
-import static io.github.overrun.mc2d.util.GlfwUtils.*;
+import static io.github.overrun.mc2d.client.Mouse.isMousePress;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
@@ -57,118 +63,170 @@ import static org.lwjgl.opengl.GL11.*;
  * @author squid233
  * @since 2021/01/09
  */
-public final class World implements Serializable {
-    private static final Logger logger = LogManager.getLogger();
-    private static final long serialVersionUID = 1L;
-    private final byte[] blocks;
+public final class World implements Serializable, Drawable {
+    private static final Logger logger = LogManager.getLogger(World.class.getName());
+    private static final long serialVersionUID = 2L;
+    private static final IText MAX_MEMORY;
+    public static byte z;
+    private static boolean debug;
+    private final Identifier[] blocks;
     private final Player player;
     public final transient int width;
     public final transient int height;
-    private static boolean debug;
+    public final transient byte depth;
 
     static {
-        KeyCallback.EVENT.register(context -> {
-            if (context.key == GLFW_KEY_F3 && context.action == GLFW_PRESS) {
-                debug = !debug;
+        KeyCallback.EVENT.register((window, key, scancode, action, mods) -> {
+            if (Mc2dClient.getInstance().screen instanceof InGameScreen) {
+                if (action == GLFW_PRESS) {
+                    if (key == GLFW_KEY_F3) {
+                        debug = !debug;
+                    }
+                    // 逗号 || 句号
+                    if (key == GLFW_KEY_COMMA || key == GLFW_KEY_PERIOD) {
+                        --z;
+                        if (z < 0) {
+                            z = 1;
+                        }
+                        if (z > 1) {
+                            z = 0;
+                        }
+                    }
+                }
             }
         });
+        double maxMemory = Runtime.getRuntime().maxMemory() / 1048576.0;
+        MAX_MEMORY = new TranslatableText("Max.memory", maxMemory >= 1024 ? maxMemory / 1024.0 + " GB" : maxMemory + " MB");
     }
 
     public World(Player player, int w, int h) {
         this.player = player;
-        blocks = new byte[w * h];
         width = w;
         height = h;
-        Arrays.fill(blocks, AIR.getRawId());
+        depth = 2;
+        blocks = new Identifier[w * h * depth];
+        Arrays.fill(blocks, AIR.getId());
         // generate the terrain
         for (int i = 0; i < w; i++) {
-            setBlock(i, 0, BEDROCK);
-        }
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < w; j++) {
-                setBlock(j, i + 1, COBBLESTONE);
+            for (byte j = 0; j < 2; j++) {
+                setBlock(i, 0, j, BEDROCK);
+                setBlock(i, 0, j, BEDROCK);
             }
         }
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < w; j++) {
-                setBlock(j, i + 3, DIRT);
+                for (byte k = 0; k < 2; k++) {
+                    setBlock(j, i + 1, k, COBBLESTONE);
+                    setBlock(j, i + 1, k, COBBLESTONE);
+                }
+            }
+        }
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < w; j++) {
+                for (byte k = 0; k < 2; k++) {
+                    setBlock(j, i + 3, k, DIRT);
+                    setBlock(j, i + 3, k, DIRT);
+                }
             }
         }
         for (int i = 0; i < w; i++) {
-            setBlock(i, 5, GRASS_BLOCK);
+            for (byte j = 0; j < 2; j++) {
+                setBlock(i, 5, j, GRASS_BLOCK);
+                setBlock(i, 5, j, GRASS_BLOCK);
+            }
         }
         load();
     }
 
-    public void setBlock(int x, int y, byte type) {
-        if (x >= 0 && x < width && y >= 0 && y < height) {
-            blocks[x % width + y * width] = type;
+    public void setBlock(int x, int y, int z, Block block) {
+        if (x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < depth) {
+            blocks[getIndex(x, y, (byte) z)] = block.getId();
         }
     }
 
-    public void setBlock(int x, int y, Block block) {
-        setBlock(x, y, block.getRawId());
-    }
-
-    public Block getBlock(int x, int y) {
-        if (x >= 0 && x < width && y >= 0 && y < height) {
-            return RAW_ID_BLOCKS.get(blocks[x % width + y * width]);
+    public Block getBlock(int x, int y, int z) {
+        if (x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < depth) {
+            return Registry.BLOCK.getById(blocks[getIndex(x, y, (byte) z)]);
         } else {
             return AIR;
         }
     }
 
-    public void render(Mc2dClient client, int mouseX, int mouseY, int windowW, int windowH) {
-        byte pointBlock = 0;
-        int pointBlockX = 0, pointBlockY = 0;
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                Block b = getBlock(j, i);
-                double ltX = (windowW >> 1) - 1 + (j - player.x) * BLOCK_SIZE,
-                        ltY = (windowH >> 1) - 1 - (i - player.y) * BLOCK_SIZE,
-                        rdX = ltX + BLOCK_SIZE,
-                        rdY = ltY + BLOCK_SIZE;
-                if (b != AIR && rdX >= 0 && rdY >= 0 && ltX < windowW && ltY < windowH) {
-                    client.getTextureManager().bindTexture(new Identifier("textures/block/" + BLOCK2ID.get(b) + ".png"));
-                    drawTexture(ltX, ltY, BLOCK_SIZE, BLOCK_SIZE);
-                }
-                if (client.screen instanceof InGameScreen
-                        && mouseX >= ltX
-                        && mouseX < rdX
-                        && mouseY >= ltY
-                        && mouseY < rdY) {
-                    pointBlock = b.getRawId();
-                    pointBlockX = j;
-                    pointBlockY = i;
-                    if (
-                            Options.getB(Options.BLOCK_HIGHLIGHT,
-                                    System.getProperty("mc2d.block.highlight",
-                                            "false"))
-                    ) {
-                        glDisable(GL_TEXTURE_2D);
-                        GlUtils.fillRect(ltX, ltY, rdX, rdY, 0x80ffffff, true);
-                        glEnable(GL_TEXTURE_2D);
-                    } else {
-                        GlUtils.drawRect(ltX, ltY, rdX, rdY, 0, false);
+    public int getIndex(int x, int y, byte z) {
+        return x % width + y * width + z * width * height;
+    }
+
+    @Override
+    public void render(int mouseX, int mouseY) {
+        Mc2dClient client = Mc2dClient.getInstance();
+        int windowW = Window.width, windowH = Window.height;
+        boolean inGame = client.screen instanceof InGameScreen;
+        Block pointBlock = AIR;
+        int pointBlockX = 0, pointBlockY = 0, pointBlockZ = 0;
+        for (byte z = 1; z > -1; z--) {
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    Block b = getBlock(x, y, z);
+                    double ltX = (windowW >> 1) + (x - player.x) * 32,
+                            ltY = (windowH >> 1) - (y - player.y) * 32 - 32,
+                            rdX = ltX + 32,
+                            rdY = ltY + 32;
+                    b.x = (int) ltX;
+                    b.y = (int) ltY;
+                    b.z = z;
+                    boolean dark = getBlock(x, y, 0) == AIR;
+                    if (rdX >= 0 && rdY >= 0 && ltX < windowW && ltY < windowH) {
+                        b.render(z == 0 || dark, dark);
                     }
-                    if (getBlock(j, i) != AIR
-                            && isMousePress(GLFW_MOUSE_BUTTON_LEFT)) {
-                        setBlock(j, i, AIR);
-                    } else if (getBlock(j, i) == AIR
-                            && isMousePress(GLFW_MOUSE_BUTTON_RIGHT)) {
-                        setBlock(j, i, player.handledBlock);
+                    if (inGame
+                            && mouseX >= ltX
+                            && mouseX < rdX
+                            && mouseY >= ltY
+                            && mouseY < rdY) {
+                        pointBlock = getBlock(x, y, World.z);
+                        pointBlockX = x;
+                        pointBlockY = y;
+                        pointBlockZ = World.z;
+                        glDisable(GL_TEXTURE_2D);
+                        if (z == 0 || dark) {
+                            VoxelShape shape = b.getOutlineShape();
+                            for (VoxelSet set : shape.getSets()) {
+                                GlUtils.fillRect(ltX + (set.x << 1),
+                                        ltY + (set.y << 1),
+                                        ltX + (set.x << 1) + 2,
+                                        ltY + (set.y << 1) + 2,
+                                        0x80ffffff,
+                                        true);
+                            }
+                        }
+                        glEnable(GL_TEXTURE_2D);
+                        if (pointBlock != AIR && isMousePress(GLFW_MOUSE_BUTTON_LEFT)) {
+                            setBlock(x, y, World.z, AIR);
+                        } else if (pointBlock == AIR && isMousePress(GLFW_MOUSE_BUTTON_RIGHT)) {
+                            setBlock(x, y, World.z, Registry.BLOCK.getByRawId(player.handledBlock));
+                        }
                     }
                 }
             }
-        }
-        if (debug) {
-            client.textRenderer.draw(0, 0, "Minecraft2D " + Main.VERSION);
-            client.textRenderer.draw(0, 30, String.format("Pos: %.4f, %.4f", player.x, player.y));
-            client.textRenderer.draw(0, 60, "Handled block: " + RAW_ID_BLOCKS.get(player.handledBlock));
-            client.textRenderer.draw(0, 90, "Point block pos: " + pointBlockX + ", " + pointBlockY);
-            client.textRenderer.draw(0, 120, "Point block: " + RAW_ID_BLOCKS.get(pointBlock));
+            if (z == 1) {
+                player.render(mouseX, mouseY);
+            }
         }
         glFinish();
+        if (debug) {
+            client.textRenderer.draw(0, 0, Main.VERSION_TEXT);
+            client.textRenderer.draw(0, 17, new TranslatableText("Pos", player.x, player.y));
+            client.textRenderer.draw(0, 34, new TranslatableText("Handled.block", Registry.BLOCK.getByRawId(player.handledBlock)));
+            client.textRenderer.draw(0, 51, new TranslatableText("Point.block.pos", pointBlockX, pointBlockY, pointBlockZ));
+            client.textRenderer.draw(0, 68, new TranslatableText("Point.block", pointBlock));
+            client.textRenderer.draw(0, 85, MAX_MEMORY);
+            if (ModLoader.getModCount() > 0) {
+                client.textRenderer.draw(0, 102, new TranslatableText("Mods.count", ModLoader.getModCount()));
+            }
+        }
+        if (inGame) {
+            player.move();
+        }
     }
 
     public void load() {

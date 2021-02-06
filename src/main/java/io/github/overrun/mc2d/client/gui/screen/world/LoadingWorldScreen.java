@@ -26,6 +26,7 @@ package io.github.overrun.mc2d.client.gui.screen.world;
 
 import io.github.overrun.mc2d.client.gui.screen.DirtScreen;
 import io.github.overrun.mc2d.client.gui.screen.ingame.InGameScreen;
+import io.github.overrun.mc2d.text.TranslatableText;
 
 /**
  * @author squid233
@@ -33,7 +34,12 @@ import io.github.overrun.mc2d.client.gui.screen.ingame.InGameScreen;
  */
 public final class LoadingWorldScreen extends DirtScreen {
     public LoadingWorldScreen() {
-        super("Loading World");
+        super(new TranslatableText("Loading.World"));
+    }
+
+    @Override
+    protected void init() {
+        super.init();
     }
 
     @Override

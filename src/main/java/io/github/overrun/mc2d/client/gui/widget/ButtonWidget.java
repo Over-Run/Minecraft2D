@@ -24,6 +24,8 @@
 
 package io.github.overrun.mc2d.client.gui.widget;
 
+import io.github.overrun.mc2d.text.IText;
+
 /**
  * @author squid233
  * @since 2021/01/25
@@ -33,11 +35,11 @@ public class ButtonWidget extends AbstractPressableButtonWidget {
     protected final PressAction onPress;
     protected final TooltipSupplier tooltipSupplier;
 
-    public ButtonWidget(int x, int y, int width, int height, String message, PressAction onPress) {
+    public ButtonWidget(int x, int y, int width, int height, IText message, PressAction onPress) {
         this(x, y, width, height, message, onPress, EMPTY);
     }
 
-    public ButtonWidget(int x, int y, int width, int height, String message, PressAction onPress, TooltipSupplier tooltipSupplier) {
+    public ButtonWidget(int x, int y, int width, int height, IText message, PressAction onPress, TooltipSupplier tooltipSupplier) {
         super(x, y, width, height, message);
         this.onPress = onPress;
         this.tooltipSupplier = tooltipSupplier;

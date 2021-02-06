@@ -22,22 +22,17 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.util;
+package io.github.overrun.mc2d.client;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * @author squid233
- * @since 2021/01/10
+ * @since 2021/01/31
  */
-public final class GlfwUtils {
-    public static boolean isKeyPress(int key) {
-        return glfwGetKey(glfwGetCurrentContext(), key) == GLFW_PRESS;
-    }
-
-    public static boolean isKeyRelease(int key) {
-        return glfwGetKey(glfwGetCurrentContext(), key) == GLFW_RELEASE;
-    }
+public final class Mouse {
+    public static int mouseX;
+    public static int mouseY;
 
     public static boolean isMousePress(int button) {
         return glfwGetMouseButton(glfwGetCurrentContext(), button) == GLFW_PRESS;

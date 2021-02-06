@@ -24,13 +24,16 @@
 
 package io.github.overrun.mc2d.util;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * @author squid233
  * @since 2021/01/25
  */
-public final class Identifier {
+public final class Identifier implements Serializable {
+    public static final String VANILLA = "mc2d";
+    private static final long serialVersionUID = 1L;
     private final String namespace;
     private final String path;
 
@@ -39,7 +42,7 @@ public final class Identifier {
             namespace = id[0];
             path = id[1];
         } else {
-            namespace = "mc2d";
+            namespace = VANILLA;
             path = id[0];
         }
     }
@@ -58,6 +61,10 @@ public final class Identifier {
 
     public String getPath() {
         return path;
+    }
+
+    public boolean isVanilla() {
+        return VANILLA.equals(namespace);
     }
 
     @Override

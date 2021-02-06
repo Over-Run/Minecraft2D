@@ -24,33 +24,21 @@
 
 package io.github.overrun.mc2d.block;
 
-import it.unimi.dsi.fastutil.bytes.Byte2ObjectArrayMap;
-import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
+import io.github.overrun.mc2d.util.registry.Registry;
 
 /**
  * @author squid233
  * @since 2021/01/09
  */
 public final class Blocks {
-    public static final Map<String, Block> BLOCKS = new LinkedHashMap<>(5);
-    public static final Map<Block, String> BLOCK2ID = new LinkedHashMap<>(5);
-    public static final Byte2ObjectMap<Block> RAW_ID_BLOCKS = new Byte2ObjectArrayMap<>(5);
-    public static final int BLOCK_SIZE = 32;
-    public static final Block AIR = register("air", 0);
-    public static final Block GRASS_BLOCK = register("grass_block", 1);
-    public static final Block DIRT = register("dirt", 2);
-    public static final Block COBBLESTONE = register("cobblestone", 3);
-    public static final Block BEDROCK = register("bedrock", 4);
+    public static final Block AIR = register("air", new AirBlock());
+    public static final Block GRASS_BLOCK = register("grass_block", new Block());
+    public static final Block DIRT = register("dirt", new Block());
+    public static final Block COBBLESTONE = register("cobblestone", new Block());
+    public static final Block BEDROCK = register("bedrock", new Block());
 
-    public static Block register(String id, int rawId) {
-        Block b = new Block(rawId);
-        BLOCKS.putIfAbsent(id, b);
-        BLOCK2ID.putIfAbsent(b, id);
-        RAW_ID_BLOCKS.putIfAbsent(b.getRawId(), b);
-        return b;
+    public static Block register(String id, Block block) {
+        return Registry.register(Registry.BLOCK, id, block);
     }
 }
 

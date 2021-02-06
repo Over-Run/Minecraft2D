@@ -24,6 +24,7 @@
 
 package io.github.overrun.mc2d.client.gui.screen;
 
+import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.text.TextColor;
 
 /**
@@ -31,7 +32,7 @@ import io.github.overrun.mc2d.text.TextColor;
  * @since 2021/01/26
  */
 public class DirtScreen extends Screen {
-    protected DirtScreen(String title) {
+    protected DirtScreen(IText title) {
         super(title);
     }
 
@@ -39,6 +40,6 @@ public class DirtScreen extends Screen {
     public void render(int mouseX, int mouseY) {
         renderBackgroundTexture();
         super.render(mouseX, mouseY);
-        drawCenteredText(textRenderer, title, width >> 1, 50, TextColor.WHITE);
+        drawCenteredText(textRenderer, title.withColor(TextColor.WHITE), width >> 1, 50);
     }
 }

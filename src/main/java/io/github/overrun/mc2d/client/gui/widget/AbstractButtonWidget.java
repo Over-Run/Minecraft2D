@@ -28,6 +28,8 @@ import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.gui.Drawable;
 import io.github.overrun.mc2d.client.gui.DrawableHelper;
 import io.github.overrun.mc2d.client.gui.Element;
+import io.github.overrun.mc2d.text.IText;
+import io.github.overrun.mc2d.text.Style;
 import io.github.overrun.mc2d.text.TextColor;
 import io.github.overrun.mc2d.util.Identifier;
 
@@ -37,15 +39,16 @@ import io.github.overrun.mc2d.util.Identifier;
  */
 public abstract class AbstractButtonWidget extends DrawableHelper implements Drawable, Element {
     public static final Identifier WIDGETS_LOCATION = new Identifier("textures/gui/widgets.png");
+    public static final TextColor NOT_ACTIVE_COLOR = new TextColor("", 0xffa0a0a0, 0xff202020);
     protected int width;
     protected int height;
     public int x;
     public int y;
-    private String message;
+    private IText message;
     protected boolean hovered;
     public boolean active = true;
 
-    public AbstractButtonWidget(int x, int y, int width, int height, String message) {
+    public AbstractButtonWidget(int x, int y, int width, int height, IText message) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -71,10 +74,10 @@ public abstract class AbstractButtonWidget extends DrawableHelper implements Dra
         drawTexture(x + width, y, 200 - (width >> 1), 46 + i * 20, width >> 1, height);
         renderBg(client, mouseX, mouseY);
         drawCenteredText(client.textRenderer,
-                getMessage(),
+                getMessage().setStyle(Style.EMPTY.withColor(active ? TextColor.WHITE : NOT_ACTIVE_COLOR)),
                 x + width,
-                y + ((height - 9) >> 1),
-                active ? TextColor.WHITE : 0xffa0a0a0);
+                // y + (height * 2 / 2 - 16 / 2)
+                y + height - 8);
     }
 
     protected void renderBg(Mc2dClient client, int mouseX, int mouseY) { }
@@ -115,11 +118,11 @@ public abstract class AbstractButtonWidget extends DrawableHelper implements Dra
         this.y = y;
     }
 
-    public String getMessage() {
+    public IText getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(IText message) {
         this.message = message;
     }
 

@@ -22,14 +22,27 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.client;
+package io.github.overrun.mc2d.util.registry;
+
+import io.github.overrun.mc2d.block.Block;
+import io.github.overrun.mc2d.block.Blocks;
+import io.github.overrun.mc2d.item.Item;
+import io.github.overrun.mc2d.item.Items;
+import io.github.overrun.mc2d.util.Identifier;
 
 /**
  * @author squid233
- * @since 2021/01/25
+ * @since 2021/01/27
  */
-public interface WindowEventHandler {
-    void onResize(int newWidth, int newHeight);
+public final class Registry {
+    public static final DefaultedRegistry<Block> BLOCK = new DefaultedRegistry<>(Blocks.AIR);
+    public static final DefaultedRegistry<Item> ITEM = new DefaultedRegistry<>(Items.AIR);
 
-    void onMouseMove(int newX, int newY);
+    public static <T> T register(BaseRegistry<T> registry, Identifier id, T entry) {
+        return registry.register(id, entry);
+    }
+
+    public static <T> T register(BaseRegistry<T> registry, String id, T entry) {
+        return register(registry, new Identifier(id), entry);
+    }
 }

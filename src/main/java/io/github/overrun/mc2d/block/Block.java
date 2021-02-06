@@ -24,36 +24,79 @@
 
 package io.github.overrun.mc2d.block;
 
+import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.item.Item;
+import io.github.overrun.mc2d.item.ItemConvertible;
+import io.github.overrun.mc2d.item.Items;
+import io.github.overrun.mc2d.util.GlUtils;
+import io.github.overrun.mc2d.util.Identifier;
+import io.github.overrun.mc2d.util.registry.Registry;
+import io.github.overrun.mc2d.util.shape.VoxelShape;
+import io.github.overrun.mc2d.util.shape.VoxelShapes;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static io.github.overrun.mc2d.client.gui.DrawableHelper.drawTexture;
+import static org.lwjgl.opengl.GL11.*;
+
 /**
  * @author squid233
  * @since 2021/01/09
  */
-public final class Block {
-    private final byte rawId;
+public class Block implements ItemConvertible {
+    public static final Map<Block, Item> BLOCK_ITEMS = new HashMap<>();
+    public int x;
+    public int y;
+    public byte z;
 
-    public Block(int rawId) {
-        this.rawId = (byte) rawId;
+    public VoxelShape getOutlineShape() {
+        return getCollisionShape();
     }
 
-    public final byte getRawId() {
-        return rawId;
+    public VoxelShape getCollisionShape() {
+        return VoxelShapes.fullSquare();
     }
 
-    @Override
-    public int hashCode() {
-        return getRawId();
+    public final int getRawId() {
+        return Registry.BLOCK.getRawId(this);
+    }
+
+    public final Identifier getId() {
+        return Registry.BLOCK.getId(this);
+    }
+
+    public void render(boolean render, boolean dark) {
+        if (render) {
+            Identifier id = Registry.BLOCK.getId(this);
+            glColor4f(1, 1, 1, 1);
+            Mc2dClient.getInstance().getTextureManager().bindTexture(new Identifier(id.getNamespace(), "textures/block/" + id.getPath() + ".png"));
+            drawTexture(x, y, 32, 32);
+            if (dark) {
+                glDisable(GL_TEXTURE_2D);
+                GlUtils.fillRect(x, y, x + 32, y + 32, 0x80000000, true);
+                glEnable(GL_TEXTURE_2D);
+            }
+        }
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-        Block block = (Block) o;
-        return getRawId() == block.getRawId();
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
     @Override
     public String toString() {
-        return Blocks.BLOCK2ID.get(this);
+        return Registry.BLOCK.getId(this).toString();
+    }
+
+    @Override
+    public Item asItem() {
+        return BLOCK_ITEMS.getOrDefault(this, Items.AIR);
     }
 }

@@ -27,10 +27,12 @@ package io.github.overrun.mc2d.client.gui.screen.ingame;
 import io.github.overrun.mc2d.Player;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
 import io.github.overrun.mc2d.level.World;
-import io.github.overrun.mc2d.option.Options;
+import io.github.overrun.mc2d.text.IText;
+import io.github.overrun.mc2d.util.GlUtils;
 import io.github.overrun.mc2d.util.Identifier;
+import io.github.overrun.mc2d.util.Options;
+import io.github.overrun.mc2d.util.registry.Registry;
 
-import static io.github.overrun.mc2d.block.Blocks.RAW_ID_BLOCKS;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
@@ -43,7 +45,7 @@ public final class InGameScreen extends Screen {
     private Player player;
 
     public InGameScreen() {
-        super("");
+        super(IText.EMPTY);
     }
 
     @Override
@@ -57,14 +59,18 @@ public final class InGameScreen extends Screen {
     public void render(int mouseX, int mouseY) {
         super.render(mouseX, mouseY);
         if (world != null) {
-            world.render(client, mouseX, mouseY, width, height);
+            world.render(mouseX, mouseY);
         }
         glPushMatrix();
         glTranslatef(width - 64, 0, 0);
-        client.getTextureManager().bindTexture(new Identifier("textures/block/" + RAW_ID_BLOCKS.get(player.handledBlock).toString() + ".png"));
+        Identifier id = Registry.BLOCK.getId(Registry.BLOCK.getByRawId(player.handledBlock));
+        glColor4f(1, 1, 1, 1);
+        client.getTextureManager().bindTexture(new Identifier(id.getNamespace(), "textures/block/" + id.getPath() + ".png"));
         drawTexture(0, 0, 64, 64);
+        glDisable(GL_TEXTURE_2D);
+        GlUtils.fillRect(0, 64, 64, 32, 0xf, true);
+        glEnable(GL_TEXTURE_2D);
         glPopMatrix();
-        player.move();
     }
 
     @Override

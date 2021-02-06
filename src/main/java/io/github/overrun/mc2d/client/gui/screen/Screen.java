@@ -25,34 +25,35 @@
 package io.github.overrun.mc2d.client.gui.screen;
 
 import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.client.Mouse;
 import io.github.overrun.mc2d.client.font.TextRenderer;
 import io.github.overrun.mc2d.client.gui.AbstractParentElement;
 import io.github.overrun.mc2d.client.gui.Drawable;
 import io.github.overrun.mc2d.client.gui.Element;
 import io.github.overrun.mc2d.client.gui.widget.AbstractButtonWidget;
-import io.github.overrun.mc2d.util.Identifier;
+import io.github.overrun.mc2d.text.IText;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
+import static org.lwjgl.opengl.GL11.glColor4f;
 
 /**
  * @author squid233
  * @since 2021/01/25
  */
 public abstract class Screen extends AbstractParentElement implements TickableElement, Drawable {
-    public static final Identifier OPTIONS_BACKGROUND = new Identifier("textures/gui/options_background.png");
     protected final List<Element> children = new ArrayList<>();
-    public final String title;
+    public final IText title;
     protected Mc2dClient client;
     protected TextRenderer textRenderer;
     public int width;
     public int height;
     protected final List<AbstractButtonWidget> buttons = new ArrayList<>();
 
-    protected Screen(String title) {
+    protected Screen(IText title) {
         this.title = title;
     }
 
@@ -75,7 +76,7 @@ public abstract class Screen extends AbstractParentElement implements TickableEl
 
     public void renderBackground() {
         if (client.world != null) {
-            client.world.render(client, client.mouseX, client.mouseY, width, height);
+            client.world.render(Mouse.mouseX, Mouse.mouseY);
             fillGradient(0, 0, width, height, 0xc0101010, 0xd0101010);
         } else {
             renderBackgroundTexture();
@@ -83,6 +84,7 @@ public abstract class Screen extends AbstractParentElement implements TickableEl
     }
 
     public void renderBackgroundTexture() {
+        glColor4f(1, 1, 1, 1);
         client.getTextureManager().bindTexture(OPTIONS_BACKGROUND);
         for (int i = 0; i < height; i += 32) {
             for (int j = 0; j < width; j += 32) {
@@ -122,7 +124,7 @@ public abstract class Screen extends AbstractParentElement implements TickableEl
     }
 
     @Override
-    public boolean mouseClicked(int mouseX, int mouseY, int button) {
+    public boolean mousePressed(int mouseX, int mouseY, int button) {
         for (AbstractButtonWidget b : buttons) {
             if (b.isMouseOver(mouseX, mouseY) && button == GLFW_MOUSE_BUTTON_LEFT) {
                 b.onClick(mouseX, mouseY);

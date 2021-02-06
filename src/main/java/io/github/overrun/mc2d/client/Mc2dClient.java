@@ -38,15 +38,13 @@ import java.io.Closeable;
  * @author squid233
  * @since 2021/01/25
  */
-public final class Mc2dClient implements Closeable, WindowEventHandler {
+public final class Mc2dClient implements Closeable {
     private static final Mc2dClient INSTANCE = new Mc2dClient();
     public final TextRenderer textRenderer;
     private final TextureManager textureManager;
     public Screen screen;
     public @Nullable World world;
     public Player player;
-    private int width, height;
-    public int mouseX, mouseY;
 
     private Mc2dClient() {
         textRenderer = new TextRenderer(this);
@@ -62,12 +60,12 @@ public final class Mc2dClient implements Closeable, WindowEventHandler {
         }
         this.screen = screen;
         if (screen != null) {
-            screen.init(this, width, height);
+            screen.init(this, Window.width, Window.height);
         }
     }
 
     public void render() {
-        screen.render(mouseX, mouseY);
+        screen.render(Mouse.mouseX, Mouse.mouseY);
     }
 
     public void tick() {
@@ -78,14 +76,6 @@ public final class Mc2dClient implements Closeable, WindowEventHandler {
         return textureManager;
     }
 
-    public int width() {
-        return width;
-    }
-
-    public int height() {
-        return height;
-    }
-
     public static Mc2dClient getInstance() {
         return INSTANCE;
     }
@@ -93,18 +83,5 @@ public final class Mc2dClient implements Closeable, WindowEventHandler {
     @Override
     public void close() {
         textureManager.close();
-    }
-
-    @Override
-    public void onResize(int newWidth, int newHeight) {
-        width = newWidth;
-        height = newHeight;
-        screen.init(this, width, height);
-    }
-
-    @Override
-    public void onMouseMove(int newX, int newY) {
-        mouseX = newX;
-        mouseY = newY;
     }
 }

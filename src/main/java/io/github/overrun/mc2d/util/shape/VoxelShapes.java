@@ -22,39 +22,29 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.client.font;
+package io.github.overrun.mc2d.util.shape;
+
+import io.github.overrun.mc2d.util.Utils;
 
 /**
  * @author squid233
- * @since 2021/01/26
+ * @since 2021/02/03
  */
-public interface Font {
-    int width();
-
-    int height();
-
-    default int width(String text) {
-        return text.length() * width();
-    }
-
-    default char[] availableChars() {
-        return new char[0];
-    }
-
-    default int textureWidth() {
-        return availableChars().length * width();
-    }
-
-    default int textureHeight() {
-        return height();
-    }
-
-    default boolean contains(char c) {
-        for (char ch : availableChars()) {
-            if (ch == c) {
-                return true;
-            }
+public final class VoxelShapes {
+    private static final VoxelShape FULL_SQUARE = Utils.make(() -> {
+        VoxelSet[] sets = new VoxelSet[256];
+        for (int i = 0; i < sets.length; i++) {
+            sets[i] = new VoxelSet(i % 16, i >> 4);
         }
-        return false;
+        return new VoxelShape(sets);
+    });
+    private static final VoxelShape EMPTY = new VoxelShape();
+
+    public static VoxelShape empty() {
+        return EMPTY;
+    }
+
+    public static VoxelShape fullSquare() {
+        return FULL_SQUARE;
     }
 }

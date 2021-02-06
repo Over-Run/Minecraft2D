@@ -24,12 +24,14 @@
 
 package io.github.overrun.mc2d.client.gui.widget;
 
+import io.github.overrun.mc2d.text.IText;
+
 /**
  * @author squid233
  * @since 2021/01/25
  */
 public abstract class AbstractPressableButtonWidget extends AbstractButtonWidget {
-    public AbstractPressableButtonWidget(int x, int y, int width, int height, String message) {
+    public AbstractPressableButtonWidget(int x, int y, int width, int height, IText message) {
         super(x, y, width, height, message);
     }
 

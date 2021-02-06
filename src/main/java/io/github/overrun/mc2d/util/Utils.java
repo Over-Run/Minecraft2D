@@ -25,6 +25,7 @@
 package io.github.overrun.mc2d.util;
 
 import java.nio.ByteBuffer;
+import java.util.function.Supplier;
 
 /**
  * @author squid233
@@ -45,5 +46,9 @@ public final class Utils {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    public static <T> T make(Supplier<T> supplier) {
+        return supplier.get();
     }
 }

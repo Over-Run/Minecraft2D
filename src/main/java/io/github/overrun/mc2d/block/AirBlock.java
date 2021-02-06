@@ -22,11 +22,21 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.event;
+package io.github.overrun.mc2d.block;
+
+import io.github.overrun.mc2d.util.shape.VoxelShape;
+import io.github.overrun.mc2d.util.shape.VoxelShapes;
 
 /**
  * @author squid233
- * @since 2021/01/26
+ * @since 2021/01/27
  */
-public interface EventContext {
+public class AirBlock extends Block {
+    @Override
+    public VoxelShape getCollisionShape() {
+        return VoxelShapes.empty();
+    }
+
+    @Override
+    public void render(boolean render, boolean dark) { }
 }

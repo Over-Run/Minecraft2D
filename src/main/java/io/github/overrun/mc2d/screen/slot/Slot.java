@@ -31,7 +31,7 @@ package io.github.overrun.mc2d.screen.slot;
 public final class Slot {
     public final int x;
     public final int y;
-    public byte item;
+    public int item;
 
     public Slot(int x, int y) {
         this.x = x;

@@ -24,34 +24,20 @@
 
 package io.github.overrun.mc2d.event;
 
+import org.lwjgl.glfw.GLFWKeyCallbackI;
+
 /**
  * @author squid233
  * @since 2021/01/26
  */
-public interface KeyCallback extends EventPublisher<KeyCallback.Context> {
-    Event<KeyCallback, Context> EVENT = new Event<>(listeners -> context -> {
+public interface KeyCallback extends GLFWKeyCallbackI {
+    Event<KeyCallback> EVENT = new Event<>(listeners -> (window, key, scancode, action, mods) -> {
         for (KeyCallback callback : listeners) {
-            callback.publish(context);
+            callback.invoke(window, key, scancode, action, mods);
         }
     });
 
-    static void post(Context context) {
-        EVENT.invoker.invoke(EVENT.listeners).publish(context);
-    }
-
-    @Override
-    void publish(Context context);
-
-    final class Context implements EventContext {
-        public final long window;
-        public final int key, scancode, action, mods;
-
-        public Context(long window, int key, int scancode, int action, int mods) {
-            this.window = window;
-            this.key = key;
-            this.scancode = scancode;
-            this.action = action;
-            this.mods = mods;
-        }
+    static void post(long window, int key, int scancode, int action, int mods) {
+        EVENT.post().invoke(window, key, scancode, action, mods);
     }
 }

@@ -25,7 +25,9 @@
 package io.github.overrun.mc2d.client.gui;
 
 import io.github.overrun.mc2d.client.font.TextRenderer;
+import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.util.GlUtils;
+import io.github.overrun.mc2d.util.Identifier;
 
 import java.awt.Color;
 
@@ -36,8 +38,10 @@ import static org.lwjgl.opengl.GL11.*;
  * @since 2021/01/25
  */
 public abstract class DrawableHelper {
-    public static void drawCenteredText(TextRenderer renderer, String text, int centerX, int y, int rgba) {
-        renderer.draw(centerX - (text.length() << 3), y, text, rgba);
+    public static final Identifier OPTIONS_BACKGROUND = new Identifier("textures/gui/options_background.png");
+
+    public static void drawCenteredText(TextRenderer renderer, IText text, int centerX, int y) {
+        renderer.drawWithShadow(centerX - (renderer.width(text) >> 1), y, text);
     }
 
     public static void fillGradient(int xStart, int yStart, int xEnd, int yEnd, int colorStart, int colorEnd) {
@@ -62,8 +66,8 @@ public abstract class DrawableHelper {
         glEnable(GL_TEXTURE_2D);
     }
 
-    public static void drawTexture(int x,
-                                   int y,
+    public static void drawTexture(double x,
+                                   double y,
                                    int u,
                                    int v,
                                    int regionW,
@@ -78,21 +82,21 @@ public abstract class DrawableHelper {
         GlUtils.glColor4f(new Color(rgba, true));
         // Left top
         glTexCoord2f((float) u / texW, (float) v / texH);
-        glVertex2f(x, y);
+        glVertex2d(x, y);
         // Left down
         glTexCoord2f((float) u / texW, (float) (v + regionH) / texH);
-        glVertex2f(x, y + (height << 1));
+        glVertex2d(x, y + (height << 1));
         // Right down
         glTexCoord2f((float) (u + regionW) / texW, (float) (v + regionH) / texH);
-        glVertex2f(x + (width << 1), y + (height << 1));
+        glVertex2d(x + (width << 1), y + (height << 1));
         // Right top
         glTexCoord2f((float) (u + regionW) / texW, (float) v / texH);
-        glVertex2f(x + (width << 1), y);
+        glVertex2d(x + (width << 1), y);
         glEnd();
     }
 
-    public static void drawTexture(int x,
-                                   int y,
+    public static void drawTexture(double x,
+                                   double y,
                                    int u,
                                    int v,
                                    int regionW,
@@ -110,7 +114,6 @@ public abstract class DrawableHelper {
                                    double height) {
         glEnable(GL_TEXTURE_2D);
         glBegin(GL_QUADS);
-        glColor4f(1, 1, 1, 1);
         // Left top
         glTexCoord2f(0, 0);
         glVertex2d(x, y);
@@ -126,8 +129,8 @@ public abstract class DrawableHelper {
         glEnd();
     }
 
-    public static void drawTexture(int x,
-                                   int y,
+    public static void drawTexture(double x,
+                                   double y,
                                    int u,
                                    int v,
                                    int regionW,
@@ -137,8 +140,8 @@ public abstract class DrawableHelper {
         drawTexture(x, y, u, v, regionW, regionH, width, height, 256, 256);
     }
 
-    public static void drawTexture(int x,
-                                   int y,
+    public static void drawTexture(double x,
+                                   double y,
                                    int u,
                                    int v,
                                    int width,

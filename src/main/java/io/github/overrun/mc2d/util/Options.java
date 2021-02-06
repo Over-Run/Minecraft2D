@@ -22,9 +22,8 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.option;
+package io.github.overrun.mc2d.util;
 
-import io.github.overrun.mc2d.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -43,10 +42,10 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
  * @since 2021/01/23
  */
 public final class Options {
-    public static final Properties OPTIONS = new Properties(7);
-    public static final String BLOCK_HIGHLIGHT = "block.highlight";
+    public static final Properties OPTIONS = new Properties();
     public static final String KEY_CREATIVE_TAB = "key.creativeTab";
-    private static final Logger logger = LogManager.getLogger();
+    public static final String LANG = "lang";
+    private static final Logger logger = LogManager.getLogger(Options.class.getName());
 
     private static void put(String key, int value) {
         OPTIONS.put(key, String.valueOf(value));
@@ -57,7 +56,7 @@ public final class Options {
         if (!file.exists()) {
             try (OutputStream os = new FileOutputStream(file)) {
                 put(KEY_CREATIVE_TAB, GLFW_KEY_E);
-                OPTIONS.put(BLOCK_HIGHLIGHT, "false");
+                OPTIONS.put(LANG, "en_us");
                 OPTIONS.store(os, null);
             } catch (IOException e) {
                 logger.catching(e);

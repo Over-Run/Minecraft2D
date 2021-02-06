@@ -22,29 +22,30 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.client.font;
+package io.github.overrun.mc2d.text;
 
 /**
  * @author squid233
- * @since 2021/01/26
+ * @since 2021/01/29
  */
-public final class AsciiFont implements Font {
-    @Override
-    public int width() {
-        return 8;
+public interface IText {
+    IText EMPTY = new LiteralText("");
+
+    /**
+     * Cast to string.
+     * <p>May the translated text.</p>
+     *
+     * @return The text.
+     */
+    String asString();
+
+    default Style getStyle() {
+        return Style.EMPTY;
     }
 
-    @Override
-    public int height() {
-        return 16;
-    }
+    IText setStyle(Style style);
 
-    @Override
-    public char[] availableChars() {
-        char[] chars = new char[128];
-        for (int i = 0; i < chars.length; i++) {
-            chars[i] = (char) i;
-        }
-        return chars;
+    default IText withColor(TextColor color) {
+        return setStyle(getStyle().withColor(color));
     }
 }

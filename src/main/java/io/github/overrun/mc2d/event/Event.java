@@ -26,6 +26,7 @@ package io.github.overrun.mc2d.event;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Lightweight event system.
@@ -33,12 +34,12 @@ import java.util.List;
  * @author squid233
  * @since 2021/01/26
  */
-public final class Event<T extends EventPublisher<C>, C extends EventContext> {
+public final class Event<T> {
     public final List<T> listeners = new ArrayList<>();
-    public final Invoker<T> invoker;
+    public final Function<List<T>, T> invokerFactory;
 
-    public Event(Invoker<T> invoker) {
-        this.invoker = invoker;
+    public Event(Function<List<T>, T> invokerFactory) {
+        this.invokerFactory = invokerFactory;
     }
 
     public void register(T listener) {
@@ -47,7 +48,7 @@ public final class Event<T extends EventPublisher<C>, C extends EventContext> {
         }
     }
 
-    public interface Invoker<T> {
-        T invoke(List<T> listeners);
+    public T post() {
+        return invokerFactory.apply(listeners);
     }
 }

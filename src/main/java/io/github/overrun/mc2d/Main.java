@@ -25,12 +25,19 @@
 package io.github.overrun.mc2d;
 
 import io.github.overrun.mc2d.client.Mc2dClient;
-import io.github.overrun.mc2d.client.WindowEventHandler;
+import io.github.overrun.mc2d.client.Mouse;
+import io.github.overrun.mc2d.client.Window;
 import io.github.overrun.mc2d.event.KeyCallback;
-import io.github.overrun.mc2d.option.Options;
+import io.github.overrun.mc2d.item.Items;
+import io.github.overrun.mc2d.mod.ModLoader;
+import io.github.overrun.mc2d.text.IText;
+import io.github.overrun.mc2d.text.LiteralText;
 import io.github.overrun.mc2d.util.ImageReader;
+import io.github.overrun.mc2d.util.Language;
+import io.github.overrun.mc2d.util.Options;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -38,13 +45,9 @@ import org.lwjgl.system.MemoryStack;
 
 import java.io.Closeable;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
-import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memUTF8;
 
 /**
@@ -52,91 +55,115 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
  * @since 2021/01/07
  */
 public final class Main implements Runnable, Closeable {
-    public static final String VERSION = "0.4.0";
-    private static final Logger logger = LogManager.getLogger();
-    private static final List<WindowEventHandler> WINDOW_EVENT_HANDLERS = new ArrayList<>(1);
-    private final Mc2dClient client = registerWindowEventHandler(Mc2dClient.getInstance());
-    private long window;
+    // todo mods screen
 
-    public <T extends WindowEventHandler> T registerWindowEventHandler(T handler) {
-        WINDOW_EVENT_HANDLERS.add(handler);
-        return handler;
-    }
+    public static final String VERSION = "0.5.0";
+    public static final IText VERSION_TEXT = new LiteralText("Minecraft2D " + VERSION);
+    private static final Logger logger = LogManager.getLogger(Main.class.getName());
+    private static int oldX, oldY, oldWidth, oldHeight;
+    private final Mc2dClient client = Mc2dClient.getInstance();
 
     @Override
     public void run() {
         logger.info("Loading for game Minecraft2D {}", VERSION);
         init();
-        glClearColor(.4f, .6f, .9f, .1f);
+        try {
+            Class.forName(Items.class.getName());
+        } catch (ClassNotFoundException e) {
+            logger.catching(e);
+        }
+        ModLoader.loadMods();
+        Language.init();
+        Language.currentLang = Options.get("lang", "en_us");
+        logger.info("Backend library: LWJGL version {}", Version.getVersion());
+        glClearColor(.4f, .6f, .9f, 1);
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        while (!glfwWindowShouldClose(window)) {
+        while (!Window.shouldClose()) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             client.render();
             client.tick();
-            glfwSwapBuffers(window);
+            Window.swapBuffers();
             glfwPollEvents();
         }
     }
 
     private void init() {
         GLFWErrorCallback.create((error, description) -> {
-            String desc = memUTF8(description);
             logger.error("########## GL ERROR ##########");
-            logger.error("{}: {}", error, desc);
+            logger.error("{}: {}", error, memUTF8(description));
         });
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-        window = glfwCreateWindow(896, 512, "Minecraft2D " + VERSION, NULL, NULL);
-        if (window == NULL) {
-            throw new RuntimeException("Failed to create the GLFW window");
-        }
-        ImageReader.withGlfwImg("assets/mc2d/icon.png",
-                imgs -> glfwSetWindowIcon(window, imgs));
-        glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
-            KeyCallback.post(new KeyCallback.Context(window, key, scancode, action, mods));
+        Window.create(896, 512, VERSION_TEXT.asString());
+        Window.check();
+        ImageReader.withGlfwImg("assets/mc2d/icon.png", Window::setIcon);
+        Window.setKeyCallback((window, key, scancode, action, mods) -> {
+            KeyCallback.post(window, key, scancode, action, mods);
             if (action == GLFW_PRESS) {
                 client.screen.keyPressed(key, scancode, mods);
+                if (key == GLFW_KEY_F11) {
+                    GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+                    if (glfwGetWindowMonitor(window) == 0) {
+                        try (MemoryStack stack = MemoryStack.stackPush()) {
+                            IntBuffer pX = stack.mallocInt(1);
+                            IntBuffer pY = stack.mallocInt(1);
+                            glfwGetWindowPos(window, pX, pY);
+                            oldX = pX.get(0);
+                            oldY = pY.get(0);
+                        }
+                        oldWidth = Window.width;
+                        oldHeight = Window.height;
+                        if (vidMode != null) {
+                            glfwSetWindowMonitor(window,
+                                    glfwGetPrimaryMonitor(),
+                                    0,
+                                    0,
+                                    vidMode.width(),
+                                    vidMode.height(),
+                                    vidMode.refreshRate());
+                        }
+                    } else {
+                        glfwSetWindowMonitor(window, 0, oldX, oldY, oldWidth, oldHeight, 0);
+                    }
+                }
             }
         });
-        glfwSetMouseButtonCallback(window, (window, button, action, mods) -> {
+        Window.setMouseButtonCallback((window, button, action, mods) -> {
             if (action == GLFW_PRESS) {
-                client.screen.mouseClicked(client.mouseX, client.mouseY, button);
+                client.screen.mousePressed(Mouse.mouseX, Mouse.mouseY, button);
             }
         });
-        glfwSetWindowCloseCallback(window, window -> {
+        Window.setCloseCallback(window -> {
             if (client.world != null) {
                 client.world.save();
             }
         });
-        glfwSetWindowSizeCallback(window, (window, width, height) -> resize(width, height));
-        glfwSetCursorPosCallback(window, (window, x, y) -> {
-            for (WindowEventHandler handler : WINDOW_EVENT_HANDLERS) {
-                handler.onMouseMove((int) Math.floor(x), (int) Math.floor(y));
-            }
+        Window.setSizeCallback((window, width, height) -> resize(width, height));
+        Window.setCursorPosCallback((window, x, y) -> {
+            Mouse.mouseX = (int) Math.floor(x);
+            Mouse.mouseY = (int) Math.floor(y);
         });
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer pWidth = stack.mallocInt(1);
             IntBuffer pHeight = stack.mallocInt(1);
-            glfwGetWindowSize(window, pWidth, pHeight);
+            Window.getSize(pWidth, pHeight);
             GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
             if (vidMode != null) {
-                glfwSetWindowPos(
-                        window,
-                        (vidMode.width() - pWidth.get(0)) >> 1,
-                        (vidMode.height() - pHeight.get(0)) >> 1
+                Window.setPos(
+                        vidMode.width() - pWidth.get(0) >> 1,
+                        vidMode.height() - pHeight.get(0) >> 1
                 );
             }
         }
-        glfwMakeContextCurrent(window);
+        Window.makeContextCurrent();
         GL.createCapabilities();
-        client.player = new Player();
         glfwSwapInterval(1);
-        glfwShowWindow(window);
+        Window.show();
     }
 
     private void resize(int width, int height) {
@@ -145,9 +172,9 @@ public final class Main implements Runnable, Closeable {
         if (client.screen == null) {
             client.openScreen(null);
         }
-        for (WindowEventHandler handler : WINDOW_EVENT_HANDLERS) {
-            handler.onResize(w, h);
-        }
+        Window.width = w;
+        Window.height = h;
+        client.screen.init(client, width, height);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glOrtho(0, w, h, 0, 1, -1);
@@ -159,8 +186,7 @@ public final class Main implements Runnable, Closeable {
     public void close() {
         client.close();
         logger.info("Stopping!");
-        glfwFreeCallbacks(window);
-        glfwDestroyWindow(window);
+        Window.destroy();
         glfwTerminate();
         GLFWErrorCallback gec = glfwSetErrorCallback(null);
         if (gec != null) {

@@ -25,14 +25,17 @@
 package io.github.overrun.mc2d.client.gui.screen;
 
 import io.github.overrun.mc2d.Main;
-import io.github.overrun.mc2d.client.gui.screen.ingame.InGameScreen;
+import io.github.overrun.mc2d.Player;
 import io.github.overrun.mc2d.client.gui.screen.world.LoadingWorldScreen;
 import io.github.overrun.mc2d.client.gui.widget.ButtonWidget;
 import io.github.overrun.mc2d.level.World;
+import io.github.overrun.mc2d.text.IText;
+import io.github.overrun.mc2d.text.TranslatableText;
 import io.github.overrun.mc2d.util.Identifier;
 
 import static org.lwjgl.glfw.GLFW.glfwGetCurrentContext;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
+import static org.lwjgl.opengl.GL11.glColor4f;
 
 /**
  * @author squid233
@@ -41,7 +44,7 @@ import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
 public final class TitleScreen extends Screen {
     public static final Identifier LOGO = new Identifier("textures/gui/logo.png");
     public TitleScreen() {
-        super("");
+        super(IText.EMPTY);
     }
 
     @Override
@@ -51,8 +54,9 @@ public final class TitleScreen extends Screen {
                 (height - 40 >> 1) - 50,
                 200,
                 20,
-                "Play",
+                new TranslatableText("Play"),
                 b -> {
+                    client.player = new Player();
                     client.world = new World(client.player, 64, 64);
                     client.openScreen(new LoadingWorldScreen());
                 }));
@@ -60,13 +64,13 @@ public final class TitleScreen extends Screen {
                 height - 40 >> 1,
                 200,
                 20,
-                "Mods",
+                new TranslatableText("Mods"),
                 b -> {})).active = false;
         addButton(new ButtonWidget(width - 400 >> 1,
                 (height - 40 >> 1) + 50,
                 200,
                 20,
-                "Exit Game",
+                new TranslatableText("Exit.Game"),
                 b -> glfwSetWindowShouldClose(glfwGetCurrentContext(), true)));
     }
 
@@ -74,9 +78,10 @@ public final class TitleScreen extends Screen {
     public void render(int mouseX, int mouseY) {
         renderBackground();
         super.render(mouseX, mouseY);
+        glColor4f(1, 1, 1, 1);
         client.getTextureManager().bindTexture(LOGO);
         drawTexture((width >> 1) - 202, 15, 404, 84);
-        textRenderer.draw(0, height - 20, "Minecraft2D " + Main.VERSION);
+        textRenderer.draw(0, height - 16, Main.VERSION_TEXT);
     }
 
     @Override

@@ -34,6 +34,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -41,7 +42,23 @@ import java.util.function.Consumer;
  * @since 2021/01/07
  */
 public final class ImageReader {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger(ImageReader.class.getName());
+
+    public static BufferedImage read(String path, ClassLoader loader) {
+        try {
+            return ImageIO.read(
+                    Objects.requireNonNull(
+                            Objects.requireNonNullElse(
+                                    loader,
+                                    ClassLoader.getSystemClassLoader()
+                            ).getResource(path)
+                    )
+            );
+        } catch (Throwable t) {
+            logger.catching(t);
+            return null;
+        }
+    }
 
     /**
      * Read an image as {@link BufferedImage}.
@@ -50,12 +67,7 @@ public final class ImageReader {
      * @return Read {@link BufferedImage}.
      */
     public static BufferedImage read(String path) {
-        try {
-            return ImageIO.read(ClassLoader.getSystemResource(path));
-        } catch (Throwable t) {
-            logger.catching(t);
-            return null;
-        }
+        return read(path, ClassLoader.getSystemClassLoader());
     }
 
     public static Texture readImg(String path) {

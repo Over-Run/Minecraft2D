@@ -1,0 +1,16 @@
+language.name=简体中文
+language.code=zh_cn
+Play=开始游戏
+Mods=Mods
+Exit.Game=退出游戏
+Creative.Tab=创造模式物品栏
+Pausing=暂停中
+Back.to.Game=返回游戏
+Save.and.Back.to.Title.Screen=保存并返回标题画面
+Loading.World=加载世界中
+Max.memory=最大内存：%s
+Pos=坐标：%.4f, %.4f
+Handled.block=手持方块：%s
+Point.block.pos=指向方块坐标：%d, %d, %d
+Point.block=指向方块：%s
+Mods.count=Mods：%d

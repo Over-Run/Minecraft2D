@@ -24,18 +24,29 @@
 
 package io.github.overrun.mc2d;
 
+import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.client.Window;
+import io.github.overrun.mc2d.client.gui.Drawable;
+import io.github.overrun.mc2d.client.gui.DrawableHelper;
+import io.github.overrun.mc2d.util.Identifier;
+
 import java.io.Serializable;
 
-import static io.github.overrun.mc2d.util.GlfwUtils.isKeyPress;
+import static io.github.overrun.mc2d.client.Keyboard.isKeyPress;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author squid233
  * @since 2021/01/09
  */
-public final class Player implements Serializable {
+public final class Player extends DrawableHelper implements Serializable, Drawable {
+    public static final Identifier HEAD_TEXTURE = new Identifier("char_head.png");
+    public static final Identifier BODY_TEXTURE = new Identifier("char_body.png");
     private static final long serialVersionUID = 1L;
-    public transient byte handledBlock = 1;
+    public transient int handledBlock = 1;
+    public transient int headTexCoord;
+    public transient int bodyTexCoord;
     public double x = .5;
     public double y = 6;
 
@@ -43,10 +54,14 @@ public final class Player implements Serializable {
         if (isKeyPress(GLFW_KEY_A)
                 || isKeyPress(GLFW_KEY_LEFT)) {
             x -= .0625;
+            headTexCoord = 8;
+            bodyTexCoord = 4;
         }
         if (isKeyPress(GLFW_KEY_D)
                 || isKeyPress(GLFW_KEY_RIGHT)) {
             x += .0625;
+            headTexCoord = 0;
+            bodyTexCoord = 0;
         }
         if (isKeyPress(GLFW_KEY_SPACE)
                 || isKeyPress(GLFW_KEY_W)
@@ -59,5 +74,22 @@ public final class Player implements Serializable {
         ) {
             y -= .0625;
         }
+    }
+
+    @Override
+    public void render(int mouseX, int mouseY) {
+        Mc2dClient client = Mc2dClient.getInstance();
+        double x = Window.width >> 1;
+        double y = Window.height >> 1;
+        client.getTextureManager().bindTexture(BODY_TEXTURE);
+        glPushMatrix();
+        glTranslatef(0, -48, 0);
+        drawTexture(x - 8, y, bodyTexCoord, 0, 4, 12, 8, 24, 16, 12);
+        glTranslatef(0, -48, 0);
+        drawTexture(x - 8, y, bodyTexCoord + 8, 0, 4, 12, 8, 24, 16, 12);
+        client.getTextureManager().bindTexture(HEAD_TEXTURE);
+        glTranslatef(0, -32, 0);
+        drawTexture(x - 16, y, headTexCoord, 0, 8, 8, 16, 16, 16, 8);
+        glPopMatrix();
     }
 }
