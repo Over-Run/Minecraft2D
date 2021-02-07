@@ -70,9 +70,9 @@ public final class ModLoader {
                     String modid = null, name, version, main;
                     try {
                         ClassLoader loader = new URLClassLoader(new URL[]{file.toURI().toURL()}, Thread.currentThread().getContextClassLoader());
-                        InputStream is = loader.getResourceAsStream("mc2d.mod.prop");
-                        if (is != null) {
-                            try (is) {
+                        InputStream propIs = loader.getResourceAsStream("mc2d.mod.prop");
+                        if (propIs != null) {
+                            try (propIs; InputStream is = propIs) {
                                 Properties prop = new Properties(4);
                                 prop.load(is);
                                 modid = prop.getProperty("modid");

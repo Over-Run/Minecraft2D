@@ -121,7 +121,7 @@ public final class ImageReader {
      * @see ImageReader#withGlfwImg(String, Consumer)
      */
     public static void withGlfwImg(GLFWImage.Buffer img, Consumer<GLFWImage.Buffer> consumer) {
-        try (GLFWImage.Buffer buffer = img) {
+        try (img; GLFWImage.Buffer buffer = img) {
             consumer.accept(buffer);
         }
     }
