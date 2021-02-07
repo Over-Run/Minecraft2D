@@ -34,9 +34,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 import java.util.function.Consumer;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * @author squid233
@@ -48,10 +47,10 @@ public final class ImageReader {
     public static BufferedImage read(String path, ClassLoader loader) {
         try {
             return ImageIO.read(
-                    requireNonNull(
-                            (loader != null
-                                    ? loader
-                                    : requireNonNull(ClassLoader.getSystemClassLoader(), "defaultObj")
+                    Objects.requireNonNull(
+                            Objects.requireNonNullElse(
+                                    loader,
+                                    ClassLoader.getSystemClassLoader()
                             ).getResource(path)
                     )
             );
@@ -121,8 +120,8 @@ public final class ImageReader {
      * @see ImageReader#withGlfwImg(String, Consumer)
      */
     public static void withGlfwImg(GLFWImage.Buffer img, Consumer<GLFWImage.Buffer> consumer) {
-        try (img; GLFWImage.Buffer buffer = img) {
-            consumer.accept(buffer);
+        try (img) {
+            consumer.accept(img);
         }
     }
 
