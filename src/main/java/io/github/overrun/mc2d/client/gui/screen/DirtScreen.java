@@ -37,9 +37,9 @@ public class DirtScreen extends Screen {
     }
 
     @Override
-    public void render(int mouseX, int mouseY) {
+    public void render(int mouseX, int mouseY, float delta) {
         renderBackgroundTexture();
-        super.render(mouseX, mouseY);
+        super.render(mouseX, mouseY, delta);
         drawCenteredText(textRenderer, title.withColor(TextColor.WHITE), width >> 1, 50);
     }
 }

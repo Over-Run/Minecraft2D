@@ -29,7 +29,11 @@ package io.github.overrun.mc2d.text;
  * @since 2021/01/29
  */
 public interface IText {
-    IText EMPTY = new LiteralText("");
+    IText EMPTY = of("");
+
+    static IText of(String text) {
+        return new LiteralText(text);
+    }
 
     /**
      * Cast to string.

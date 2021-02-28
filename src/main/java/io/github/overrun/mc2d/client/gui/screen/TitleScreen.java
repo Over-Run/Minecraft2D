@@ -75,9 +75,9 @@ public final class TitleScreen extends Screen {
     }
 
     @Override
-    public void render(int mouseX, int mouseY) {
+    public void render(int mouseX, int mouseY, float delta) {
         renderBackground();
-        super.render(mouseX, mouseY);
+        super.render(mouseX, mouseY, delta);
         glColor4f(1, 1, 1, 1);
         client.getTextureManager().bindTexture(LOGO);
         drawTexture((width >> 1) - 202, 15, 404, 84);

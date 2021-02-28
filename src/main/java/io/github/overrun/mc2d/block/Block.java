@@ -70,7 +70,8 @@ public class Block implements ItemConvertible {
         if (render) {
             Identifier id = Registry.BLOCK.getId(this);
             glColor4f(1, 1, 1, 1);
-            Mc2dClient.getInstance().getTextureManager().bindTexture(new Identifier(id.getNamespace(), "textures/block/" + id.getPath() + ".png"));
+            Mc2dClient.getInstance().getTextureManager().bindTexture(
+                    new Identifier(id.getNamespace(), "textures/block/" + id.getPath() + ".png"));
             drawTexture(x, y, 32, 32);
             if (dark) {
                 glDisable(GL_TEXTURE_2D);

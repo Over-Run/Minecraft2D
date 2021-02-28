@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2021 Over-Run
+ * Copyright (c) 2020-2021 OverRun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,42 +22,18 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.util.shape;
-
-import java.util.Objects;
-import java.util.StringJoiner;
+package io.github.overrun.mc2d.client.gui;
 
 /**
  * @author squid233
- * @since 2021/02/03
+ * @since 2021/02/28
  */
-public final class VoxelSet {
-    public final int x;
-    public final int y;
+public final class Framebuffer {
+    public static int width;
+    public static int height;
 
-    public VoxelSet(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-        VoxelSet voxelSet = (VoxelSet) o;
-        return x == voxelSet.x && y == voxelSet.y;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(x, y);
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", VoxelSet.class.getSimpleName() + "{", "}")
-                .add("x=" + x)
-                .add("y=" + y)
-                .toString();
+    public static void setSize(int width, int height) {
+        Framebuffer.width = width;
+        Framebuffer.height = height;
     }
 }

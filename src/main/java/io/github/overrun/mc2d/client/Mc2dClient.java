@@ -24,12 +24,15 @@
 
 package io.github.overrun.mc2d.client;
 
+import io.github.overrun.mc2d.Main;
 import io.github.overrun.mc2d.Player;
-import io.github.overrun.mc2d.client.font.TextRenderer;
+import io.github.overrun.mc2d.client.gui.Framebuffer;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
 import io.github.overrun.mc2d.client.gui.screen.TitleScreen;
-import io.github.overrun.mc2d.client.texture.TextureManager;
 import io.github.overrun.mc2d.level.World;
+import io.github.overrun.mc2d.mod.ModLoader;
+import io.github.overrun.mc2d.text.IText;
+import io.github.overrun.mc2d.text.TranslatableText;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
@@ -40,11 +43,19 @@ import java.io.Closeable;
  */
 public final class Mc2dClient implements Closeable {
     private static final Mc2dClient INSTANCE = new Mc2dClient();
+    private static final IText MAX_MEMORY;
     public final TextRenderer textRenderer;
     private final TextureManager textureManager;
     public Screen screen;
     public @Nullable World world;
     public Player player;
+    public int fps;
+    public boolean debugging;
+
+    static {
+        double maxMemory = Runtime.getRuntime().maxMemory() / 1048576D;
+        MAX_MEMORY = new TranslatableText("Max.memory", maxMemory >= 1024 ? maxMemory / 1024D + " GB" : maxMemory + " MB");
+    }
 
     private Mc2dClient() {
         textRenderer = new TextRenderer(this);
@@ -60,12 +71,27 @@ public final class Mc2dClient implements Closeable {
         }
         this.screen = screen;
         if (screen != null) {
-            screen.init(this, Window.width, Window.height);
+            screen.init(this, Framebuffer.width, Framebuffer.height);
         }
     }
 
-    public void render() {
-        screen.render(Mouse.mouseX, Mouse.mouseY);
+    public void renderHud() {
+        if (debugging) {
+            textRenderer.draw(0, 0, Main.VERSION_TEXT);
+            textRenderer.draw(0, 17, IText.of(fps + " fps"));
+            textRenderer.draw(0, 34, new TranslatableText("player.position", player.x, player.y, player.z));
+            textRenderer.draw(0, 51, new TranslatableText("player.hand.block", player.handledBlock));
+//            textRenderer.draw(0, 68, new TranslatableText("Point.block.pos", pointBlockX, pointBlockY, pointBlockZ));
+//            textRenderer.draw(0, 85, new TranslatableText("Point.block", pointBlock));
+            textRenderer.draw(0, 102, MAX_MEMORY);
+            if (ModLoader.getModCount() > 0) {
+                textRenderer.draw(0, 119, new TranslatableText("mods.count", ModLoader.getModCount()));
+            }
+        }
+    }
+
+    public void render(float delta) {
+        screen.render(Mouse.mouseX, Mouse.mouseY, delta);
     }
 
     public void tick() {

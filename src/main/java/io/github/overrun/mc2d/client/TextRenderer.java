@@ -22,9 +22,8 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.client.font;
+package io.github.overrun.mc2d.client;
 
-import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.gui.DrawableHelper;
 import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.util.Identifier;

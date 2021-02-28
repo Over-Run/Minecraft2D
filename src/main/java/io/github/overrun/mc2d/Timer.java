@@ -22,19 +22,46 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.util.shape;
+package io.github.overrun.mc2d;
 
 /**
  * @author squid233
- * @since 2021/02/03
+ * @since 2021/02/28
  */
-public final class VoxelShape {
-    public final int x0, y0, x1, y1;
+public final class Timer {
+    private static final long NS_PER_SECOND = 1000000000L;
+    private static final long MAX_NS_PER_UPDATE = 1000000000L;
+    private static final int MAX_TICKS_PER_UPDATE = 100;
+    private final float tps;
+    private long lastTime;
+    public int ticks;
+    public float delta;
+    public float timeScale = 1;
+    public float fps;
+    public float passedTime;
 
-    public VoxelShape(int x0, int y0, int x1, int y1) {
-        this.x0 = x0;
-        this.y0 = y0;
-        this.x1 = x1;
-        this.y1 = y1;
+    public Timer(float tps) {
+        this.tps = tps;
+        lastTime = System.nanoTime();
+    }
+
+    public void advanceTime() {
+        long now = System.nanoTime();
+        long passedNs = now - lastTime;
+        lastTime = now;
+        if (passedNs < 0L) {
+            passedNs = 0L;
+        }
+        if (passedNs > MAX_NS_PER_UPDATE) {
+            passedNs = MAX_NS_PER_UPDATE;
+        }
+        fps = (float) (NS_PER_SECOND / passedNs);
+        passedTime += (float) passedNs * timeScale * tps / NS_PER_SECOND;
+        ticks = (int) passedTime;
+        if (ticks > MAX_TICKS_PER_UPDATE) {
+            ticks = MAX_TICKS_PER_UPDATE;
+        }
+        passedTime -= (float) ticks;
+        delta = passedTime;
     }
 }

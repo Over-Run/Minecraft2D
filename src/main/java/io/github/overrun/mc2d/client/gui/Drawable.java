@@ -29,5 +29,5 @@ package io.github.overrun.mc2d.client.gui;
  * @since 2021/01/25
  */
 public interface Drawable {
-    void render(int mouseX, int mouseY);
+    void render(int mouseX, int mouseY, float delta);
 }

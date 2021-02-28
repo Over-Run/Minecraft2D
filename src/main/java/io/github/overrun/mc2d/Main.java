@@ -27,6 +27,7 @@ package io.github.overrun.mc2d;
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.Mouse;
 import io.github.overrun.mc2d.client.Window;
+import io.github.overrun.mc2d.client.gui.Framebuffer;
 import io.github.overrun.mc2d.event.KeyCallback;
 import io.github.overrun.mc2d.item.Items;
 import io.github.overrun.mc2d.mod.ModLoader;
@@ -46,6 +47,7 @@ import org.lwjgl.system.MemoryStack;
 import java.io.Closeable;
 import java.nio.IntBuffer;
 
+import static java.lang.Math.max;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.memUTF8;
@@ -57,11 +59,12 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
 public final class Main implements Runnable, Closeable {
     // todo mods screen
 
-    public static final String VERSION = "0.5.0";
+    public static final String VERSION = "0.6.0";
     public static final IText VERSION_TEXT = new LiteralText("Minecraft2D " + VERSION);
     private static final Logger logger = LogManager.getLogger(Main.class.getName());
     private static int oldX, oldY, oldWidth, oldHeight;
     private final Mc2dClient client = Mc2dClient.getInstance();
+    private final Timer timer = new Timer(Integer.parseInt(System.getProperty("mc2d.tps", "20")));
 
     @Override
     public void run() {
@@ -80,12 +83,23 @@ public final class Main implements Runnable, Closeable {
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        long lastTime = System.currentTimeMillis();
+        int frames = 0;
         while (!Window.shouldClose()) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            client.render();
-            client.tick();
+            timer.advanceTime();
+            for (int i = 0; i < timer.ticks; i++) {
+                client.tick();
+            }
+            client.render(timer.delta);
             Window.swapBuffers();
             glfwPollEvents();
+            ++frames;
+            while (System.currentTimeMillis() >= lastTime + 1000) {
+                client.fps = frames;
+                lastTime += 1000;
+                frames = 0;
+            }
         }
     }
 
@@ -144,6 +158,7 @@ public final class Main implements Runnable, Closeable {
             }
         });
         Window.setSizeCallback((window, width, height) -> resize(width, height));
+        Window.setFramebufferSizeCallback((window, width, height) -> Framebuffer.setSize(width, height));
         Window.setCursorPosCallback((window, x, y) -> {
             Mouse.mouseX = (int) Math.floor(x);
             Mouse.mouseY = (int) Math.floor(y);
@@ -162,24 +177,26 @@ public final class Main implements Runnable, Closeable {
         }
         Window.makeContextCurrent();
         GL.createCapabilities();
-        glfwSwapInterval(1);
+        glfwSwapInterval(Boolean.parseBoolean(System.getProperty("mc2d.vsync", "true")) ? 1 : 0);
         Window.show();
     }
 
     private void resize(int width, int height) {
-        int w = Math.max(width, 1);
-        int h = Math.max(height, 1);
+        int w = max(width, 1);
+        int h = max(height, 1);
+        int fw = max(Framebuffer.width, 1);
+        int fh = max(Framebuffer.height, 1);
         if (client.screen == null) {
             client.openScreen(null);
         }
         Window.width = w;
         Window.height = h;
-        client.screen.init(client, width, height);
+        client.screen.init(client, fw, fh);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, w, h, 0, 1, -1);
+        glOrtho(0, fw, fh, 0, 1, -1);
         glMatrixMode(GL_MODELVIEW);
-        glViewport(0, 0, w, h);
+        glViewport(0, 0, fw, fh);
     }
 
     @Override

@@ -15,13 +15,13 @@ This game is publishing on [itch.io](https://squid233.itch.io/minecraft2d), too.
 
 Minecraft2D 0.3.0 has sealed all libraries, so you can use command `java -jar mc2d-0.3.0.jar` in terminal.
 
-<!-- We'll make a launcher to quick download and launch the game. The jar file will be more small. -->
+Since 0.5.0, you must play game with the [launcher](https://over-run.github.io/mc2d/launcher/mc2d-launcher-0.1.0.jar)
 
 ## Links
 
 现在就加入我们的QQ~~吹水~~群！[![Java 开发交流群](https://pub.idqqimg.com/wpa/images/group.png)](https://qm.qq.com/cgi-bin/qm/qr?k=efwa2cjVSs-S_UorWELGd45SPTJBTGV6&jump_from=webapi)
 
-看看[Fandom Wiki](https://minecraft2d.fandom.com/zh/wiki/) (基本停更)!
+看看[Fandom Wiki](https://minecraft2d.fandom.com/zh/wiki/)!
 
 在 [官方网站](https://over-run.github.io/wiki/mc2d/) (404) 上看我们的游戏!
 

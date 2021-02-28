@@ -26,7 +26,7 @@ package io.github.overrun.mc2d.client.gui.screen;
 
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.Mouse;
-import io.github.overrun.mc2d.client.font.TextRenderer;
+import io.github.overrun.mc2d.client.TextRenderer;
 import io.github.overrun.mc2d.client.gui.AbstractParentElement;
 import io.github.overrun.mc2d.client.gui.Drawable;
 import io.github.overrun.mc2d.client.gui.Element;
@@ -115,12 +115,12 @@ public abstract class Screen extends AbstractParentElement implements TickableEl
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW_KEY_ESCAPE && shouldCloseOnEsc()) {
+    public boolean keyPressed(int key, int scancode, int mods) {
+        if (key == GLFW_KEY_ESCAPE && shouldCloseOnEsc()) {
             client.screen.onClose();
             return true;
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(key, scancode, mods);
     }
 
     @Override
@@ -134,9 +134,9 @@ public abstract class Screen extends AbstractParentElement implements TickableEl
     }
 
     @Override
-    public void render(int mouseX, int mouseY) {
+    public void render(int mouseX, int mouseY, float delta) {
         for (AbstractButtonWidget button : buttons) {
-            button.render(mouseX, mouseY);
+            button.render(mouseX, mouseY, delta);
         }
     }
 }

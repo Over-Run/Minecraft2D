@@ -25,11 +25,11 @@
 package io.github.overrun.mc2d.client.gui.screen.ingame;
 
 import io.github.overrun.mc2d.client.Mouse;
+import io.github.overrun.mc2d.client.TextureManager;
 import io.github.overrun.mc2d.client.gui.DrawableHelper;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
-import io.github.overrun.mc2d.client.texture.TextureManager;
 import io.github.overrun.mc2d.item.BlockItem;
-import io.github.overrun.mc2d.item.ItemConvertible;
+import io.github.overrun.mc2d.item.Item;
 import io.github.overrun.mc2d.screen.ScreenHandler;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.text.IText;
@@ -75,8 +75,8 @@ public abstract class HandledScreen<T extends ScreenHandler> extends Screen {
      *     <li>{@link DrawableHelper#drawTexture(double, double, int, int, int, int) Draw texture}</li>
      * </ol>
      *
-     * @param mouseX X of mouse pos.
-     * @param mouseY Y of mouse pos.
+     * @param mouseX Mouse pos x.
+     * @param mouseY Mouse pos y.
      */
     protected abstract void drawBackground(int mouseX, int mouseY);
 
@@ -92,9 +92,9 @@ public abstract class HandledScreen<T extends ScreenHandler> extends Screen {
     }
 
     @Override
-    public void render(int mouseX, int mouseY) {
+    public void render(int mouseX, int mouseY, float delta) {
         drawBackground(mouseX, mouseY);
-        super.render(mouseX, mouseY);
+        super.render(mouseX, mouseY, delta);
         for (Slot slot : handler.slots) {
             drawSlot(slot);
             mouseOverSlotEffect(slot, mouseX, mouseY);
@@ -117,13 +117,13 @@ public abstract class HandledScreen<T extends ScreenHandler> extends Screen {
     }
 
     private void drawSlot(Slot slot) {
-        ItemConvertible ic = Registry.ITEM.getByRawId(slot.item);
-        glColor4f(1, 1, 1, 1);
-        if (ic instanceof BlockItem) {
-            Identifier id = Registry.BLOCK.getId(((BlockItem) ic).getBlock());
+        Item item = slot.item;
+        glColor3f(1, 1, 1);
+        if (item instanceof BlockItem) {
+            Identifier id = Registry.BLOCK.getId(((BlockItem) item).getBlock());
             client.getTextureManager().bindTexture(new Identifier(id.getNamespace(), "textures/block/" + id.getPath() + ".png"));
         } else {
-            Identifier id = Registry.ITEM.getId(ic.asItem());
+            Identifier id = Registry.ITEM.getId(item.asItem());
             client.getTextureManager().bindTexture(new Identifier(id.getNamespace(), "textures/item/" + id.getPath() + ".png"));
         }
         drawTexture(slot.x, slot.y, 32, 32);

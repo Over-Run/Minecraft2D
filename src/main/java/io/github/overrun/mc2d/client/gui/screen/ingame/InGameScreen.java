@@ -28,11 +28,11 @@ import io.github.overrun.mc2d.Player;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
 import io.github.overrun.mc2d.level.World;
 import io.github.overrun.mc2d.text.IText;
-import io.github.overrun.mc2d.util.GlUtils;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.Options;
-import io.github.overrun.mc2d.util.registry.Registry;
 
+import static io.github.overrun.mc2d.block.Blocks.*;
+import static io.github.overrun.mc2d.util.registry.Registry.BLOCK;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
@@ -56,44 +56,67 @@ public final class InGameScreen extends Screen {
     }
 
     @Override
-    public void render(int mouseX, int mouseY) {
-        super.render(mouseX, mouseY);
+    public void tick() {
+        player.tick();
+    }
+
+    @Override
+    public void render(int mouseX, int mouseY, float delta) {
+        super.render(mouseX, mouseY, delta);
         if (world != null) {
             world.render(mouseX, mouseY);
         }
         glPushMatrix();
         glTranslatef(width - 64, 0, 0);
-        Identifier id = Registry.BLOCK.getId(Registry.BLOCK.getByRawId(player.handledBlock));
-        glColor4f(1, 1, 1, 1);
+        Identifier id = BLOCK.getId(player.handledBlock);
+        glColor3f(1, 1, 1);
         client.getTextureManager().bindTexture(new Identifier(id.getNamespace(), "textures/block/" + id.getPath() + ".png"));
         drawTexture(0, 0, 64, 64);
-        glDisable(GL_TEXTURE_2D);
-        GlUtils.fillRect(0, 64, 64, 32, 0xf, true);
-        glEnable(GL_TEXTURE_2D);
         glPopMatrix();
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW_KEY_ENTER && world != null) {
+    public boolean keyPressed(int key, int scancode, int mods) {
+        if (key == GLFW_KEY_ENTER && world != null) {
             world.save();
+            return true;
         }
-        if (keyCode == GLFW_KEY_1) {
-            player.handledBlock = 1;
+        if (key == GLFW_KEY_1) {
+            player.handledBlock = GRASS_BLOCK;
+            return true;
         }
-        if (keyCode == GLFW_KEY_2) {
-            player.handledBlock = 2;
+        if (key == GLFW_KEY_2) {
+            player.handledBlock = DIRT;
+            return true;
         }
-        if (keyCode == GLFW_KEY_3) {
-            player.handledBlock = 3;
+        if (key == GLFW_KEY_3) {
+            player.handledBlock = COBBLESTONE;
+            return true;
         }
-        if (keyCode == GLFW_KEY_4) {
-            player.handledBlock = 4;
+        if (key == GLFW_KEY_4) {
+            player.handledBlock = BEDROCK;
+            return true;
         }
-        if (keyCode == Options.getI(Options.KEY_CREATIVE_TAB, GLFW_KEY_E)) {
+        if (key == GLFW_KEY_F3) {
+            client.debugging = !client.debugging;
+            return true;
+        }
+        // , || .
+        if (key == GLFW_KEY_COMMA || key == GLFW_KEY_PERIOD) {
+            --World.z;
+            if (World.z < 0) {
+                World.z = 1;
+            }
+            if (World.z > 1) {
+                World.z = 0;
+            }
+            return true;
+        }
+        if (key == Options.getI(Options.KEY_CREATIVE_TAB, GLFW_KEY_E)) {
             client.openScreen(new CreativeTabScreen(player, this));
+            return true;
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(key, scancode, mods);
     }
 
     @Override

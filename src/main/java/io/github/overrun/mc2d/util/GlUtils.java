@@ -24,36 +24,17 @@
 
 package io.github.overrun.mc2d.util;
 
-import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.Color;
-import java.nio.ByteBuffer;
+import java.awt.*;
 
-import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.system.MemoryUtil.NULL;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author squid233
  * @since 2021/01/08
  */
 public final class GlUtils {
-    public static void generateMipmap(int target,
-                                      int components,
-                                      int width,
-                                      int height,
-                                      int format,
-                                      int type,
-                                      ByteBuffer pixels) {
-        // If support to generate mipmap, use
-        if (GL.getCapabilities().glGenerateMipmap != NULL) {
-            glGenerateMipmap(target);
-        }
-        else {
-            glTexImage2D(target, 0, components, width, height, 0, format, type, pixels);
-        }
-    }
-
     /**
      * Draw a rect.
      * <p>If {@code alpha} is {@code true}, you should

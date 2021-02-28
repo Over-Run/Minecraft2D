@@ -24,10 +24,11 @@
 
 package io.github.overrun.mc2d;
 
+import io.github.overrun.mc2d.block.Block;
+import io.github.overrun.mc2d.block.Blocks;
 import io.github.overrun.mc2d.client.Mc2dClient;
-import io.github.overrun.mc2d.client.Window;
-import io.github.overrun.mc2d.client.gui.Drawable;
 import io.github.overrun.mc2d.client.gui.DrawableHelper;
+import io.github.overrun.mc2d.client.gui.Framebuffer;
 import io.github.overrun.mc2d.util.Identifier;
 
 import java.io.Serializable;
@@ -40,17 +41,18 @@ import static org.lwjgl.opengl.GL11.*;
  * @author squid233
  * @since 2021/01/09
  */
-public final class Player extends DrawableHelper implements Serializable, Drawable {
+public final class Player extends DrawableHelper implements Serializable {
     public static final Identifier HEAD_TEXTURE = new Identifier("char_head.png");
     public static final Identifier BODY_TEXTURE = new Identifier("char_body.png");
-    private static final long serialVersionUID = 1L;
-    public transient int handledBlock = 1;
+    private static final long serialVersionUID = 2L;
+    public transient Block handledBlock = Blocks.GRASS_BLOCK;
     public transient int headTexCoord;
     public transient int bodyTexCoord;
     public double x = .5;
     public double y = 6;
+    public final int z = 0;
 
-    public void move() {
+    public void tick() {
         if (isKeyPress(GLFW_KEY_A)
                 || isKeyPress(GLFW_KEY_LEFT)) {
             x -= .0625;
@@ -76,11 +78,10 @@ public final class Player extends DrawableHelper implements Serializable, Drawab
         }
     }
 
-    @Override
     public void render(int mouseX, int mouseY) {
         Mc2dClient client = Mc2dClient.getInstance();
-        double x = Window.width >> 1;
-        double y = Window.height >> 1;
+        double x = Framebuffer.width >> 1;
+        double y = Framebuffer.height >> 1;
         client.getTextureManager().bindTexture(BODY_TEXTURE);
         glPushMatrix();
         glTranslatef(0, -48, 0);

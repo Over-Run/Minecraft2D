@@ -26,6 +26,7 @@ package io.github.overrun.mc2d.client.gui.screen.ingame;
 
 import io.github.overrun.mc2d.Player;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
+import io.github.overrun.mc2d.item.BlockItem;
 import io.github.overrun.mc2d.screen.CreativeTabScreenHandler;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.text.TranslatableText;
@@ -51,7 +52,9 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
     @Override
     protected void onClickSlot(Slot slot) {
         super.onClickSlot(slot);
-        player.handledBlock = slot.item;
+        if (slot.item instanceof BlockItem) {
+            player.handledBlock = ((BlockItem) slot.item).getBlock();
+        }
     }
 
     @Override
@@ -61,17 +64,17 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
     }
 
     @Override
-    public void render(int mouseX, int mouseY) {
+    public void render(int mouseX, int mouseY, float delta) {
         renderBackground();
-        super.render(mouseX, mouseY);
+        super.render(mouseX, mouseY, delta);
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW_KEY_E) {
+    public boolean keyPressed(int key, int scancode, int mods) {
+        if (key == GLFW_KEY_E) {
             onClose();
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(key, scancode, mods);
     }
 
     @Override

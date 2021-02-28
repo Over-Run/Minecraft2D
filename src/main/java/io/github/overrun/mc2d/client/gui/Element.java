@@ -33,7 +33,7 @@ public interface Element {
         return false;
     }
 
-    default boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    default boolean keyPressed(int key, int scancode, int mods) {
         return false;
     }
 

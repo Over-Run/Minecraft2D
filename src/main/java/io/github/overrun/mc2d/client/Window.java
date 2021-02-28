@@ -29,6 +29,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWCursorPosCallbackI;
+import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
+import org.lwjgl.glfw.GLFWFramebufferSizeCallbackI;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWKeyCallbackI;
@@ -101,6 +103,11 @@ public final class Window {
     @Nullable
     public static GLFWCursorPosCallback setCursorPosCallback(@Nullable GLFWCursorPosCallbackI callback) {
         return glfwSetCursorPosCallback(handler, callback);
+    }
+
+    @Nullable
+    public static GLFWFramebufferSizeCallback setFramebufferSizeCallback(@Nullable GLFWFramebufferSizeCallbackI callback) {
+        return glfwSetFramebufferSizeCallback(handler, callback);
     }
 
     public static void getSize(@Nullable IntBuffer width, @Nullable IntBuffer height) {

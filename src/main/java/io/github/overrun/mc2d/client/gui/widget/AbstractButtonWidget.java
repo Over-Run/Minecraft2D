@@ -131,7 +131,7 @@ public abstract class AbstractButtonWidget extends DrawableHelper implements Dra
     }
 
     @Override
-    public void render(int mouseX, int mouseY) {
+    public void render(int mouseX, int mouseY, float delta) {
         hovered = mouseX >= x && mouseY >= y && mouseX < x + (width << 1) && mouseY < y + (height << 1);
         renderButton(mouseX, mouseY);
     }

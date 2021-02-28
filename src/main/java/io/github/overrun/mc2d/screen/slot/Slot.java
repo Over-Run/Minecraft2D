@@ -24,6 +24,8 @@
 
 package io.github.overrun.mc2d.screen.slot;
 
+import io.github.overrun.mc2d.item.Item;
+
 /**
  * @author squid233
  * @since 2021/01/23
@@ -31,7 +33,7 @@ package io.github.overrun.mc2d.screen.slot;
 public final class Slot {
     public final int x;
     public final int y;
-    public int item;
+    public Item item;
 
     public Slot(int x, int y) {
         this.x = x;

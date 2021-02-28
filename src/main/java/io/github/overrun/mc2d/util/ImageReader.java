@@ -26,9 +26,9 @@ package io.github.overrun.mc2d.util;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -82,7 +82,7 @@ public final class ImageReader {
             } else {
                 int width = img.getWidth();
                 int height = img.getHeight();
-                ByteBuffer buf = BufferUtils.createByteBuffer(width * height << 2);
+                ByteBuffer buf = MemoryUtil.memAlloc(width * height << 2);
                 for (int i = 0; i < height; i++) {
                     for (int j = 0; j < width; j++) {
                         ColorModel cm = img.getColorModel();

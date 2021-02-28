@@ -64,9 +64,9 @@ public final class PauseScreen extends Screen {
     }
 
     @Override
-    public void render(int mouseX, int mouseY) {
+    public void render(int mouseX, int mouseY, float delta) {
         renderBackground();
-        super.render(mouseX, mouseY);
+        super.render(mouseX, mouseY, delta);
         drawCenteredText(textRenderer, title.setStyle(Style.EMPTY.withColor(TextColor.WHITE)), width >> 1, 50);
     }
 

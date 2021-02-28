@@ -24,21 +24,13 @@
 
 package io.github.overrun.mc2d.util.shape;
 
-import io.github.overrun.mc2d.util.Utils;
-
 /**
  * @author squid233
  * @since 2021/02/03
  */
 public final class VoxelShapes {
-    private static final VoxelShape FULL_SQUARE = Utils.make(() -> {
-        VoxelSet[] sets = new VoxelSet[256];
-        for (int i = 0; i < sets.length; i++) {
-            sets[i] = new VoxelSet(i % 16, i >> 4);
-        }
-        return new VoxelShape(sets);
-    });
-    private static final VoxelShape EMPTY = new VoxelShape();
+    private static final VoxelShape FULL_SQUARE = new VoxelShape(0, 0, 16, 16);
+    private static final VoxelShape EMPTY = new VoxelShape(-1, -1, -1, -1);
 
     public static VoxelShape empty() {
         return EMPTY;

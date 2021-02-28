@@ -24,7 +24,7 @@
 
 package io.github.overrun.mc2d.client.gui;
 
-import io.github.overrun.mc2d.client.font.TextRenderer;
+import io.github.overrun.mc2d.client.TextRenderer;
 import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.util.GlUtils;
 import io.github.overrun.mc2d.util.Identifier;

@@ -37,7 +37,7 @@ public final class CreativeTabScreenHandler extends ScreenHandler {
         super.init(x, y);
         for (int i = 1; i < Registry.ITEM.size(); i++) {
             Slot slot = addSlot(new Slot(x + 18 + (i - 1) % 9 * 36, y + 36 + (i - 1) / 9 * 36));
-            slot.item = i;
+            slot.item = Registry.ITEM.getByRawId(i);
         }
     }
 }
