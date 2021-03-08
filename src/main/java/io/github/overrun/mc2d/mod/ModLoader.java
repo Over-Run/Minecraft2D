@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -55,7 +56,7 @@ public final class ModLoader {
      *
      * @throws RuntimeException If an error is occurred on loading mod
      */
-    public static void loadMods() {
+    public static void loadMods() throws IllegalArgumentException {
         File dir = new File("mods");
         if (!dir.exists()) {
             //noinspection ResultOfMethodCallIgnored
@@ -64,8 +65,9 @@ public final class ModLoader {
         File[] files = dir.listFiles();
         if (files != null && files.length > 0) {
             for (File file : files) {
+                String filename = file.getName();
                 boolean isModFile = file.isFile() &&
-                        (file.getName().endsWith(".jar") || file.getName().endsWith(".zip"));
+                        (filename.endsWith(".jar") || filename.endsWith(".zip"));
                 if (isModFile) {
                     String modid = null, name, version, main;
                     try {
@@ -84,28 +86,37 @@ public final class ModLoader {
                                 main = prop.getProperty("main");
                                 try {
                                     Class<?> clazz = Class.forName(main, true, loader);
-                                    ModInitializer modInitializer = (ModInitializer) clazz.getDeclaredConstructor().newInstance();
-                                    MODS.put(modid, modInitializer);
                                     MOD_LOADERS.put(modid, loader);
                                     MODS_NAME.put(modid, name);
                                     MODS_VERSION.put(modid, version);
                                     try {
-                                        for (Field field : clazz.getFields()) {
-                                            if (field.getDeclaredAnnotation(Mod.Instance.class) != null) {
-                                                field.set(modInitializer, modInitializer);
+                                        ModInitializer modInitializer = (ModInitializer) clazz.getDeclaredConstructor().newInstance();
+                                        MODS.put(modid, modInitializer);
+                                        try {
+                                            for (Field field : clazz.getFields()) {
+                                                if (field.getDeclaredAnnotation(Mod.Instance.class) != null) {
+                                                    field.set(modInitializer, modInitializer);
+                                                }
+                                                if (field.getDeclaredAnnotation(Mod.Modid.class) != null) {
+                                                    field.set(modInitializer, modid);
+                                                }
+                                                if (field.getDeclaredAnnotation(Mod.Name.class) != null) {
+                                                    field.set(modInitializer, name);
+                                                }
+                                                if (field.getDeclaredAnnotation(Mod.Version.class) != null) {
+                                                    field.set(modInitializer, version);
+                                                }
                                             }
-                                            if (field.getDeclaredAnnotation(Mod.Modid.class) != null) {
-                                                field.set(modInitializer, modid);
-                                            }
-                                            if (field.getDeclaredAnnotation(Mod.Name.class) != null) {
-                                                field.set(modInitializer, name);
-                                            }
-                                            if (field.getDeclaredAnnotation(Mod.Version.class) != null) {
-                                                field.set(modInitializer, version);
-                                            }
+                                            clazz.getDeclaredConstructor().setAccessible(false);
+                                        } catch (SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException ignored) { }
+                                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+                                        try {
+                                            clazz.getMethod(main.split("@", 2)[1]).invoke(null);
+                                        } catch (ArrayIndexOutOfBoundsException | NoSuchMethodException ee) {
+                                            Field field = clazz.getField(main.split("#", 2)[1]);
+                                            field.getType().getMethod("onInitialize").invoke(field.get(null));
                                         }
-                                        clazz.getDeclaredConstructor().setAccessible(false);
-                                    } catch (SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException ignored) { }
+                                    }
                                 } catch (Exception e) {
                                     throw new RuntimeException("Could not execute entrypoint due to errors, provided by '" + modid + "'!");
                                 }
