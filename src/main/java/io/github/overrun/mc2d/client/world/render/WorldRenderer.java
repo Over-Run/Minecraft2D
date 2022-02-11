@@ -54,12 +54,11 @@ public class WorldRenderer {
         this.world = world;
     }
 
-    public void render(double delta, int z, int mouseX, int mouseY) {
+    public void render(int z, int mouseX, int mouseY) {
         Block target;
         for (int y = 0; y < world.height; y++) {
             for (int x = 0; x < world.width; x++) {
                 var b = world.getBlock(x, y, z);
-                client.player.prevPos.lerp(client.player.position, delta, interpolation);
                 double ltX = (Framebuffer.width >> 1) + (x - interpolation.x) * 32,
                     ltY = (Framebuffer.height >> 1) - (y - interpolation.y) * 32 - 32,
                     rdX = ltX + 32,
@@ -98,10 +97,11 @@ public class WorldRenderer {
         }
     }
 
-    public void render(double delta, int mouseX, int mouseY) {
-        render(delta, 1, mouseX, mouseY);
+    public void render(float delta, int mouseX, int mouseY) {
+        client.player.prevPos.lerp(client.player.position, delta, interpolation);
+        render(1, mouseX, mouseY);
         glColor3f(1, 1, 1);
         client.player.render(delta, mouseX, mouseY);
-        render(delta, 0, mouseX, mouseY);
+        render(0, mouseX, mouseY);
     }
 }

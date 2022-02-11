@@ -110,6 +110,8 @@ public final class Mc2dClient implements Closeable {
         }
     }
 
+    public void setupCamera() {}
+
     public void render(float delta) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         if (world != null) {

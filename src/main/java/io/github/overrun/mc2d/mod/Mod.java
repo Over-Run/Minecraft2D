@@ -35,18 +35,30 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Mod {
+    /**
+     * Annotate on a field to autofill by the mod instance.
+     */
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.RUNTIME)
     @interface Instance { }
 
+    /**
+     * Annotate on a field to autofill by the mod namespace.
+     */
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.RUNTIME)
     @interface Modid { }
 
+    /**
+     * Annotate on a field to autofill by the mod name.
+     */
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.RUNTIME)
     @interface Name { }
 
+    /**
+     * Annotate on a field to autofill by the mod version.
+     */
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.RUNTIME)
     @interface Version { }

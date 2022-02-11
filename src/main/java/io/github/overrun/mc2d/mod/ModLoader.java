@@ -30,7 +30,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -57,25 +56,25 @@ public final class ModLoader {
      * @throws RuntimeException If an error is occurred on loading mod
      */
     public static void loadMods() throws IllegalArgumentException {
-        File dir = new File("mods");
+        var dir = new File("mods");
         if (!dir.exists()) {
             //noinspection ResultOfMethodCallIgnored
             dir.mkdir();
         }
-        File[] files = dir.listFiles();
+        var files = dir.listFiles();
         if (files != null && files.length > 0) {
-            for (File file : files) {
-                String filename = file.getName();
-                boolean isModFile = file.isFile() &&
+            for (var file : files) {
+                var filename = file.getName();
+                var isModFile = file.isFile() &&
                         (filename.endsWith(".jar") || filename.endsWith(".zip"));
                 if (isModFile) {
                     String modid = null, name, version, main;
                     try {
-                        ClassLoader loader = new URLClassLoader(new URL[]{file.toURI().toURL()}, Thread.currentThread().getContextClassLoader());
-                        InputStream is = loader.getResourceAsStream("mc2d.mod.prop");
+                        var loader = new URLClassLoader(new URL[]{file.toURI().toURL()}, Thread.currentThread().getContextClassLoader());
+                        var is = loader.getResourceAsStream("mc2d.mod.prop");
                         if (is != null) {
                             try (is) {
-                                Properties prop = new Properties(4);
+                                var prop = new Properties(4);
                                 prop.load(is);
                                 modid = prop.getProperty("modid");
                                 if (modid == null) {
@@ -85,12 +84,12 @@ public final class ModLoader {
                                 version = prop.getProperty("version", "0.0.0");
                                 main = prop.getProperty("main");
                                 try {
-                                    Class<?> clazz = Class.forName(main, true, loader);
+                                    var clazz = Class.forName(main, true, loader);
                                     MOD_LOADERS.put(modid, loader);
                                     MODS_NAME.put(modid, name);
                                     MODS_VERSION.put(modid, version);
                                     try {
-                                        ModInitializer modInitializer = (ModInitializer) clazz.getDeclaredConstructor().newInstance();
+                                        var modInitializer = (ModInitializer) clazz.getDeclaredConstructor().newInstance();
                                         MODS.put(modid, modInitializer);
                                         try {
                                             for (Field field : clazz.getFields()) {
@@ -113,7 +112,7 @@ public final class ModLoader {
                                         try {
                                             clazz.getMethod(main.split("@", 2)[1]).invoke(null);
                                         } catch (ArrayIndexOutOfBoundsException | NoSuchMethodException ee) {
-                                            Field field = clazz.getField(main.split("#", 2)[1]);
+                                            var field = clazz.getField(main.split("#", 2)[1]);
                                             field.getType().getMethod("onInitialize").invoke(field.get(null));
                                         }
                                     }
@@ -133,7 +132,7 @@ public final class ModLoader {
                     }
                     try {
                         if (!MODS.isEmpty()) {
-                            for (ModInitializer initializer : MODS.values()) {
+                            for (var initializer : MODS.values()) {
                                 logger.info("Loading mod {}@{}!", getName(modid), getVersion(modid));
                                 initializer.onInitialize();
                             }

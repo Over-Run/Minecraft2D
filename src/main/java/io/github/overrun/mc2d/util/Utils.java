@@ -25,6 +25,7 @@
 package io.github.overrun.mc2d.util;
 
 import java.nio.ByteBuffer;
+import java.util.Optional;
 
 /**
  * @author squid233
@@ -38,12 +39,11 @@ public final class Utils {
         return buffer;
     }
 
-    public static boolean isParsableNumber(String s) {
+    public static Optional<Integer> isParsableNumber(String s) {
         try {
-            Integer.parseInt(s);
-            return true;
+            return Optional.of(Integer.parseInt(s));
         } catch (NumberFormatException e) {
-            return false;
+            return Optional.empty();
         }
     }
 }

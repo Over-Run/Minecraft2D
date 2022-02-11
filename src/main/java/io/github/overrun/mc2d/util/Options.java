@@ -77,7 +77,7 @@ public final class Options {
 
     public static int getI(String key, int def) {
         String value = OPTIONS.getProperty(key, String.valueOf(def));
-        return Utils.isParsableNumber(value) ? Integer.parseInt(value) : def;
+        return Utils.isParsableNumber(value).orElse(def);
     }
 
     public static String get(String key, String def) {
