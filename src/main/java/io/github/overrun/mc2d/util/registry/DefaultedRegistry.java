@@ -28,8 +28,10 @@ import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.collect.DefaultedList;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -100,5 +102,11 @@ public class DefaultedRegistry<T> extends MutableRegistry<T> {
         entry2id.remove(entry);
         entries.remove(entry);
         entry2rawId.removeInt(entry);
+    }
+
+    @NotNull
+    @Override
+    public Iterator<Map.Entry<Identifier, T>> iterator() {
+        return id2entry.entrySet().iterator();
     }
 }

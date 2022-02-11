@@ -24,7 +24,7 @@
 
 package io.github.overrun.mc2d.client.gui.screen.ingame;
 
-import io.github.overrun.mc2d.Player;
+import io.github.overrun.mc2d.world.Player;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
 import io.github.overrun.mc2d.item.BlockItem;
 import io.github.overrun.mc2d.screen.CreativeTabScreenHandler;

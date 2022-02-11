@@ -26,11 +26,13 @@ package io.github.overrun.mc2d.util.registry;
 
 import io.github.overrun.mc2d.util.Identifier;
 
+import java.util.Map.Entry;
+
 /**
  * @author squid233
  * @since 2021/01/27
  */
-public abstract class BaseRegistry<T> {
+public abstract class BaseRegistry<T> implements Iterable<Entry<Identifier, T>> {
     public abstract Identifier getId(T entry);
 
     public abstract T getById(Identifier id);

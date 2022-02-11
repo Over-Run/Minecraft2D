@@ -25,7 +25,7 @@
 package io.github.overrun.mc2d.client.gui.screen;
 
 import io.github.overrun.mc2d.Main;
-import io.github.overrun.mc2d.Player;
+import io.github.overrun.mc2d.world.Player;
 import io.github.overrun.mc2d.client.gui.screen.world.LoadingWorldScreen;
 import io.github.overrun.mc2d.client.gui.widget.ButtonWidget;
 import io.github.overrun.mc2d.client.world.render.WorldRenderer;
@@ -58,9 +58,9 @@ public final class TitleScreen extends Screen {
             20,
             new TranslatableText("Play"),
             b -> {
-                client.player = new Player();
+                client.player = new Player(64, 64, 2);
                 client.world = new World(client.player, 64, 64);
-                client.worldRenderer = new WorldRenderer(client.world);
+                client.worldRenderer = new WorldRenderer(client, client.world);
                 client.openScreen(new LoadingWorldScreen());
             }));
         addButton(new ButtonWidget(width - 400 >> 1,

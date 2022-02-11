@@ -38,5 +38,6 @@ public class AirBlock extends Block {
     }
 
     @Override
-    public void render(boolean render, boolean dark) { }
+    public void render(boolean dark, int x, int y, int z) {
+    }
 }

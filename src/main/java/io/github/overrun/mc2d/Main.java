@@ -157,7 +157,7 @@ public final class Main implements Runnable, Closeable {
 
                 if (client.world != null) {
                     if (key == GLFW_KEY_ENTER) {
-                        client.world.save();
+                        client.world.save(client.player);
                     }
                     if (key == GLFW_KEY_1) {
                         client.player.handledBlock = GRASS_BLOCK;
@@ -199,7 +199,7 @@ public final class Main implements Runnable, Closeable {
         });
         Window.setCloseCallback(window -> {
             if (client.world != null) {
-                client.world.save();
+                client.world.save(client.player);
             }
         });
         Window.setSizeCallback((window, width, height) -> resize(width, height));

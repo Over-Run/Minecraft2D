@@ -22,16 +22,19 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d;
+package io.github.overrun.mc2d.world;
 
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 import io.github.overrun.mc2d.block.Block;
 import io.github.overrun.mc2d.block.Blocks;
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.gui.DrawableHelper;
 import io.github.overrun.mc2d.client.gui.Framebuffer;
 import io.github.overrun.mc2d.util.Identifier;
+import org.joml.Vector3d;
 
-import java.io.Serializable;
+import java.io.IOException;
 
 import static io.github.overrun.mc2d.client.Keyboard.isKeyPress;
 import static org.lwjgl.glfw.GLFW.*;
@@ -41,45 +44,57 @@ import static org.lwjgl.opengl.GL11.*;
  * @author squid233
  * @since 2021/01/09
  */
-public final class Player extends DrawableHelper implements Serializable {
+public final class Player extends DrawableHelper {
     public static final Identifier HEAD_TEXTURE = new Identifier("char_head.png");
     public static final Identifier BODY_TEXTURE = new Identifier("char_body.png");
     private static final long serialVersionUID = 2L;
-    public transient Block handledBlock = Blocks.GRASS_BLOCK;
-    public transient int headTexCoord;
-    public transient int bodyTexCoord;
-    public double x = .5;
-    public double y = 6;
-    public final int z = 0;
+    public Block handledBlock = Blocks.GRASS_BLOCK;
+    public int headTexCoord;
+    public int bodyTexCoord;
+    public final Vector3d prevPos = new Vector3d();
+    public final Vector3d position = new Vector3d();
+    public final Vector3d velocity = new Vector3d();
+
+    public Player(int ww, int wh, int wd) {
+        position.x = Math.random() * ww;
+        position.y = wh + 10;
+        position.z = 1.5;
+    }
 
     public void tick() {
+        prevPos.set(position);
+        double xa = 0, ya = 0;
         if (isKeyPress(GLFW_KEY_A)
-                || isKeyPress(GLFW_KEY_LEFT)) {
-            x -= .0625;
+            || isKeyPress(GLFW_KEY_LEFT)) {
+            --xa;
             headTexCoord = 8;
             bodyTexCoord = 4;
         }
         if (isKeyPress(GLFW_KEY_D)
-                || isKeyPress(GLFW_KEY_RIGHT)) {
-            x += .0625;
+            || isKeyPress(GLFW_KEY_RIGHT)) {
+            ++xa;
             headTexCoord = 0;
             bodyTexCoord = 0;
         }
         if (isKeyPress(GLFW_KEY_SPACE)
-                || isKeyPress(GLFW_KEY_W)
-                || isKeyPress(GLFW_KEY_UP)) {
-            y += .0625;
+            || isKeyPress(GLFW_KEY_W)
+            || isKeyPress(GLFW_KEY_UP)) {
+            ++ya;
         }
         if (isKeyPress(GLFW_KEY_LEFT_SHIFT)
-                || isKeyPress(GLFW_KEY_S)
-                || isKeyPress(GLFW_KEY_DOWN)
+            || isKeyPress(GLFW_KEY_S)
+            || isKeyPress(GLFW_KEY_DOWN)
         ) {
-            y -= .0625;
+            --ya;
         }
+        velocity.add(xa * 0.1, ya * 0.1, 0);
+        position.add(velocity);
+        velocity.mul(0.91, 0.98, 0.91);
+        velocity.mul(0.7, 1, 0.7);
     }
 
     public void render(int mouseX, int mouseY) {
-        Mc2dClient client = Mc2dClient.getInstance();
+        var client = Mc2dClient.getInstance();
         double x = Framebuffer.width >> 1;
         double y = Framebuffer.height >> 1;
         client.getTextureManager().bindTexture(BODY_TEXTURE);
@@ -92,5 +107,37 @@ public final class Player extends DrawableHelper implements Serializable {
         glTranslatef(0, -32, 0);
         drawTexture(x - 16, y, headTexCoord, 0, 8, 8, 16, 16, 16, 8);
         glPopMatrix();
+    }
+
+    public void serialize(JsonWriter writer) throws IOException {
+        writer.beginObject()
+            .name("version").value(serialVersionUID)
+            .name("x").value(position.x)
+            .name("y").value(position.y)
+            .name("z").value(position.z)
+            .endObject();
+    }
+
+    public void deserialize(JsonReader reader) throws IOException {
+        reader.beginObject();
+        while (reader.hasNext()) {
+            switch (reader.nextName()) {
+                case "version":
+                    var v = reader.nextLong();
+                    if (serialVersionUID != v) {
+                        throw new RuntimeException("Doesn't compatible with version " + v + ". Current is " + serialVersionUID);
+                    }
+                    break;
+                case "x":
+                    position.x = reader.nextDouble();
+                    break;
+                case "y":
+                    position.y = reader.nextDouble();
+                    break;
+                case "z":
+                    reader.nextDouble();
+            }
+        }
+        reader.endObject();
     }
 }

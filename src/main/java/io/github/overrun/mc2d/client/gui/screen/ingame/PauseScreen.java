@@ -47,7 +47,7 @@ public final class PauseScreen extends Screen {
     protected void init() {
         super.init();
         if (client.world != null) {
-            client.world.save();
+            client.world.save(client.player);
         }
         addButton(new ButtonWidget((width >> 1) - 300,
                 90,

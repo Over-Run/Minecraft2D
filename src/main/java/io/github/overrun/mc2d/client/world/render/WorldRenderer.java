@@ -24,20 +24,77 @@
 
 package io.github.overrun.mc2d.client.world.render;
 
+import io.github.overrun.mc2d.block.Block;
+import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.client.gui.Framebuffer;
+import io.github.overrun.mc2d.util.GlUtils;
 import io.github.overrun.mc2d.world.World;
+
+import static io.github.overrun.mc2d.block.Blocks.AIR;
+import static io.github.overrun.mc2d.client.Mouse.isMousePress;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author squid233
  * @since 0.6.0
  */
 public class WorldRenderer {
+    private final Mc2dClient client;
     private final World world;
 
-    public WorldRenderer(World world) {
+    public WorldRenderer(Mc2dClient client, World world) {
+        this.client = client;
         this.world = world;
     }
 
+    public void render(int z, int mouseX, int mouseY) {
+        Block target;
+        for (int y = 0; y < world.height; y++) {
+            for (int x = 0; x < world.width; x++) {
+                var b = world.getBlock(x, y, z);
+                double ltX = (Framebuffer.width >> 1) + (x - client.player.position.x) * 32,
+                    ltY = (Framebuffer.height >> 1) - (y - client.player.position.y) * 32 - 32,
+                    rdX = ltX + 32,
+                    rdY = ltY + 32;
+                var dark = world.getBlock(x, y, 0) == AIR;
+                if (z == 0 || dark) {
+                    b.render(dark, (int) ltX, (int) ltY, z);
+                }
+                if (mouseX >= ltX
+                    && mouseX < rdX
+                    && mouseY >= ltY
+                    && mouseY < rdY) {
+                    target = world.getBlock(x, y, World.z);
+                    glDisable(GL_TEXTURE_2D);
+                    if (z == 0 || dark) {
+                        var shape = b.getOutlineShape();
+                        if (shape.x0 > -1 && shape.y0 > -1 && shape.x1 > -1 && shape.y1 > -1) {
+                            GlUtils.drawRect(ltX + shape.x0,
+                                ltY + shape.y0,
+                                ltX + (shape.x1 << 1),
+                                ltY + (shape.y1 << 1),
+                                0x80000000,
+                                true);
+                        }
+                    }
+                    glEnable(GL_TEXTURE_2D);
+                    if (target == AIR) {
+                        if (isMousePress(GLFW_MOUSE_BUTTON_RIGHT)) {
+                            world.setBlock(x, y, World.z, client.player.handledBlock);
+                        }
+                    } else if (isMousePress(GLFW_MOUSE_BUTTON_LEFT)) {
+                        world.setBlock(x, y, World.z, AIR);
+                    }
+                }
+            }
+        }
+    }
+
     public void render(int mouseX, int mouseY) {
-        world.render(mouseX, mouseY);
+        render(1, mouseX, mouseY);
+        client.player.render(mouseX, mouseY);
+        render(0, mouseX, mouseY);
     }
 }

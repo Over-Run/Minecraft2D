@@ -25,7 +25,7 @@
 package io.github.overrun.mc2d.client;
 
 import io.github.overrun.mc2d.Main;
-import io.github.overrun.mc2d.Player;
+import io.github.overrun.mc2d.world.Player;
 import io.github.overrun.mc2d.client.gui.Framebuffer;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
 import io.github.overrun.mc2d.client.gui.screen.TitleScreen;
@@ -87,7 +87,10 @@ public final class Mc2dClient implements Closeable {
             if (debugging) {
                 textRenderer.draw(0, 0, Main.VERSION_TEXT);
                 textRenderer.draw(0, 17, IText.of(fps + " fps"));
-                textRenderer.draw(0, 34, new TranslatableText("player.position", player.x, player.y, player.z));
+                textRenderer.draw(0, 34, new TranslatableText("player.position",
+                    player.position.x,
+                    player.position.y,
+                    player.position.z));
                 textRenderer.draw(0, 51, new TranslatableText("player.hand.block", player.handledBlock));
 //            textRenderer.draw(0, 68, new TranslatableText("Point.block.pos", pointBlockX, pointBlockY, pointBlockZ));
 //            textRenderer.draw(0, 85, new TranslatableText("Point.block", pointBlock));
@@ -110,7 +113,7 @@ public final class Mc2dClient implements Closeable {
     public void render(float delta) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         if (world != null) {
-            world.render(Mouse.mouseX, Mouse.mouseY);
+            worldRenderer.render(Mouse.mouseX, Mouse.mouseY);
         }
         glClear(GL_DEPTH_BUFFER_BIT);
         renderHud();

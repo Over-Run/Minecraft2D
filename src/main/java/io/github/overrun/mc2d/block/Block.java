@@ -46,9 +46,6 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Block implements ItemConvertible {
     public static final Map<Block, Item> BLOCK_ITEMS = new HashMap<>();
-    public int x;
-    public int y;
-    public byte z;
 
     public VoxelShape getOutlineShape() {
         return getCollisionShape();
@@ -66,29 +63,17 @@ public class Block implements ItemConvertible {
         return Registry.BLOCK.getId(this);
     }
 
-    public void render(boolean render, boolean dark) {
-        if (render) {
-            Identifier id = Registry.BLOCK.getId(this);
-            glColor4f(1, 1, 1, 1);
-            Mc2dClient.getInstance().getTextureManager().bindTexture(
-                    new Identifier(id.getNamespace(), "textures/block/" + id.getPath() + ".png"));
-            drawTexture(x, y, 32, 32);
-            if (dark) {
-                glDisable(GL_TEXTURE_2D);
-                GlUtils.fillRect(x, y, x + 32, y + 32, 0x80000000, true);
-                glEnable(GL_TEXTURE_2D);
-            }
+    public void render(boolean dark, int x, int y, int z) {
+        Identifier id = Registry.BLOCK.getId(this);
+        glColor4f(1, 1, 1, 1);
+        Mc2dClient.getInstance().getTextureManager().bindTexture(
+            new Identifier(id.getNamespace(), "textures/block/" + id.getPath() + ".png"));
+        drawTexture(x, y, 32, 32);
+        if (dark) {
+            glDisable(GL_TEXTURE_2D);
+            GlUtils.fillRect(x, y, x + 32, y + 32, 0x80000000, true);
+            glEnable(GL_TEXTURE_2D);
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 
     @Override
