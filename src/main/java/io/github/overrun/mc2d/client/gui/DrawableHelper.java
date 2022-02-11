@@ -26,10 +26,7 @@ package io.github.overrun.mc2d.client.gui;
 
 import io.github.overrun.mc2d.client.TextRenderer;
 import io.github.overrun.mc2d.text.IText;
-import io.github.overrun.mc2d.util.GlUtils;
 import io.github.overrun.mc2d.util.Identifier;
-
-import java.awt.Color;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -47,20 +44,30 @@ public abstract class DrawableHelper {
     public static void fillGradient(int xStart, int yStart, int xEnd, int yEnd, int colorStart, int colorEnd) {
         glDisable(GL_TEXTURE_2D);
         glBegin(GL_QUADS);
-        Color lt = new Color(colorStart, true);
-        Color rt = new Color((colorStart + colorEnd) >> 1, true);
-        Color rd = new Color(colorEnd, true);
+        var sr = colorStart << 8 >>> 24;
+        var sg = colorStart << 16 >>> 24;
+        var sb = colorStart << 24 >>> 24;
+        var sa = colorStart >>> 24;
+        var er = colorEnd << 8 >>> 24;
+        var eg = colorEnd << 16 >>> 24;
+        var eb = colorEnd << 24 >>> 24;
+        var ea = colorEnd >>> 24;
+        var lerp = (colorStart + colorEnd) >> 1;
+        var lr = (lerp << 8 >>> 24) / 255f;
+        var lg = (lerp << 16 >>> 24) / 255f;
+        var lb = (lerp << 24 >>> 24) / 255f;
+        var la = (lerp >>> 24) / 255f;
         // Left top
-        GlUtils.glColor4f(lt);
+        glColor4f(sr / 255f, sg / 255f, sb / 255f, sa / 255f);
         glVertex2f(xStart, yStart);
         // Left down
-        GlUtils.glColor4f(rt);
+        glColor4f(lr, lg, lb, la);
         glVertex2f(xStart, yEnd);
         // Right down
-        GlUtils.glColor4f(rd);
+        glColor4f(er / 255f, eg / 255f, eb / 255f, ea / 255f);
         glVertex2f(xEnd, yEnd);
         // Right top
-        GlUtils.glColor4f(rt);
+        glColor4f(lr, lg, lb, la);
         glVertex2f(xEnd, yStart);
         glEnd();
         glEnable(GL_TEXTURE_2D);
@@ -79,7 +86,11 @@ public abstract class DrawableHelper {
                                    int rgba) {
         glEnable(GL_TEXTURE_2D);
         glBegin(GL_QUADS);
-        GlUtils.glColor4f(new Color(rgba, true));
+        var r = rgba << 8 >>> 24;
+        var g = rgba << 16 >>> 24;
+        var b = rgba << 24 >>> 24;
+        var a = rgba >>> 24;
+        glColor4f(r / 255f, g / 255f, b / 255f, a / 255f);
         // Left top
         glTexCoord2f((float) u / texW, (float) v / texH);
         glVertex2d(x, y);

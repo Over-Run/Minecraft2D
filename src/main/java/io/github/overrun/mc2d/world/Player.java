@@ -45,14 +45,14 @@ import static org.lwjgl.opengl.GL11.*;
  * @since 2021/01/09
  */
 public final class Player extends DrawableHelper {
-    public static final Identifier HEAD_TEXTURE = new Identifier("char_head.png");
-    public static final Identifier BODY_TEXTURE = new Identifier("char_body.png");
+    public static final Identifier TEXTURE = new Identifier("textures/player.png");
     private static final long serialVersionUID = 2L;
     public Block handledBlock = Blocks.GRASS_BLOCK;
     public int headTexCoord;
     public int bodyTexCoord;
     public final Vector3d prevPos = new Vector3d();
     public final Vector3d position = new Vector3d();
+    public boolean facingRight = true;
     public final Vector3d velocity = new Vector3d();
 
     public Player(int ww, int wh, int wd) {
@@ -67,12 +67,14 @@ public final class Player extends DrawableHelper {
         if (isKeyPress(GLFW_KEY_A)
             || isKeyPress(GLFW_KEY_LEFT)) {
             --xa;
+            facingRight = false;
             headTexCoord = 8;
             bodyTexCoord = 4;
         }
         if (isKeyPress(GLFW_KEY_D)
             || isKeyPress(GLFW_KEY_RIGHT)) {
             ++xa;
+            facingRight = true;
             headTexCoord = 0;
             bodyTexCoord = 0;
         }
@@ -89,23 +91,52 @@ public final class Player extends DrawableHelper {
         }
         velocity.add(xa * 0.1, ya * 0.1, 0);
         position.add(velocity);
-        velocity.mul(0.91, 0.98, 0.91);
-        velocity.mul(0.7, 1, 0.7);
+        velocity.mul(0.91, 0.91, 0.91);
+        velocity.mul(0.7, 0.7, 0.7);
     }
 
-    public void render(int mouseX, int mouseY) {
+    public void render(double delta, int mouseX, int mouseY) {
         var client = Mc2dClient.getInstance();
         double x = Framebuffer.width >> 1;
         double y = Framebuffer.height >> 1;
-        client.getTextureManager().bindTexture(BODY_TEXTURE);
+
+        client.getTextureManager().bindTexture(TEXTURE);
         glPushMatrix();
-        glTranslatef(0, -48, 0);
-        drawTexture(x - 8, y, bodyTexCoord, 0, 4, 12, 8, 24, 16, 12);
-        glTranslatef(0, -48, 0);
-        drawTexture(x - 8, y, bodyTexCoord + 8, 0, 4, 12, 8, 24, 16, 12);
-        client.getTextureManager().bindTexture(HEAD_TEXTURE);
-        glTranslatef(0, -32, 0);
-        drawTexture(x - 16, y, headTexCoord, 0, 8, 8, 16, 16, 16, 8);
+        // Move to center
+        glTranslated(x, y, 0);
+        glBegin(GL_QUADS);
+
+        // Draw head
+        glTexCoord2f(facingRight ? 0 : 0.5f, 0);
+        glVertex2f(-8, -64);
+        glTexCoord2f(facingRight ? 0 : 0.5f, 0.4f);
+        glVertex2f(-8, -48);
+        glTexCoord2f(facingRight ? 0.5f : 1, 0.4f);
+        glVertex2f(8, -48);
+        glTexCoord2f(facingRight ? 0.5f : 1, 0);
+        glVertex2f(8, -64);
+
+        // Draw body
+        glTexCoord2f(facingRight ? 0.5f : 0.75f, 0.4f);
+        glVertex2f(-4, -48);
+        glTexCoord2f(facingRight ? 0.5f : 0.75f, 1);
+        glVertex2f(-4, -24);
+        glTexCoord2f(facingRight ? 0.75f : 1, 1);
+        glVertex2f(4, -24);
+        glTexCoord2f(facingRight ? 0.75f : 1, 0.4f);
+        glVertex2f(4, -48);
+
+        // Draw legs
+        glTexCoord2f(facingRight ? 0 : 0.25f, 0.4f);
+        glVertex2f(-4, -24);
+        glTexCoord2f(facingRight ? 0 : 0.25f, 1);
+        glVertex2f(-4, 0);
+        glTexCoord2f(facingRight ? 0.25f : 0.5f, 1);
+        glVertex2f(4, 0);
+        glTexCoord2f(facingRight ? 0.25f : 0.5f, 0.4f);
+        glVertex2f(4, -24);
+
+        glEnd();
         glPopMatrix();
     }
 

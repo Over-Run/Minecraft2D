@@ -29,6 +29,7 @@ import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.gui.Framebuffer;
 import io.github.overrun.mc2d.util.GlUtils;
 import io.github.overrun.mc2d.world.World;
+import org.joml.Vector3d;
 
 import static io.github.overrun.mc2d.block.Blocks.AIR;
 import static io.github.overrun.mc2d.client.Mouse.isMousePress;
@@ -43,19 +44,24 @@ import static org.lwjgl.opengl.GL11.*;
 public class WorldRenderer {
     private final Mc2dClient client;
     private final World world;
+    /**
+     * Linear interpolation storage. Let it don't create more objects.
+     */
+    private final Vector3d interpolation = new Vector3d();
 
     public WorldRenderer(Mc2dClient client, World world) {
         this.client = client;
         this.world = world;
     }
 
-    public void render(int z, int mouseX, int mouseY) {
+    public void render(double delta, int z, int mouseX, int mouseY) {
         Block target;
         for (int y = 0; y < world.height; y++) {
             for (int x = 0; x < world.width; x++) {
                 var b = world.getBlock(x, y, z);
-                double ltX = (Framebuffer.width >> 1) + (x - client.player.position.x) * 32,
-                    ltY = (Framebuffer.height >> 1) - (y - client.player.position.y) * 32 - 32,
+                client.player.prevPos.lerp(client.player.position, delta, interpolation);
+                double ltX = (Framebuffer.width >> 1) + (x - interpolation.x) * 32,
+                    ltY = (Framebuffer.height >> 1) - (y - interpolation.y) * 32 - 32,
                     rdX = ltX + 32,
                     rdY = ltY + 32;
                 var dark = world.getBlock(x, y, 0) == AIR;
@@ -92,9 +98,10 @@ public class WorldRenderer {
         }
     }
 
-    public void render(int mouseX, int mouseY) {
-        render(1, mouseX, mouseY);
-        client.player.render(mouseX, mouseY);
-        render(0, mouseX, mouseY);
+    public void render(double delta, int mouseX, int mouseY) {
+        render(delta, 1, mouseX, mouseY);
+        glColor3f(1, 1, 1);
+        client.player.render(delta, mouseX, mouseY);
+        render(delta, 0, mouseX, mouseY);
     }
 }

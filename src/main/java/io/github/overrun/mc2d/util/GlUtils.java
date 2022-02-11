@@ -26,8 +26,6 @@ package io.github.overrun.mc2d.util;
 
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
-
 import static org.lwjgl.opengl.GL11.*;
 
 /**
@@ -45,16 +43,18 @@ public final class GlUtils {
      * @param y1 The left top coord y.
      * @param x2 The right bottom coord x.
      * @param y2 The right bottom coord y.
-     * @param color The color. RGBA if {@code alpha} is {@code true}, else RGB.
+     * @param color The color. ARGB if {@code alpha} is {@code true}, else RGB.
      * @param alpha The alpha value.
      */
     public static void drawRect(double x1, double y1, double x2, double y2, int color, boolean alpha) {
         glBegin(GL_LINE_STRIP);
-        Color c = new Color(color, alpha);
+        var r = color << 8 >>> 24;
+        var g = color << 16 >>> 24;
+        var b = color << 24 >>> 24;
         if (alpha) {
-            glColor4f(c);
+            glColor4f(r / 255f, g / 255f, b / 255f, (color >>> 24) / 255f);
         } else {
-            glColor3f(c);
+            glColor3f(r / 255f, g / 255f, b / 255f);
         }
         // Left top
         glVertex2d(x1, y1 + 1);
@@ -71,11 +71,13 @@ public final class GlUtils {
 
     public static void fillRect(double x1, double y1, double x2, double y2, int color, boolean alpha) {
         glBegin(GL_QUADS);
-        Color c = new Color(color, alpha);
+        var r = color << 8 >>> 24;
+        var g = color << 16 >>> 24;
+        var b = color << 24 >>> 24;
         if (alpha) {
-            glColor4f(c);
+            glColor4f(r / 255f, g / 255f, b / 255f, (color >>> 24) / 255f);
         } else {
-            glColor3f(c);
+            glColor3f(r / 255f, g / 255f, b / 255f);
         }
         // Left top
         glVertex2d(x1, y1);
@@ -86,13 +88,5 @@ public final class GlUtils {
         // Right up
         glVertex2d(x2, y1);
         glEnd();
-    }
-
-    public static void glColor4f(Color c) {
-        GL11.glColor4f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, c.getAlpha() / 255f);
-    }
-
-    public static void glColor3f(Color c) {
-        GL11.glColor3f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f);
     }
 }

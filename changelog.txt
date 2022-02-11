@@ -1,5 +1,6 @@
 0.6.0
-    Update Gradle to 6.8.3
-    Update FastUtil to 8.5.2 from 8.4.4
+    Update Gradle to 7.4
+    Update LWJGL from 3.2.3 to 3.3.0
+    Update FastUtil from 8.4.4 to 8.5.8
     Update LICENSE
     Fixed a bug: You can play game with OpenGL 3.0+!!!

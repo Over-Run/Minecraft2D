@@ -1,10 +1,12 @@
 # Minecraft2D
 
+**THIS IS NOT AN OFFICIAL MINECRAFT PRODUCT. IT IS NOT APPROVED BY OR ASSOCIATED WITH MOJANG.**
+
 ![Java CI with Gradle](https://github.com/Over-Run/Minecraft2D/workflows/Java%20CI%20with%20Gradle/badge.svg)
 
-Minecraft2D, a 2d sandbox game, use OpenGL.
+Minecraft2D, a 2D sandbox game, use OpenGL.
 
-This game is publishing on [itch.io](https://squid233.itch.io/minecraft2d), too.
+This game is also on [itch.io](https://squid233.itch.io/minecraft2d).
 
 ## Runtime Environment
 
@@ -32,10 +34,10 @@ Since 0.5.0, you must play game with the [launcher](https://over-run.github.io/m
 
 ## Minecraft2D & Minecraft
 
-This game is not support by Mojang Studios. Don't ask them!
+Again. **THIS IS NOT AN OFFICIAL MINECRAFT PRODUCT. IT IS NOT APPROVED BY OR ASSOCIATED WITH MOJANG.**
 
 |              | Minecraft2D | Minecraft       |
-| ------------ | ----------- | --------------- |
+|--------------|-------------|-----------------|
 | Free         | Y           | N               |
 | Java Version | 11+ (LTS)   | 8+              |
 | Mods         | Y           | Y(Non-Official) |

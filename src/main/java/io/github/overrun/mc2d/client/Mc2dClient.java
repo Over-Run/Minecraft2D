@@ -113,7 +113,7 @@ public final class Mc2dClient implements Closeable {
     public void render(float delta) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         if (world != null) {
-            worldRenderer.render(Mouse.mouseX, Mouse.mouseY);
+            worldRenderer.render(delta, Mouse.mouseX, Mouse.mouseY);
         }
         glClear(GL_DEPTH_BUFFER_BIT);
         renderHud();

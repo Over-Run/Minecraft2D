@@ -64,7 +64,7 @@ public class Block implements ItemConvertible {
     }
 
     public void render(boolean dark, int x, int y, int z) {
-        Identifier id = Registry.BLOCK.getId(this);
+        var id = Registry.BLOCK.getId(this);
         glColor4f(1, 1, 1, 1);
         Mc2dClient.getInstance().getTextureManager().bindTexture(
             new Identifier(id.getNamespace(), "textures/block/" + id.getPath() + ".png"));
