@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2021 Over-Run
+ * Copyright (c) 2020-2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,12 +30,12 @@ import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.function.Consumer;
+
+import static org.lwjgl.stb.STBImage.STBI_rgb_alpha;
+import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
 
 /**
  * @author squid233
@@ -44,16 +44,15 @@ import java.util.function.Consumer;
 public final class ImageReader {
     private static final Logger logger = LogManager.getLogger(ImageReader.class.getName());
 
-    public static BufferedImage read(String path, ClassLoader loader) {
-        try {
-            return ImageIO.read(
-                    Objects.requireNonNull(
-                            Objects.requireNonNullElse(
-                                    loader,
-                                    ClassLoader.getSystemClassLoader()
-                            ).getResource(path)
-                    )
-            );
+    public static byte[] read(String path, ClassLoader loader) {
+        try (var is = Objects.requireNonNullElse(
+            loader,
+            ClassLoader.getSystemClassLoader()
+        ).getResourceAsStream(path)) {
+            if (is == null) {
+                return null;
+            }
+            return is.readAllBytes();
         } catch (Throwable t) {
             logger.catching(t);
             return null;
@@ -66,33 +65,25 @@ public final class ImageReader {
      * @param path The image path.
      * @return Read {@link BufferedImage}.
      */
-    public static BufferedImage read(String path) {
+    public static byte[] read(String path) {
         return read(path, ClassLoader.getSystemClassLoader());
     }
 
     public static Texture readImg(String path) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            BufferedImage img = read(path);
+        try (var stack = MemoryStack.stackPush()) {
+            byte[] img = read(path);
             if (img == null) {
                 return new Texture(2, 2, Utils.putInt(stack.malloc(16),
-                        new int[]{
-                                0xfff800f8, 0xff000000,
-                                0xff000000, 0xfff800f8
-                        }).flip());
-            } else {
-                int width = img.getWidth();
-                int height = img.getHeight();
-                ByteBuffer buf = MemoryUtil.memAlloc(width * height << 2);
-                for (int i = 0; i < height; i++) {
-                    for (int j = 0; j < width; j++) {
-                        ColorModel cm = img.getColorModel();
-                        Object o = img.getRaster().getDataElements(j, i, null);
-                        buf.putInt(cm.getAlpha(o) << 24 | cm.getBlue(o) << 16 | cm.getGreen(o) << 8 | cm.getRed(o));
-                    }
-                }
-                buf.flip();
-                return new Texture(width, height, buf);
+                    0xfff800f8, 0xff000000,
+                    0xff000000, 0xfff800f8).flip(), false);
             }
+            var bb = MemoryUtil.memAlloc(img.length);
+            bb.put(img).flip();
+            var xp = stack.mallocInt(1);
+            var yp = stack.mallocInt(1);
+            var cp = stack.mallocInt(1);
+            var buf = stbi_load_from_memory(bb, xp, yp, cp, STBI_rgb_alpha);
+            return new Texture(xp.get(0), yp.get(0), buf, true);
         }
     }
 
@@ -105,8 +96,8 @@ public final class ImageReader {
      * @return An image as {@link GLFWImage.Buffer}.
      */
     public static GLFWImage.Buffer readGlfwImg(String path) {
-        try (final GLFWImage image = GLFWImage.malloc()) {
-            final Texture buf = readImg(path);
+        try (final GLFWImage image = GLFWImage.malloc();
+             final Texture buf = readImg(path)) {
             return GLFWImage.malloc(1).put(0, image.set(buf.getWidth(), buf.getHeight(), buf.getBuffer()));
         }
     }

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2021 Over-Run
+ * Copyright (c) 2020-2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,13 +29,19 @@ import io.github.overrun.mc2d.Player;
 import io.github.overrun.mc2d.client.gui.Framebuffer;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
 import io.github.overrun.mc2d.client.gui.screen.TitleScreen;
-import io.github.overrun.mc2d.level.World;
+import io.github.overrun.mc2d.client.world.render.WorldRenderer;
+import io.github.overrun.mc2d.util.Identifier;
+import io.github.overrun.mc2d.world.World;
 import io.github.overrun.mc2d.mod.ModLoader;
 import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.text.TranslatableText;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
+
+import static io.github.overrun.mc2d.client.gui.DrawableHelper.drawTexture;
+import static io.github.overrun.mc2d.util.registry.Registry.BLOCK;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author squid233
@@ -48,6 +54,7 @@ public final class Mc2dClient implements Closeable {
     private final TextureManager textureManager;
     public Screen screen;
     public @Nullable World world;
+    public WorldRenderer worldRenderer;
     public Player player;
     public int fps;
     public boolean debugging;
@@ -76,26 +83,49 @@ public final class Mc2dClient implements Closeable {
     }
 
     public void renderHud() {
-        if (debugging) {
-            textRenderer.draw(0, 0, Main.VERSION_TEXT);
-            textRenderer.draw(0, 17, IText.of(fps + " fps"));
-            textRenderer.draw(0, 34, new TranslatableText("player.position", player.x, player.y, player.z));
-            textRenderer.draw(0, 51, new TranslatableText("player.hand.block", player.handledBlock));
+        if (world != null) {
+            if (debugging) {
+                textRenderer.draw(0, 0, Main.VERSION_TEXT);
+                textRenderer.draw(0, 17, IText.of(fps + " fps"));
+                textRenderer.draw(0, 34, new TranslatableText("player.position", player.x, player.y, player.z));
+                textRenderer.draw(0, 51, new TranslatableText("player.hand.block", player.handledBlock));
 //            textRenderer.draw(0, 68, new TranslatableText("Point.block.pos", pointBlockX, pointBlockY, pointBlockZ));
 //            textRenderer.draw(0, 85, new TranslatableText("Point.block", pointBlock));
-            textRenderer.draw(0, 102, MAX_MEMORY);
-            if (ModLoader.getModCount() > 0) {
-                textRenderer.draw(0, 119, new TranslatableText("mods.count", ModLoader.getModCount()));
+                textRenderer.draw(0, 102, MAX_MEMORY);
+                if (ModLoader.getModCount() > 0) {
+                    textRenderer.draw(0, 119, new TranslatableText("mods.count", ModLoader.getModCount()));
+                }
             }
+
+            glPushMatrix();
+            glTranslatef(Framebuffer.width - 64, 0, 0);
+            Identifier id = BLOCK.getId(player.handledBlock);
+            glColor3f(1, 1, 1);
+            textureManager.bindTexture(new Identifier(id.getNamespace(), "textures/block/" + id.getPath() + ".png"));
+            drawTexture(0, 0, 64, 64);
+            glPopMatrix();
         }
     }
 
     public void render(float delta) {
-        screen.render(Mouse.mouseX, Mouse.mouseY, delta);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        if (world != null) {
+            world.render(Mouse.mouseX, Mouse.mouseY);
+        }
+        glClear(GL_DEPTH_BUFFER_BIT);
+        renderHud();
+        if (screen != null) {
+            screen.render(Mouse.mouseX, Mouse.mouseY, delta);
+        }
     }
 
     public void tick() {
-        screen.tick();
+        if (screen != null) {
+            screen.tick();
+        }
+        if (player != null) {
+            player.tick();
+        }
     }
 
     public TextureManager getTextureManager() {

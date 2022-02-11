@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2021 Over-Run
+ * Copyright (c) 2020-2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@
 package io.github.overrun.mc2d.client.gui.screen.world;
 
 import io.github.overrun.mc2d.client.gui.screen.DirtScreen;
-import io.github.overrun.mc2d.client.gui.screen.ingame.InGameScreen;
 import io.github.overrun.mc2d.text.TranslatableText;
 
 /**
@@ -51,7 +50,7 @@ public final class LoadingWorldScreen extends DirtScreen {
     @Override
     public void onClose() {
         super.onClose();
-        client.openScreen(new InGameScreen());
+        client.openScreen(null);
     }
 
     @Override

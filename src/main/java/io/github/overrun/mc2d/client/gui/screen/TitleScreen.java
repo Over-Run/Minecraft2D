@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2021 Over-Run
+ * Copyright (c) 2020-2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,8 @@ import io.github.overrun.mc2d.Main;
 import io.github.overrun.mc2d.Player;
 import io.github.overrun.mc2d.client.gui.screen.world.LoadingWorldScreen;
 import io.github.overrun.mc2d.client.gui.widget.ButtonWidget;
-import io.github.overrun.mc2d.level.World;
+import io.github.overrun.mc2d.client.world.render.WorldRenderer;
+import io.github.overrun.mc2d.world.World;
 import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.text.TranslatableText;
 import io.github.overrun.mc2d.util.Identifier;
@@ -43,6 +44,7 @@ import static org.lwjgl.opengl.GL11.glColor4f;
  */
 public final class TitleScreen extends Screen {
     public static final Identifier LOGO = new Identifier("textures/gui/logo.png");
+
     public TitleScreen() {
         super(IText.EMPTY);
     }
@@ -51,27 +53,29 @@ public final class TitleScreen extends Screen {
     protected void init() {
         super.init();
         addButton(new ButtonWidget(width - 400 >> 1,
-                (height - 40 >> 1) - 50,
-                200,
-                20,
-                new TranslatableText("Play"),
-                b -> {
-                    client.player = new Player();
-                    client.world = new World(client.player, 64, 64);
-                    client.openScreen(new LoadingWorldScreen());
-                }));
+            (height - 40 >> 1) - 50,
+            200,
+            20,
+            new TranslatableText("Play"),
+            b -> {
+                client.player = new Player();
+                client.world = new World(client.player, 64, 64);
+                client.worldRenderer = new WorldRenderer(client.world);
+                client.openScreen(new LoadingWorldScreen());
+            }));
         addButton(new ButtonWidget(width - 400 >> 1,
-                height - 40 >> 1,
-                200,
-                20,
-                new TranslatableText("Mods"),
-                b -> {})).active = false;
+            height - 40 >> 1,
+            200,
+            20,
+            new TranslatableText("Mods"),
+            b -> {
+            })).active = false;
         addButton(new ButtonWidget(width - 400 >> 1,
-                (height - 40 >> 1) + 50,
-                200,
-                20,
-                new TranslatableText("Exit.Game"),
-                b -> glfwSetWindowShouldClose(glfwGetCurrentContext(), true)));
+            (height - 40 >> 1) + 50,
+            200,
+            20,
+            new TranslatableText("Exit.Game"),
+            b -> glfwSetWindowShouldClose(glfwGetCurrentContext(), true)));
     }
 
     @Override

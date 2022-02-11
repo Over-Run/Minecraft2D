@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'maven-publish'
+    id 'application'
 //    id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
 
@@ -9,27 +10,30 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_11
 
 group 'io.github.over-run'
 archivesBaseName = 'mc2d'
-version '0.6.0'
+version '0.6.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
     maven { url 'https://maven.aliyun.com/repository/central' }
 }
 
-project.ext.lwjglVersion = '3.2.3'
-
 dependencies {
     // May use Gson
-    // implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.google.code.gson:gson:2.8.9'
     // implementation 'com.google.guava:guava:30.1-jre'
-    implementation 'it.unimi.dsi:fastutil:8.5.2'
-    implementation 'org.apache.logging.log4j:log4j-core:2.14.0'
-    compileOnly 'org.jetbrains:annotations:20.1.0'
+    implementation 'it.unimi.dsi:fastutil:8.5.8'
+    implementation 'org.apache.logging.log4j:log4j-core:2.17.1'
+    implementation 'org.joml:joml:1.10.3'
+    compileOnly 'org.jetbrains:annotations:23.0.0'
     // Lwjgl libraries
-    implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
-    for (String depend in ['', '-glfw', '-opengl']) {
+    implementation platform("org.lwjgl:lwjgl-bom:3.3.0")
+    for (String depend in ['', '-glfw', '-opengl', '-stb']) {
         implementation "org.lwjgl:lwjgl$depend"
-        for (String platform in ['windows', 'windows-x86', 'linux-arm64', 'linux-arm32', 'linux', 'macos']) {
+        for (String platform in [
+                'linux-arm32', 'linux-arm64', 'linux',
+                'macos-arm64', 'macos',
+                'windows-arm64', 'windows-x86', 'windows'
+        ]) {
             runtimeOnly "org.lwjgl:lwjgl$depend::natives-$platform"
         }
     }
@@ -39,18 +43,20 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
+application {
+    mainClass = 'io.github.overrun.mc2d.Main'
+}
+
 jar {
     from 'LICENSE'
-    manifest {
-        attributes 'Main-Class': 'io.github.overrun.mc2d.Main',
-                'Specification-Title': 'lwjgl3',
-                'Specification-Vendor': 'LWJGL',
-                'Specification-Version': lwjglVersion,
-                'Implementation-Title': 'Minecraft2D',
-                'Implementation-Vendor': 'Over-Run Organization',
-                'Implementation-Version': archiveVersion,
-                'Multi-Release': true
-    }
+    manifest.attributes('Main-Class': 'io.github.overrun.mc2d.Main',
+            'Specification-Title': 'mc2d',
+            'Specification-Vendor': 'Overrun Organization',
+            'Specification-Version': archiveVersion,
+            'Implementation-Title': 'Minecraft2D',
+            'Implementation-Vendor': 'Overrun Organization',
+            'Implementation-Version': archiveVersion,
+            'Multi-Release': true)
 }
 
 //shadowJar {
@@ -59,14 +65,12 @@ jar {
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     archiveClassifier.set 'sources'
-    from sourceSets.main.allSource
-    from 'LICENSE'
+    from sourceSets.main.allSource, 'LICENSE'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     archiveClassifier.set 'javadoc'
-    from 'build/docs/javadoc'
-    from 'LICENSE'
+    from javadoc, 'LICENSE'
 }
 
 publishing {

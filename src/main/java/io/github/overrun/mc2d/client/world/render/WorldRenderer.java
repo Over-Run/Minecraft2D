@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2022 Overrun Organization
+ * Copyright (c) 2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,15 +22,22 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.item;
+package io.github.overrun.mc2d.client.world.render;
+
+import io.github.overrun.mc2d.world.World;
 
 /**
  * @author squid233
- * @since 2021/01/27
+ * @since 0.6.0
  */
-public class Item implements ItemConvertible {
-    @Override
-    public Item asItem() {
-        return this;
+public class WorldRenderer {
+    private final World world;
+
+    public WorldRenderer(World world) {
+        this.world = world;
+    }
+
+    public void render(int mouseX, int mouseY) {
+        world.render(mouseX, mouseY);
     }
 }

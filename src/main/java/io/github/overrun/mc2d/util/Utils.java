@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2021 Over-Run
+ * Copyright (c) 2020-2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ import java.nio.ByteBuffer;
  * @since 2021/01/23
  */
 public final class Utils {
-    public static ByteBuffer putInt(ByteBuffer buffer, int[] values) {
+    public static ByteBuffer putInt(ByteBuffer buffer, int... values) {
         for (int value : values) {
             buffer.putInt(value);
         }

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2021 Over-Run
+ * Copyright (c) 2020-2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,8 @@ import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.Mouse;
 import io.github.overrun.mc2d.client.Window;
 import io.github.overrun.mc2d.client.gui.Framebuffer;
+import io.github.overrun.mc2d.client.gui.screen.ingame.CreativeTabScreen;
+import io.github.overrun.mc2d.client.gui.screen.ingame.PauseScreen;
 import io.github.overrun.mc2d.event.KeyCallback;
 import io.github.overrun.mc2d.item.Items;
 import io.github.overrun.mc2d.mod.ModLoader;
@@ -36,6 +38,7 @@ import io.github.overrun.mc2d.text.LiteralText;
 import io.github.overrun.mc2d.util.ImageReader;
 import io.github.overrun.mc2d.util.Language;
 import io.github.overrun.mc2d.util.Options;
+import io.github.overrun.mc2d.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.Version;
@@ -47,6 +50,8 @@ import org.lwjgl.system.MemoryStack;
 import java.io.Closeable;
 import java.nio.IntBuffer;
 
+import static io.github.overrun.mc2d.block.Blocks.*;
+import static io.github.overrun.mc2d.block.Blocks.BEDROCK;
 import static java.lang.Math.max;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -86,7 +91,6 @@ public final class Main implements Runnable, Closeable {
         long lastTime = System.currentTimeMillis();
         int frames = 0;
         while (!Window.shouldClose()) {
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             timer.advanceTime();
             for (int i = 0; i < timer.ticks; i++) {
                 client.tick();
@@ -107,7 +111,7 @@ public final class Main implements Runnable, Closeable {
         GLFWErrorCallback.create((error, description) -> {
             logger.error("########## GL ERROR ##########");
             logger.error("{}: {}", error, memUTF8(description));
-        });
+        }).set();
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
@@ -119,7 +123,12 @@ public final class Main implements Runnable, Closeable {
         Window.setKeyCallback((window, key, scancode, action, mods) -> {
             KeyCallback.post(window, key, scancode, action, mods);
             if (action == GLFW_PRESS) {
-                client.screen.keyPressed(key, scancode, mods);
+                if (client.screen != null) {
+                    client.screen.keyPressed(key, scancode, mods);
+                } else if (key == GLFW_KEY_ESCAPE && client.world != null) {
+                    client.openScreen(new PauseScreen(null));
+                }
+
                 if (key == GLFW_KEY_F11) {
                     GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
                     if (glfwGetWindowMonitor(window) == 0) {
@@ -130,8 +139,8 @@ public final class Main implements Runnable, Closeable {
                             oldX = pX.get(0);
                             oldY = pY.get(0);
                         }
-                        oldWidth = Window.width;
-                        oldHeight = Window.height;
+                        oldWidth = Framebuffer.width;
+                        oldHeight = Framebuffer.height;
                         if (vidMode != null) {
                             glfwSetWindowMonitor(window,
                                     glfwGetPrimaryMonitor(),
@@ -145,11 +154,47 @@ public final class Main implements Runnable, Closeable {
                         glfwSetWindowMonitor(window, 0, oldX, oldY, oldWidth, oldHeight, 0);
                     }
                 }
+
+                if (client.world != null) {
+                    if (key == GLFW_KEY_ENTER) {
+                        client.world.save();
+                    }
+                    if (key == GLFW_KEY_1) {
+                        client.player.handledBlock = GRASS_BLOCK;
+                    }
+                    if (key == GLFW_KEY_2) {
+                        client.player.handledBlock = DIRT;
+                    }
+                    if (key == GLFW_KEY_3) {
+                        client.player.handledBlock = COBBLESTONE;
+                    }
+                    if (key == GLFW_KEY_4) {
+                        client.player.handledBlock = BEDROCK;
+                    }
+                    if (key == GLFW_KEY_F3) {
+                        client.debugging = !client.debugging;
+                    }
+                    // , || .
+                    if (key == GLFW_KEY_COMMA || key == GLFW_KEY_PERIOD) {
+                        --World.z;
+                        if (World.z < 0) {
+                            World.z = 1;
+                        }
+                        if (World.z > 1) {
+                            World.z = 0;
+                        }
+                    }
+                    if (key == Options.getI(Options.KEY_CREATIVE_TAB, GLFW_KEY_E)) {
+                        client.openScreen(new CreativeTabScreen(client.player, null));
+                    }
+                }
             }
         });
         Window.setMouseButtonCallback((window, button, action, mods) -> {
             if (action == GLFW_PRESS) {
-                client.screen.mousePressed(Mouse.mouseX, Mouse.mouseY, button);
+                if (client.screen != null) {
+                    client.screen.mousePressed(Mouse.mouseX, Mouse.mouseY, button);
+                }
             }
         });
         Window.setCloseCallback(window -> {
@@ -179,6 +224,8 @@ public final class Main implements Runnable, Closeable {
         GL.createCapabilities();
         glfwSwapInterval(Boolean.parseBoolean(System.getProperty("mc2d.vsync", "true")) ? 1 : 0);
         Window.show();
+        Framebuffer.setSize(896, 512);
+        resize(896, 512);
     }
 
     private void resize(int width, int height) {
@@ -189,9 +236,10 @@ public final class Main implements Runnable, Closeable {
         if (client.screen == null) {
             client.openScreen(null);
         }
-        Window.width = w;
-        Window.height = h;
-        client.screen.init(client, fw, fh);
+        Framebuffer.setSize(w, h);
+        if (client.screen != null) {
+            client.screen.init(client, w, h);
+        }
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glOrtho(0, fw, fh, 0, 1, -1);

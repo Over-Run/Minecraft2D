@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2021 Over-Run
+ * Copyright (c) 2020-2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,11 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.level;
+package io.github.overrun.mc2d.world;
 
 import io.github.overrun.mc2d.Player;
 import io.github.overrun.mc2d.block.Block;
-import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.gui.Framebuffer;
-import io.github.overrun.mc2d.client.gui.screen.ingame.InGameScreen;
 import io.github.overrun.mc2d.util.GlUtils;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.Registry;
@@ -36,15 +34,7 @@ import io.github.overrun.mc2d.util.shape.VoxelShape;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.util.Arrays;
 
 import static io.github.overrun.mc2d.block.Blocks.*;
@@ -57,7 +47,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author squid233
  * @since 2021/01/09
  */
-public final class World implements Serializable {
+public class World implements Serializable {
     private static final Logger logger = LogManager.getLogger(World.class.getName());
     private static final long serialVersionUID = 3L;
     public static byte z;
@@ -125,7 +115,6 @@ public final class World implements Serializable {
     }
 
     public void render(int z, int mouseX, int mouseY) {
-        boolean inGame = Mc2dClient.getInstance().screen instanceof InGameScreen;
         Block target;
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -139,8 +128,7 @@ public final class World implements Serializable {
                 b.z = (byte) z;
                 boolean dark = getBlock(x, y, 0) == AIR;
                 b.render(z == 0 || dark, dark);
-                if (inGame
-                        && mouseX >= ltX
+                if (mouseX >= ltX
                         && mouseX < rdX
                         && mouseY >= ltY
                         && mouseY < rdY) {
@@ -174,7 +162,6 @@ public final class World implements Serializable {
         render(1, mouseX, mouseY);
         player.render(mouseX, mouseY);
         render(0, mouseX, mouseY);
-        Mc2dClient.getInstance().renderHud();
     }
 
     public void load() {

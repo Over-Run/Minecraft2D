@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2021 Over-Run
+ * Copyright (c) 2020-2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,21 +24,29 @@
 
 package io.github.overrun.mc2d.util;
 
+import org.lwjgl.stb.STBImage;
+import org.lwjgl.system.MemoryUtil;
+
 import java.nio.ByteBuffer;
 
 /**
  * @author squid233
  * @since 2021/01/08
  */
-public final class Texture {
+public final class Texture implements AutoCloseable {
     private final int width;
     private final int height;
     private final ByteBuffer buffer;
+    private final boolean useStb;
 
-    public Texture(int width, int height, ByteBuffer buffer) {
+    public Texture(int width,
+                   int height,
+                   ByteBuffer buffer,
+                   boolean useStb) {
         this.width = width;
         this.height = height;
         this.buffer = buffer;
+        this.useStb=useStb;
     }
 
     public int getWidth() {
@@ -51,5 +59,15 @@ public final class Texture {
 
     public ByteBuffer getBuffer() {
         return buffer;
+    }
+
+    public boolean isUseStb() {
+        return useStb;
+    }
+
+    @Override
+    public void close() {
+        if (useStb) STBImage.stbi_image_free(buffer);
+        else MemoryUtil.memFree(buffer);
     }
 }
