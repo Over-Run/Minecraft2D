@@ -47,7 +47,7 @@ public final class GlUtils {
      * @param alpha The alpha value.
      */
     public static void drawRect(double x1, double y1, double x2, double y2, int color, boolean alpha) {
-        glBegin(GL_LINE_STRIP);
+        glBegin(GL_LINE_LOOP);
         var r = color << 8 >>> 24;
         var g = color << 16 >>> 24;
         var b = color << 24 >>> 24;
@@ -57,15 +57,13 @@ public final class GlUtils {
             glColor3f(r / 255f, g / 255f, b / 255f);
         }
         // Left top
-        glVertex2d(x1, y1 + 1);
+        glVertex2d(x1, y1);
         // Left down
-        glVertex2d(x1 + 1, y2);
+        glVertex2d(x1, y2);
         // Right down
-        glVertex2d(x2 - 1, y2);
+        glVertex2d(x2, y2);
         // Right up
-        glVertex2d(x2, y1 + 1);
-        // Origin point
-        glVertex2d(x1, y1 + 1);
+        glVertex2d(x2, y1);
         glEnd();
     }
 

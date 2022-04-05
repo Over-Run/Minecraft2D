@@ -26,13 +26,15 @@ package io.github.overrun.mc2d.world;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import io.github.overrun.mc2d.block.Block;
-import io.github.overrun.mc2d.block.Blocks;
+import io.github.overrun.mc2d.world.block.Block;
+import io.github.overrun.mc2d.world.block.Blocks;
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.gui.DrawableHelper;
 import io.github.overrun.mc2d.client.gui.Framebuffer;
 import io.github.overrun.mc2d.util.Identifier;
 import org.joml.Vector3d;
+import org.overrun.swgl.core.phys.p2d.AABBox2f;
+import org.overrun.swgl.core.util.math.Numbers;
 
 import java.io.IOException;
 
@@ -44,7 +46,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author squid233
  * @since 2021/01/09
  */
-public final class Player extends DrawableHelper {
+public class Player extends DrawableHelper {
     public static final Identifier TEXTURE = new Identifier("textures/player.png");
     private static final long serialVersionUID = 2L;
     public Block handledBlock = Blocks.GRASS_BLOCK;
@@ -54,16 +56,26 @@ public final class Player extends DrawableHelper {
     public final Vector3d position = new Vector3d();
     public boolean facingRight = true;
     public final Vector3d velocity = new Vector3d();
+    public AABBox2f box;
+    public boolean onGround = false;
+    protected float bbWidth = 0.6f;
+    protected float bbHeight = 1.8f;
+    public World world;
 
-    public Player(int ww, int wh, int wd) {
-        position.x = Math.random() * ww;
-        position.y = wh + 10;
-        position.z = 1.5;
+    public Player(World world) {
+        this.world = world;
+        setPos(Math.random() * world.width, world.height + 10, 0.5);
+    }
+
+    public void setPos(double x, double y, double z) {
+        position.set(x, y, z);
+        float hw = bbWidth * 0.5f;
+        box = new AABBox2f((float) (x - hw), (float) y, (float) (x + hw), (float) (y + bbHeight));
     }
 
     public void tick() {
         prevPos.set(position);
-        double xa = 0, ya = 0;
+        double xa = 0;
         if (isKeyPress(GLFW_KEY_A)
             || isKeyPress(GLFW_KEY_LEFT)) {
             --xa;
@@ -81,18 +93,51 @@ public final class Player extends DrawableHelper {
         if (isKeyPress(GLFW_KEY_SPACE)
             || isKeyPress(GLFW_KEY_W)
             || isKeyPress(GLFW_KEY_UP)) {
-            ++ya;
+            velocity.y = 0.5f;
         }
         if (isKeyPress(GLFW_KEY_LEFT_SHIFT)
             || isKeyPress(GLFW_KEY_S)
             || isKeyPress(GLFW_KEY_DOWN)
         ) {
-            --ya;
+            velocity.y = -0.5f;
         }
-        velocity.add(xa * 0.1, ya * 0.1, 0);
-        position.add(velocity);
-        velocity.mul(0.91, 0.91, 0.91);
-        velocity.mul(0.7, 0.7, 0.7);
+        moveRelative(xa, onGround ? 0.1f : 0.02f);
+        velocity.y -= 0.08;
+        move((float) velocity.x(), (float) velocity.y());
+        velocity.mul(0.91, 0.98, 0.91);
+        if (onGround) {
+            velocity.mul(0.7, 1.0, 0.7);
+        }
+    }
+
+    public void moveRelative(double x, float speed) {
+        if ((x * x) >= 0.01f) {
+            velocity.x += x * speed / Math.abs(x);
+        }
+    }
+
+    public void move(float x, float y) {
+        float xaOrg = x;
+        float yaOrg = y;
+        var cubes = world.getCubes(0, box.expand(x, y, new AABBox2f()));
+        for (var cube : cubes) {
+            y = box.clipYCollide(y, cube);
+        }
+        box.move(0.0f, y);
+        for (var cube : cubes) {
+            x = box.clipXCollide(x, cube);
+        }
+        box.move(x, 0.0f);
+        onGround = yaOrg != y && yaOrg < 0.0f;
+        if (Numbers.isNonEqual(xaOrg, x))
+            velocity.x = 0.0f;
+        if (Numbers.isNonEqual(yaOrg, y))
+            velocity.y = 0.0f;
+        position.set(
+            (box.getMinX() + box.getMaxX()) * 0.5f,
+            box.getMinY(),
+            position.z()
+        );
     }
 
     public void render(double delta, int mouseX, int mouseY) {
@@ -104,37 +149,39 @@ public final class Player extends DrawableHelper {
         glPushMatrix();
         // Move to center
         glTranslated(x, y, 0);
+        final float scalar = 1.8f / 2.0f;
+        glScalef(scalar, scalar, scalar);
         glBegin(GL_QUADS);
 
         // Draw head
         glTexCoord2f(facingRight ? 0 : 0.5f, 0);
-        glVertex2f(-8, -64);
+        glVertex2f(-8, 64);
         glTexCoord2f(facingRight ? 0 : 0.5f, 0.4f);
-        glVertex2f(-8, -48);
+        glVertex2f(-8, 48);
         glTexCoord2f(facingRight ? 0.5f : 1, 0.4f);
-        glVertex2f(8, -48);
+        glVertex2f(8, 48);
         glTexCoord2f(facingRight ? 0.5f : 1, 0);
-        glVertex2f(8, -64);
+        glVertex2f(8, 64);
 
         // Draw body
         glTexCoord2f(facingRight ? 0.5f : 0.75f, 0.4f);
-        glVertex2f(-4, -48);
+        glVertex2f(-4, 48);
         glTexCoord2f(facingRight ? 0.5f : 0.75f, 1);
-        glVertex2f(-4, -24);
+        glVertex2f(-4, 24);
         glTexCoord2f(facingRight ? 0.75f : 1, 1);
-        glVertex2f(4, -24);
+        glVertex2f(4, 24);
         glTexCoord2f(facingRight ? 0.75f : 1, 0.4f);
-        glVertex2f(4, -48);
+        glVertex2f(4, 48);
 
         // Draw legs
         glTexCoord2f(facingRight ? 0 : 0.25f, 0.4f);
-        glVertex2f(-4, -24);
+        glVertex2f(-4, 24);
         glTexCoord2f(facingRight ? 0 : 0.25f, 1);
         glVertex2f(-4, 0);
         glTexCoord2f(facingRight ? 0.25f : 0.5f, 1);
         glVertex2f(4, 0);
         glTexCoord2f(facingRight ? 0.25f : 0.5f, 0.4f);
-        glVertex2f(4, -24);
+        glVertex2f(4, 24);
 
         glEnd();
         glPopMatrix();
@@ -153,20 +200,15 @@ public final class Player extends DrawableHelper {
         reader.beginObject();
         while (reader.hasNext()) {
             switch (reader.nextName()) {
-                case "version":
+                case "version" -> {
                     var v = reader.nextLong();
                     if (serialVersionUID != v) {
                         throw new RuntimeException("Doesn't compatible with version " + v + ". Current is " + serialVersionUID);
                     }
-                    break;
-                case "x":
-                    position.x = reader.nextDouble();
-                    break;
-                case "y":
-                    position.y = reader.nextDouble();
-                    break;
-                case "z":
-                    reader.nextDouble();
+                }
+                case "x" -> position.x = reader.nextDouble();
+                case "y" -> position.y = reader.nextDouble();
+                case "z" -> reader.nextDouble();
             }
         }
         reader.endObject();

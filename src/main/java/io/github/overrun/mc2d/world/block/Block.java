@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.block;
+package io.github.overrun.mc2d.world.block;
 
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.item.Item;
@@ -31,13 +31,14 @@ import io.github.overrun.mc2d.item.Items;
 import io.github.overrun.mc2d.util.GlUtils;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.Registry;
-import io.github.overrun.mc2d.util.shape.VoxelShape;
 import io.github.overrun.mc2d.util.shape.VoxelShapes;
+import org.jetbrains.annotations.Nullable;
+import org.overrun.swgl.core.phys.p2d.AABBox2f;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.github.overrun.mc2d.client.gui.DrawableHelper.drawTexture;
+import static io.github.overrun.mc2d.client.gui.DrawableHelper.drawTextureFlip;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
@@ -47,11 +48,13 @@ import static org.lwjgl.opengl.GL11.*;
 public class Block implements ItemConvertible {
     public static final Map<Block, Item> BLOCK_ITEMS = new HashMap<>();
 
-    public VoxelShape getOutlineShape() {
+    @Nullable
+    public AABBox2f getOutlineShape() {
         return getCollisionShape();
     }
 
-    public VoxelShape getCollisionShape() {
+    @Nullable
+    public AABBox2f getCollisionShape() {
         return VoxelShapes.fullSquare();
     }
 
@@ -68,10 +71,10 @@ public class Block implements ItemConvertible {
         glColor4f(1, 1, 1, 1);
         Mc2dClient.getInstance().getTextureManager().bindTexture(
             new Identifier(id.getNamespace(), "textures/block/" + id.getPath() + ".png"));
-        drawTexture(x, y, 32, 32);
+        drawTextureFlip(x, y, 32, 32);
         if (dark) {
             glDisable(GL_TEXTURE_2D);
-            GlUtils.fillRect(x, y, x + 32, y + 32, 0x80000000, true);
+            GlUtils.fillRect(x, y + 32, x + 32, y, 0x80000000, true);
             glEnable(GL_TEXTURE_2D);
         }
     }

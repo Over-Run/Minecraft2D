@@ -73,9 +73,13 @@ public final class ImageReader {
         try (var stack = MemoryStack.stackPush()) {
             byte[] img = read(path);
             if (img == null) {
-                return new Texture(2, 2, Utils.putInt(stack.malloc(16),
-                    0xfff800f8, 0xff000000,
-                    0xff000000, 0xfff800f8).flip(), false);
+                return new Texture(2, 2,
+                    stack.malloc(16)
+                        .putInt(0xfff800f8)
+                        .putInt(0xff000000)
+                        .putInt(0xff000000)
+                        .putInt(0xfff800f8)
+                        .flip(), false);
             }
             var bb = MemoryUtil.memAlloc(img.length);
             bb.put(img).flip();
@@ -96,8 +100,8 @@ public final class ImageReader {
      * @return An image as {@link GLFWImage.Buffer}.
      */
     public static GLFWImage.Buffer readGlfwImg(String path) {
-        try (final GLFWImage image = GLFWImage.malloc();
-             final Texture buf = readImg(path)) {
+        try (final var image = GLFWImage.malloc();
+             final var buf = readImg(path)) {
             return GLFWImage.malloc(1).put(0, image.set(buf.getWidth(), buf.getHeight(), buf.getBuffer()));
         }
     }

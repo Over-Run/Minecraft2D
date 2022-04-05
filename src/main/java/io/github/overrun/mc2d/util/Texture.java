@@ -46,7 +46,7 @@ public final class Texture implements AutoCloseable {
         this.width = width;
         this.height = height;
         this.buffer = buffer;
-        this.useStb=useStb;
+        this.useStb = useStb;
     }
 
     public int getWidth() {

@@ -26,19 +26,22 @@ package io.github.overrun.mc2d.world;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import io.github.overrun.mc2d.block.Block;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.Registry;
+import io.github.overrun.mc2d.world.block.Block;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.overrun.swgl.core.phys.p2d.AABBox2f;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import static io.github.overrun.mc2d.block.Blocks.*;
+import static io.github.overrun.mc2d.world.block.Blocks.*;
 
 /**
  * @author squid233
@@ -53,7 +56,7 @@ public class World {
     public final int height;
     public final int depth;
 
-    public World(Player player, int w, int h) {
+    public World(int w, int h) {
         width = w;
         height = h;
         depth = 2;
@@ -88,7 +91,6 @@ public class World {
                 setBlock(i, 5, j, GRASS_BLOCK);
             }
         }
-        load(player);
     }
 
     public void setBlock(int x, int y, int z, Block block) {
@@ -107,6 +109,38 @@ public class World {
 
     public int getIndex(int x, int y, int z) {
         return x % width + y * width + z * width * height;
+    }
+
+    public List<AABBox2f> getCubes(int z, AABBox2f origin) {
+        var lst = new ArrayList<AABBox2f>();
+        int x0 = (int) origin.getMinX();
+        int y0 = (int) origin.getMinY();
+        int x1 = (int) (origin.getMaxX() + 1.0f);
+        int y1 = (int) (origin.getMaxY() + 1.0f);
+
+        if (x0 < 0) {
+            x0 = 0;
+        }
+        if (y0 < 0) {
+            y0 = 0;
+        }
+
+        if (x1 > width) {
+            x1 = width;
+        }
+        if (y1 > height) {
+            y1 = height;
+        }
+
+        for (int x = x0; x < x1; x++) {
+            for (int y = y0; y < y1; y++) {
+                var aabb = getBlock(x, y, z).getCollisionShape();
+                if (aabb != null) {
+                    lst.add(new AABBox2f(aabb.getMinX() / 16.0f + x, aabb.getMinY() / 16.0f + y, aabb.getMaxX() / 16.0f + x, aabb.getMaxY() / 16.0f + y));
+                }
+            }
+        }
+        return lst;
     }
 
     public void load(Player player) {
@@ -168,39 +202,31 @@ public class World {
         reader.beginObject();
         while (reader.hasNext()) {
             switch (reader.nextName()) {
-                case "version":
+                case "version" -> {
                     var v = reader.nextLong();
                     if (serialVersionUID != v) {
                         throw new RuntimeException("Doesn't compatible with version " + v + ". Current is " + serialVersionUID);
                     }
-                    break;
-                case "width":
-                    w = reader.nextInt();
-                    break;
-                case "height":
-                    h = reader.nextInt();
-                    break;
-                case "depth":
-                    d = reader.nextInt();
-                    break;
-                case "player":
-                    player.deserialize(reader);
-                    break;
-                case "id_map":
+                }
+                case "width" -> w = reader.nextInt();
+                case "height" -> h = reader.nextInt();
+                case "depth" -> d = reader.nextInt();
+                case "player" -> player.deserialize(reader);
+                case "id_map" -> {
                     reader.beginObject();
                     while (reader.hasNext()) {
                         idMap.put(Integer.parseInt(reader.nextName()),
                             new Identifier(reader.nextString()));
                     }
                     reader.endObject();
-                    break;
-                case "blocks":
+                }
+                case "blocks" -> {
                     reader.beginArray();
                     for (int i = 0, l = w * h * d; i < l; i++) {
                         blocks[i] = idMap.get(reader.nextInt());
                     }
                     reader.endArray();
-                    break;
+                }
             }
         }
         reader.endObject();

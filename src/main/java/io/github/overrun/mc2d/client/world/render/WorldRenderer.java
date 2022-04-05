@@ -24,15 +24,15 @@
 
 package io.github.overrun.mc2d.client.world.render;
 
-import io.github.overrun.mc2d.block.Block;
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.gui.Framebuffer;
 import io.github.overrun.mc2d.util.GlUtils;
 import io.github.overrun.mc2d.world.World;
+import io.github.overrun.mc2d.world.block.Block;
 import org.joml.Vector3d;
 
-import static io.github.overrun.mc2d.block.Blocks.AIR;
 import static io.github.overrun.mc2d.client.Mouse.isMousePress;
+import static io.github.overrun.mc2d.world.block.Blocks.AIR;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
 import static org.lwjgl.opengl.GL11.*;
@@ -59,27 +59,27 @@ public class WorldRenderer {
         for (int y = 0; y < world.height; y++) {
             for (int x = 0; x < world.width; x++) {
                 var b = world.getBlock(x, y, z);
-                double ltX = (Framebuffer.width >> 1) + (x - interpolation.x) * 32,
-                    ltY = (Framebuffer.height >> 1) - (y - interpolation.y) * 32 - 32,
-                    rdX = ltX + 32,
-                    rdY = ltY + 32;
+                double ldX = (Framebuffer.width >> 1) + (x - interpolation.x) * 32,
+                    ldY = (Framebuffer.height >> 1) + (y - interpolation.y) * 32,
+                    rtX = ldX + 32,
+                    rtY = ldY + 32;
                 var dark = world.getBlock(x, y, 0) == AIR;
                 if (z == 0 || dark) {
-                    b.render(dark, (int) ltX, (int) ltY, z);
+                    b.render(dark, (int) ldX, (int) ldY, z);
                 }
-                if (mouseX >= ltX
-                    && mouseX < rdX
-                    && mouseY >= ltY
-                    && mouseY < rdY) {
+                if (mouseX >= ldX
+                    && mouseX < rtX
+                    && mouseY >= ldY
+                    && mouseY < rtY) {
                     target = world.getBlock(x, y, World.z);
                     glDisable(GL_TEXTURE_2D);
                     if (z == 0 || dark) {
                         var shape = b.getOutlineShape();
-                        if (shape.x0 > -1 && shape.y0 > -1 && shape.x1 > -1 && shape.y1 > -1) {
-                            GlUtils.drawRect(ltX + shape.x0,
-                                ltY + shape.y0,
-                                ltX + (shape.x1 << 1),
-                                ltY + (shape.y1 << 1),
+                        if (shape != null) {
+                            GlUtils.drawRect(ldX + shape.getMinX(),
+                                ldY + shape.getMinY(),
+                                ldX + ((int) shape.getMaxX() << 1),
+                                ldY + ((int) shape.getMaxY() << 1),
                                 0x80000000,
                                 true);
                         }

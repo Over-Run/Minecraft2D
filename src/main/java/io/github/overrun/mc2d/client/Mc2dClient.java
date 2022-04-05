@@ -37,8 +37,6 @@ import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.text.TranslatableText;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.Closeable;
-
 import static io.github.overrun.mc2d.client.gui.DrawableHelper.drawTexture;
 import static io.github.overrun.mc2d.util.registry.Registry.BLOCK;
 import static org.lwjgl.opengl.GL11.*;
@@ -47,7 +45,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author squid233
  * @since 2021/01/25
  */
-public final class Mc2dClient implements Closeable {
+public final class Mc2dClient implements AutoCloseable {
     private static final Mc2dClient INSTANCE = new Mc2dClient();
     private static final IText MAX_MEMORY;
     public final TextRenderer textRenderer;
@@ -113,10 +111,20 @@ public final class Mc2dClient implements Closeable {
     public void setupCamera() {}
 
     public void render(float delta) {
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, Framebuffer.width, 0, Framebuffer.height, 1, -1);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         if (world != null) {
-            worldRenderer.render(delta, Mouse.mouseX, Mouse.mouseY);
+            worldRenderer.render(delta, Mouse.mouseX, Framebuffer.height - Mouse.mouseY);
         }
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, Framebuffer.width, Framebuffer.height, 0, 1, -1);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
         glClear(GL_DEPTH_BUFFER_BIT);
         renderHud();
         if (screen != null) {

@@ -31,8 +31,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Reader;
 import java.util.Properties;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
@@ -52,9 +50,9 @@ public final class Options {
     }
 
     public static void init() {
-        File file = new File("options.txt");
+        var file = new File("options.txt");
         if (!file.exists()) {
-            try (OutputStream os = new FileOutputStream(file)) {
+            try (var os = new FileOutputStream(file)) {
                 put(KEY_CREATIVE_TAB, GLFW_KEY_E);
                 OPTIONS.put(LANG, "en_us");
                 OPTIONS.store(os, null);
@@ -62,7 +60,7 @@ public final class Options {
                 logger.catching(e);
             }
         }
-        try (Reader r = new FileReader(file)) {
+        try (var r = new FileReader(file)) {
             OPTIONS.load(r);
         } catch (IOException e) {
             logger.catching(e);
@@ -76,8 +74,11 @@ public final class Options {
     }
 
     public static int getI(String key, int def) {
-        String value = OPTIONS.getProperty(key, String.valueOf(def));
-        return Utils.isParsableNumber(value).orElse(def);
+        var value = OPTIONS.getProperty(key);
+        if (value == null) {
+            return def;
+        }
+        return Integer.parseInt(value);
     }
 
     public static String get(String key, String def) {

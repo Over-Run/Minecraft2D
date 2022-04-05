@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.block;
+package io.github.overrun.mc2d.world.block;
 
 import io.github.overrun.mc2d.util.registry.Registry;
 

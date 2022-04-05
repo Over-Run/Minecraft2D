@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2022 Overrun Organization
+ * Copyright (c) 2020-2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,31 +22,24 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.phys;
+package io.github.overrun.mc2d.world.block;
+
+import io.github.overrun.mc2d.util.shape.VoxelShapes;
+import org.jetbrains.annotations.Nullable;
+import org.overrun.swgl.core.phys.p2d.AABBox2f;
 
 /**
  * @author squid233
- * @since 0.6.0
+ * @since 2021/01/27
  */
-public class AABBox {
-    public float x0;
-    public float y0;
-    public float z0;
-    public float x1;
-    public float y1;
-    public float z1;
+public class AirBlock extends Block {
+    @Override
+    @Nullable
+    public AABBox2f getCollisionShape() {
+        return VoxelShapes.empty();
+    }
 
-    public AABBox(final float x0,
-                  final float y0,
-                  final float z0,
-                  final float x1,
-                  final float y1,
-                  final float z1) {
-        this.x0 = x0;
-        this.y0 = y0;
-        this.z0 = z0;
-        this.x1 = x1;
-        this.y1 = y1;
-        this.z1 = z1;
+    @Override
+    public void render(boolean dark, int x, int y, int z) {
     }
 }

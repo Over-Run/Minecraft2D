@@ -10,14 +10,21 @@ This game is also on [itch.io](https://squid233.itch.io/minecraft2d).
 
 ## Runtime Environment
 
-- Java: 11+
+- Java: 17+
 - OpenGL: 1.1+
 
-## Use Guide
+## Playing
 
 Minecraft2D 0.3.0 has sealed all libraries, so you can use command `java -jar mc2d-0.3.0.jar` in terminal.
 
 Since 0.5.0, you must play game with the [launcher](https://over-run.github.io/mc2d/launcher/mc2d-launcher-0.1.0.jar)
+
+## Keybindings
+
+- ENTER: Save the world
+- F3: Turn on/off the debug mode
+- COMMA/PERIOD: Change z mode
+- E: Open the inventory
 
 ## Links
 
@@ -29,8 +36,8 @@ Since 0.5.0, you must play game with the [launcher](https://over-run.github.io/m
 
 ## Other Edition
 
-- [Kotlin Edition](https://github.com/Over-Run/Minecraft2D-Kotlin/)
-- [Python Edition](https://github.com/QWERTY770/Minecraft-2D-Python/)
+- [Kotlin Edition](https://github.com/Over-Run/Minecraft2D-Kotlin/) (Deprecated)
+- [~~Python Edition~~](https://github.com/QWERTY770/Minecraft-2D-Python/)  (Deprecated)
 
 ## Minecraft2D & Minecraft
 
@@ -39,7 +46,7 @@ Again. **THIS IS NOT AN OFFICIAL MINECRAFT PRODUCT. IT IS NOT APPROVED BY OR ASS
 |              | Minecraft2D | Minecraft       |
 |--------------|-------------|-----------------|
 | Free         | Y           | N               |
-| Java Version | 11+ (LTS)   | 8+              |
+| Java Version | 17+ (LTS)   | 17+ (LTS)       |
 | Mods         | Y           | Y(Non-Official) |
 | Multiplayer  | N           | Y               |
 | I18n         | Y           | Y               |
@@ -54,5 +61,4 @@ Again. **THIS IS NOT AN OFFICIAL MINECRAFT PRODUCT. IT IS NOT APPROVED BY OR ASS
 
 ## Coming in 2.0 (Future)
 
-- Migrate to Java 17
 - Use OpenGL 2.0

@@ -24,7 +24,7 @@
 
 package io.github.overrun.mc2d.item;
 
-import io.github.overrun.mc2d.block.Block;
+import io.github.overrun.mc2d.world.block.Block;
 
 /**
  * @author squid233

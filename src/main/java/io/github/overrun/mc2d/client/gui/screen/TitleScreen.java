@@ -58,8 +58,9 @@ public final class TitleScreen extends Screen {
             20,
             new TranslatableText("Play"),
             b -> {
-                client.player = new Player(64, 64, 2);
-                client.world = new World(client.player, 64, 64);
+                client.world = new World(64, 64);
+                client.player = new Player(client.world);
+                client.world.load(client.player);
                 client.worldRenderer = new WorldRenderer(client, client.world);
                 client.openScreen(new LoadingWorldScreen());
             }));

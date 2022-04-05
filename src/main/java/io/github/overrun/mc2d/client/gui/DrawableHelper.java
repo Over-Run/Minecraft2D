@@ -119,6 +119,27 @@ public abstract class DrawableHelper {
         drawTexture(x, y, u, v, regionW, regionH, width, height, texW, texH, 0xffffffff);
     }
 
+    public static void drawTextureFlip(double x,
+                                       double y,
+                                       double width,
+                                       double height) {
+        glEnable(GL_TEXTURE_2D);
+        glBegin(GL_QUADS);
+        // Left top
+        glTexCoord2f(0, 0);
+        glVertex2d(x, y + height);
+        // Left down
+        glTexCoord2f(0, 1);
+        glVertex2d(x, y);
+        // Right down
+        glTexCoord2f(1, 1);
+        glVertex2d(x + width, y);
+        // Right top
+        glTexCoord2f(1, 0);
+        glVertex2d(x + width, y + height);
+        glEnd();
+    }
+
     public static void drawTexture(double x,
                                    double y,
                                    double width,

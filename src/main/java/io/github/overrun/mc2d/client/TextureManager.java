@@ -33,7 +33,6 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
-import java.io.Closeable;
 import java.nio.ByteBuffer;
 
 import static io.github.overrun.mc2d.util.ImageReader.read;
@@ -44,7 +43,7 @@ import static org.lwjgl.stb.STBImage.*;
  * @author squid233
  * @since 2021/01/25
  */
-public final class TextureManager implements Closeable {
+public final class TextureManager implements AutoCloseable {
     private static final Logger logger = LogManager.getLogger(TextureManager.class.getName());
     private final Object2IntMap<Identifier> idMap = new Object2IntOpenHashMap<>(16);
     private int lastId = 0;

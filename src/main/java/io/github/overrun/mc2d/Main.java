@@ -46,13 +46,12 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
+import org.overrun.swgl.core.cfg.GlobalConfig;
+import org.overrun.swgl.core.util.timing.Timer;
 
-import java.io.Closeable;
 import java.nio.IntBuffer;
 
-import static io.github.overrun.mc2d.block.Blocks.*;
-import static io.github.overrun.mc2d.block.Blocks.BEDROCK;
-import static java.lang.Math.max;
+import static io.github.overrun.mc2d.world.block.Blocks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.memUTF8;
@@ -61,7 +60,7 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
  * @author squid233
  * @since 2021/01/07
  */
-public final class Main implements Runnable, Closeable {
+public final class Main implements Runnable, AutoCloseable {
     // todo mods screen
 
     public static final String VERSION = "0.6.0";
@@ -69,7 +68,12 @@ public final class Main implements Runnable, Closeable {
     private static final Logger logger = LogManager.getLogger(Main.class.getName());
     private static int oldX, oldY, oldWidth, oldHeight;
     private final Mc2dClient client = Mc2dClient.getInstance();
-    private final Timer timer = new Timer(Integer.parseInt(System.getProperty("mc2d.tps", "20")));
+    private final Timer timer;
+
+    public Main() {
+        GlobalConfig.initialTps = Integer.parseInt(System.getProperty("mc2d.tps", "20"));
+        timer = new Timer();
+    }
 
     @Override
     public void run() {
@@ -91,11 +95,11 @@ public final class Main implements Runnable, Closeable {
         long lastTime = System.currentTimeMillis();
         int frames = 0;
         while (!Window.shouldClose()) {
-            timer.advanceTime();
+            timer.update();
             for (int i = 0; i < timer.ticks; i++) {
                 client.tick();
             }
-            client.render(timer.delta);
+            client.render((float) timer.deltaTime);
             Window.swapBuffers();
             glfwPollEvents();
             ++frames;
@@ -143,12 +147,12 @@ public final class Main implements Runnable, Closeable {
                         oldHeight = Framebuffer.height;
                         if (vidMode != null) {
                             glfwSetWindowMonitor(window,
-                                    glfwGetPrimaryMonitor(),
-                                    0,
-                                    0,
-                                    vidMode.width(),
-                                    vidMode.height(),
-                                    vidMode.refreshRate());
+                                glfwGetPrimaryMonitor(),
+                                0,
+                                0,
+                                vidMode.width(),
+                                vidMode.height(),
+                                vidMode.refreshRate());
                         }
                     } else {
                         glfwSetWindowMonitor(window, 0, oldX, oldY, oldWidth, oldHeight, 0);
@@ -215,8 +219,8 @@ public final class Main implements Runnable, Closeable {
             GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
             if (vidMode != null) {
                 Window.setPos(
-                        vidMode.width() - pWidth.get(0) >> 1,
-                        vidMode.height() - pHeight.get(0) >> 1
+                    vidMode.width() - pWidth.get(0) >> 1,
+                    vidMode.height() - pHeight.get(0) >> 1
                 );
             }
         }
@@ -229,22 +233,14 @@ public final class Main implements Runnable, Closeable {
     }
 
     private void resize(int width, int height) {
-        int w = max(width, 1);
-        int h = max(height, 1);
-        int fw = max(Framebuffer.width, 1);
-        int fh = max(Framebuffer.height, 1);
         if (client.screen == null) {
             client.openScreen(null);
         }
-        Framebuffer.setSize(w, h);
+        Framebuffer.setSize(width, height);
         if (client.screen != null) {
-            client.screen.init(client, w, h);
+            client.screen.init(client, width, height);
         }
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(0, fw, fh, 0, 1, -1);
-        glMatrixMode(GL_MODELVIEW);
-        glViewport(0, 0, fw, fh);
+        glViewport(0, 0, width, height);
     }
 
     @Override
