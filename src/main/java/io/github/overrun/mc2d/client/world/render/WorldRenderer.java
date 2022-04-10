@@ -27,6 +27,7 @@ package io.github.overrun.mc2d.client.world.render;
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.gui.Framebuffer;
 import io.github.overrun.mc2d.util.GlUtils;
+import io.github.overrun.mc2d.world.HitResult;
 import io.github.overrun.mc2d.world.World;
 import io.github.overrun.mc2d.world.block.Block;
 import org.joml.Vector3d;
@@ -48,6 +49,7 @@ public class WorldRenderer {
      * Linear interpolation storage. Let it don't create more objects.
      */
     private final Vector3d interpolation = new Vector3d();
+    private final HitResult hitResult = new HitResult(null, 0, 0, 0, true);
 
     public WorldRenderer(Mc2dClient client, World world) {
         this.client = client;
@@ -55,7 +57,7 @@ public class WorldRenderer {
     }
 
     public void render(int z, int mouseX, int mouseY) {
-        Block target;
+        Block target = null;
         for (int y = 0; y < world.height; y++) {
             for (int x = 0; x < world.width; x++) {
                 var b = world.getBlock(x, y, z);
@@ -72,19 +74,10 @@ public class WorldRenderer {
                     && mouseY >= ldY
                     && mouseY < rtY) {
                     target = world.getBlock(x, y, World.z);
-                    glDisable(GL_TEXTURE_2D);
-                    if (z == 0 || dark) {
-                        var shape = b.getOutlineShape();
-                        if (shape != null) {
-                            GlUtils.drawRect(ldX + shape.getMinX(),
-                                ldY + shape.getMinY(),
-                                ldX + ((int) shape.getMaxX() << 1),
-                                ldY + ((int) shape.getMaxY() << 1),
-                                0x80000000,
-                                true);
-                        }
-                    }
-                    glEnable(GL_TEXTURE_2D);
+                    hitResult.block = target;
+                    hitResult.x = x;
+                    hitResult.y = y;
+                    hitResult.z = World.z;
                     if (target == AIR) {
                         if (isMousePress(GLFW_MOUSE_BUTTON_RIGHT)) {
                             world.setBlock(x, y, World.z, client.player.handledBlock);
@@ -95,6 +88,28 @@ public class WorldRenderer {
                 }
             }
         }
+        hitResult.miss = (target == null);
+    }
+
+    public void renderHit() {
+        if (!hitResult.miss) {
+            double ldX = (Framebuffer.width >> 1) + (hitResult.x - interpolation.x) * 32,
+                ldY = (Framebuffer.height >> 1) + (hitResult.y - interpolation.y) * 32;
+            boolean dark = world.getBlock(hitResult.x, hitResult.y, 0) == AIR;
+            glDisable(GL_TEXTURE_2D);
+            if (hitResult.z == 0 || dark) {
+                var shape = hitResult.block.getOutlineShape();
+                if (shape != null) {
+                    GlUtils.drawRect(ldX + ((int) shape.getMinX() << 4),
+                        ldY + ((int) shape.getMinY() << 4),
+                        ldX + ((int) shape.getMaxX() << 5),
+                        ldY + ((int) shape.getMaxY() << 5),
+                        0x80000000,
+                        true);
+                }
+            }
+            glEnable(GL_TEXTURE_2D);
+        }
     }
 
     public void render(float delta, int mouseX, int mouseY) {
@@ -103,5 +118,6 @@ public class WorldRenderer {
         glColor3f(1, 1, 1);
         client.player.render(delta, mouseX, mouseY);
         render(0, mouseX, mouseY);
+        renderHit();
     }
 }

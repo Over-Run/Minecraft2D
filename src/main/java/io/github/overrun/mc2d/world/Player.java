@@ -197,6 +197,7 @@ public class Player extends DrawableHelper {
     }
 
     public void deserialize(JsonReader reader) throws IOException {
+        double x = position.x, y = position.y;
         reader.beginObject();
         while (reader.hasNext()) {
             switch (reader.nextName()) {
@@ -206,11 +207,12 @@ public class Player extends DrawableHelper {
                         throw new RuntimeException("Doesn't compatible with version " + v + ". Current is " + serialVersionUID);
                     }
                 }
-                case "x" -> position.x = reader.nextDouble();
-                case "y" -> position.y = reader.nextDouble();
+                case "x" -> x = reader.nextDouble();
+                case "y" -> y = reader.nextDouble();
                 case "z" -> reader.nextDouble();
             }
         }
         reader.endObject();
+        setPos(x, y, position.z);
     }
 }

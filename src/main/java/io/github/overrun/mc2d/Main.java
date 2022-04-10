@@ -167,12 +167,15 @@ public final class Main implements Runnable, AutoCloseable {
                         client.player.handledBlock = GRASS_BLOCK;
                     }
                     if (key == GLFW_KEY_2) {
-                        client.player.handledBlock = DIRT;
+                        client.player.handledBlock = STONE;
                     }
                     if (key == GLFW_KEY_3) {
-                        client.player.handledBlock = COBBLESTONE;
+                        client.player.handledBlock = DIRT;
                     }
                     if (key == GLFW_KEY_4) {
+                        client.player.handledBlock = COBBLESTONE;
+                    }
+                    if (key == GLFW_KEY_5) {
                         client.player.handledBlock = BEDROCK;
                     }
                     if (key == GLFW_KEY_F3) {

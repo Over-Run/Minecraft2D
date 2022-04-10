@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2022 Overrun Organization
+ * Copyright (c) 2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,22 +22,28 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.util.shape;
+package io.github.overrun.mc2d.world;
 
-import org.overrun.swgl.core.phys.p2d.AABBox2f;
+import io.github.overrun.mc2d.world.block.Block;
 
 /**
  * @author squid233
- * @since 2021/02/03
+ * @since 0.6.0
  */
-public final class VoxelShapes {
-    private static final AABBox2f FULL_SQUARE = new AABBox2f(0, 0, 1, 1);
+public class HitResult {
+    public Block block;
+    public int x, y, z;
+    public boolean miss;
 
-    public static AABBox2f empty() {
-        return null;
+    public HitResult(Block block, int x, int y, int z, boolean miss) {
+        this.block = block;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.miss = miss;
     }
 
-    public static AABBox2f fullSquare() {
-        return FULL_SQUARE;
+    public HitResult(Block block, int x, int y, int z) {
+        this(block, x, y, z, false);
     }
 }

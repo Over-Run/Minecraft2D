@@ -60,7 +60,9 @@ public final class TitleScreen extends Screen {
             b -> {
                 client.world = new World(64, 64);
                 client.player = new Player(client.world);
-                client.world.load(client.player);
+                if (!client.world.load(client.player)) {
+                    client.world.genTerrain();
+                }
                 client.worldRenderer = new WorldRenderer(client, client.world);
                 client.openScreen(new LoadingWorldScreen());
             }));

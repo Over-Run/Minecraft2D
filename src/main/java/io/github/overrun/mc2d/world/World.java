@@ -31,6 +31,7 @@ import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.world.block.Block;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joml.SimplexNoise;
 import org.overrun.swgl.core.phys.p2d.AABBox2f;
 
 import java.io.*;
@@ -50,7 +51,7 @@ import static io.github.overrun.mc2d.world.block.Blocks.*;
 public class World {
     private static final Logger logger = LogManager.getLogger(World.class.getName());
     private static final long serialVersionUID = 3L;
-    public static int z;
+    public static int z = 0;
     private final Identifier[] blocks;
     public final int width;
     public final int height;
@@ -62,33 +63,45 @@ public class World {
         depth = 2;
         blocks = new Identifier[w * h * depth];
         Arrays.fill(blocks, AIR.getId());
+    }
+
+    private float sumOctaves(int numIterations,
+                             float x,
+                             float y,
+                             float z,
+                             float persistence,
+                             float scale,
+                             float low,
+                             float high) {
+        float maxAmp = 0;
+        float amp = 1;
+        float freq = scale;
+        float noise = 0;
+        for (int i = 0; i < numIterations; i++) {
+            noise += SimplexNoise.noise(x * freq, y * freq, z * freq) * amp;
+            maxAmp += amp;
+            amp *= persistence;
+            freq *= 2;
+        }
+        noise /= maxAmp;
+        noise = (noise * (high - low) + (high + low)) * 0.5f;
+        return noise;
+    }
+
+    public void genTerrain() {
         // generate the terrain
-        for (int i = 0; i < w; i++) {
-            for (byte j = 0; j < 2; j++) {
-                setBlock(i, 0, j, BEDROCK);
-                setBlock(i, 0, j, BEDROCK);
-            }
-        }
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < w; j++) {
-                for (byte k = 0; k < 2; k++) {
-                    setBlock(j, i + 1, k, COBBLESTONE);
-                    setBlock(j, i + 1, k, COBBLESTONE);
+        for (int x = 0; x < width; x++) {
+            for (int z = 0; z < depth; z++) {
+                setBlock(x, 0, z, BEDROCK);
+
+                int layers = (int) sumOctaves(16, x, 0, z, 0.5f, 0.007f, 1, height - 10);
+                setBlock(x, layers - 1, z, GRASS_BLOCK);
+                for (int y = layers - 4, c = layers - 1; y < c; y++) {
+                    setBlock(x, y, z, DIRT);
                 }
-            }
-        }
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < w; j++) {
-                for (byte k = 0; k < 2; k++) {
-                    setBlock(j, i + 3, k, DIRT);
-                    setBlock(j, i + 3, k, DIRT);
+                for (int y = 1, c = layers - 4; y < c; y++) {
+                    setBlock(x, y, z, STONE);
                 }
-            }
-        }
-        for (int i = 0; i < w; i++) {
-            for (byte j = 0; j < 2; j++) {
-                setBlock(i, 5, j, GRASS_BLOCK);
-                setBlock(i, 5, j, GRASS_BLOCK);
             }
         }
     }
@@ -102,13 +115,12 @@ public class World {
     public Block getBlock(int x, int y, int z) {
         if (x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < depth) {
             return Registry.BLOCK.getById(blocks[getIndex(x, y, z)]);
-        } else {
-            return AIR;
         }
+        return AIR;
     }
 
     public int getIndex(int x, int y, int z) {
-        return x % width + y * width + z * width * height;
+        return x + y * width + z * width * height;
     }
 
     public List<AABBox2f> getCubes(int z, AABBox2f origin) {
@@ -136,14 +148,14 @@ public class World {
             for (int y = y0; y < y1; y++) {
                 var aabb = getBlock(x, y, z).getCollisionShape();
                 if (aabb != null) {
-                    lst.add(new AABBox2f(aabb.getMinX() / 16.0f + x, aabb.getMinY() / 16.0f + y, aabb.getMaxX() / 16.0f + x, aabb.getMaxY() / 16.0f + y));
+                    lst.add(new AABBox2f(aabb.getMinX() + x, aabb.getMinY() + y, aabb.getMaxX() + x, aabb.getMaxY() + y));
                 }
             }
         }
         return lst;
     }
 
-    public void load(Player player) {
+    public boolean load(Player player) {
         logger.info("Loading world");
         var file = new File("level.dat");
         if (file.exists()) {
@@ -153,10 +165,13 @@ public class World {
                  var br = new BufferedReader(isr);
                  var jr = new JsonReader(br)) {
                 deserialize(jr, player);
+                return true;
             } catch (IOException e) {
                 logger.catching(e);
+                return false;
             }
         }
+        return false;
     }
 
     public void save(Player player) {

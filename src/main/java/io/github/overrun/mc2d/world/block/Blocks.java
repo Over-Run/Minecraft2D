@@ -33,6 +33,7 @@ import io.github.overrun.mc2d.util.registry.Registry;
 public final class Blocks {
     public static final Block AIR = register("air", new AirBlock());
     public static final Block GRASS_BLOCK = register("grass_block", new Block());
+    public static final Block STONE = register("stone", new Block());
     public static final Block DIRT = register("dirt", new Block());
     public static final Block COBBLESTONE = register("cobblestone", new Block());
     public static final Block BEDROCK = register("bedrock", new Block());
