@@ -26,10 +26,14 @@ package io.github.overrun.mc2d.client.world.render;
 
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.gui.Framebuffer;
+import io.github.overrun.mc2d.client.model.BlockModelMgr;
+import io.github.overrun.mc2d.client.world.ClientChunk;
 import io.github.overrun.mc2d.util.GlUtils;
 import io.github.overrun.mc2d.world.HitResult;
 import io.github.overrun.mc2d.world.World;
 import io.github.overrun.mc2d.world.block.Block;
+import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import org.joml.Vector3d;
 
 import static io.github.overrun.mc2d.client.Mouse.isMousePress;
@@ -50,14 +54,40 @@ public class WorldRenderer {
      */
     private final Vector3d interpolation = new Vector3d();
     private final HitResult hitResult = new HitResult(null, 0, 0, 0, true);
+    private final Long2ObjectMap<ClientChunk> chunkMap = new Long2ObjectArrayMap<>();
 
     public WorldRenderer(Mc2dClient client, World world) {
         this.client = client;
         this.world = world;
     }
 
+    public ClientChunk getOrCreateChunk(int x, int y) {
+        return chunkMap.computeIfAbsent(ClientChunk.pos2Long(x, y),
+            pos -> {
+                int x0 = x * ClientChunk.CHUNK_SIZE;
+                int y0 = y * ClientChunk.CHUNK_SIZE;
+                int x1 = (x + 1) * ClientChunk.CHUNK_SIZE;
+                int y1 = (y + 1) * ClientChunk.CHUNK_SIZE;
+
+                if (x1 > world.width) {
+                    x1 = world.width;
+                }
+                if (y1 > world.height) {
+                    y1 = world.height;
+                }
+
+                return new ClientChunk(world,
+                    x0,
+                    y0,
+                    x1,
+                    y1);
+            });
+    }
+
     public void render(int z, int mouseX, int mouseY) {
         Block target = null;
+        client.getTextureManager().bindTexture(BlockModelMgr.BLOCK_ATLAS);
+        glBegin(GL_QUADS);
         for (int y = 0; y < world.height; y++) {
             for (int x = 0; x < world.width; x++) {
                 var b = world.getBlock(x, y, z);
@@ -65,9 +95,12 @@ public class WorldRenderer {
                     ldY = (Framebuffer.height >> 1) + (y - interpolation.y) * 32,
                     rtX = ldX + 32,
                     rtY = ldY + 32;
+                if (ldX > Framebuffer.width || ldY > Framebuffer.height || rtX < 0 || rtY < 0) {
+                    continue;
+                }
                 var dark = world.getBlock(x, y, 0) == AIR;
                 if (z == 0 || dark) {
-                    b.render(dark, (int) ldX, (int) ldY, z);
+                    b.render(null, (int) ldX, (int) ldY, z);
                 }
                 if (mouseX >= ldX
                     && mouseX < rtX
@@ -88,7 +121,9 @@ public class WorldRenderer {
                 }
             }
         }
+        glEnd();
         hitResult.miss = (target == null);
+        client.getTextureManager().bindTexture(0);
     }
 
     public void renderHit() {
@@ -114,7 +149,11 @@ public class WorldRenderer {
 
     public void render(float delta, int mouseX, int mouseY) {
         client.player.prevPos.lerp(client.player.position, delta, interpolation);
+        glEnable(GL_LIGHTING);
+        glEnable(GL_COLOR_MATERIAL);
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, new float[]{0.5f, 0.5f, 0.5f, 1.0f});
         render(1, mouseX, mouseY);
+        glDisable(GL_LIGHTING);
         glColor3f(1, 1, 1);
         client.player.render(delta, mouseX, mouseY);
         render(0, mouseX, mouseY);

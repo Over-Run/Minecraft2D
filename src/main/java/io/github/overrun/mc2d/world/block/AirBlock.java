@@ -24,8 +24,10 @@
 
 package io.github.overrun.mc2d.world.block;
 
+import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.shape.VoxelShapes;
 import org.jetbrains.annotations.Nullable;
+import org.overrun.swgl.core.gl.batch.GLBatch;
 import org.overrun.swgl.core.phys.p2d.AABBox2f;
 
 /**
@@ -40,6 +42,11 @@ public class AirBlock extends Block {
     }
 
     @Override
-    public void render(boolean dark, int x, int y, int z) {
+    public void render(GLBatch batch, int x, int y, int z) {
+    }
+
+    @Override
+    public Identifier getTexture() {
+        return null;
     }
 }

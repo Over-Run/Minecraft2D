@@ -30,6 +30,7 @@ import io.github.overrun.mc2d.client.Window;
 import io.github.overrun.mc2d.client.gui.Framebuffer;
 import io.github.overrun.mc2d.client.gui.screen.ingame.CreativeTabScreen;
 import io.github.overrun.mc2d.client.gui.screen.ingame.PauseScreen;
+import io.github.overrun.mc2d.client.model.BlockModelMgr;
 import io.github.overrun.mc2d.event.KeyCallback;
 import io.github.overrun.mc2d.item.Items;
 import io.github.overrun.mc2d.mod.ModLoader;
@@ -39,22 +40,22 @@ import io.github.overrun.mc2d.util.ImageReader;
 import io.github.overrun.mc2d.util.Language;
 import io.github.overrun.mc2d.util.Options;
 import io.github.overrun.mc2d.world.World;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import io.github.overrun.mc2d.world.block.Blocks;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 import org.overrun.swgl.core.cfg.GlobalConfig;
+import org.overrun.swgl.core.gl.GLStateMgr;
+import org.overrun.swgl.core.util.LogFactory9;
 import org.overrun.swgl.core.util.timing.Timer;
+import org.slf4j.Logger;
 
 import java.nio.IntBuffer;
 
 import static io.github.overrun.mc2d.world.block.Blocks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.system.MemoryUtil.memUTF8;
 
 /**
  * @author squid233
@@ -65,7 +66,7 @@ public final class Main implements Runnable, AutoCloseable {
 
     public static final String VERSION = "0.6.0";
     public static final IText VERSION_TEXT = new LiteralText("Minecraft2D " + VERSION);
-    private static final Logger logger = LogManager.getLogger(Main.class.getName());
+    private static final Logger logger = LogFactory9.getLogger();
     private static int oldX, oldY, oldWidth, oldHeight;
     private final Mc2dClient client = Mc2dClient.getInstance();
     private final Timer timer;
@@ -79,12 +80,10 @@ public final class Main implements Runnable, AutoCloseable {
     public void run() {
         logger.info("Loading for game Minecraft2D {}", VERSION);
         init();
-        try {
-            Class.forName(Items.class.getName());
-        } catch (ClassNotFoundException e) {
-            logger.catching(e);
-        }
+        Items.register();
+        Blocks.register();
         ModLoader.loadMods();
+        BlockModelMgr.loadAtlas();
         Language.init();
         Language.currentLang = Options.get("lang", "en_us");
         logger.info("Backend library: LWJGL version {}", Version.getVersion());
@@ -114,7 +113,7 @@ public final class Main implements Runnable, AutoCloseable {
     private void init() {
         GLFWErrorCallback.create((error, description) -> {
             logger.error("########## GL ERROR ##########");
-            logger.error("{}: {}", error, memUTF8(description));
+            logger.error("{}: {}", error, GLFWErrorCallback.getDescription(description));
         }).set();
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
@@ -134,11 +133,11 @@ public final class Main implements Runnable, AutoCloseable {
                 }
 
                 if (key == GLFW_KEY_F11) {
-                    GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+                    var vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
                     if (glfwGetWindowMonitor(window) == 0) {
                         try (MemoryStack stack = MemoryStack.stackPush()) {
-                            IntBuffer pX = stack.mallocInt(1);
-                            IntBuffer pY = stack.mallocInt(1);
+                            IntBuffer pX = stack.callocInt(1);
+                            IntBuffer pY = stack.callocInt(1);
                             glfwGetWindowPos(window, pX, pY);
                             oldX = pX.get(0);
                             oldY = pY.get(0);
@@ -215,11 +214,11 @@ public final class Main implements Runnable, AutoCloseable {
             Mouse.mouseX = (int) Math.floor(x);
             Mouse.mouseY = (int) Math.floor(y);
         });
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer pWidth = stack.mallocInt(1);
-            IntBuffer pHeight = stack.mallocInt(1);
+        try (var stack = MemoryStack.stackPush()) {
+            var pWidth = stack.callocInt(1);
+            var pHeight = stack.callocInt(1);
             Window.getSize(pWidth, pHeight);
-            GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+            var vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
             if (vidMode != null) {
                 Window.setPos(
                     vidMode.width() - pWidth.get(0) >> 1,
@@ -229,6 +228,7 @@ public final class Main implements Runnable, AutoCloseable {
         }
         Window.makeContextCurrent();
         GL.createCapabilities();
+        GLStateMgr.init();
         glfwSwapInterval(Boolean.parseBoolean(System.getProperty("mc2d.vsync", "true")) ? 1 : 0);
         Window.show();
         Framebuffer.setSize(896, 512);
@@ -252,7 +252,7 @@ public final class Main implements Runnable, AutoCloseable {
         logger.info("Stopping!");
         Window.destroy();
         glfwTerminate();
-        GLFWErrorCallback gec = glfwSetErrorCallback(null);
+        var gec = glfwSetErrorCallback(null);
         if (gec != null) {
             gec.free();
         }

@@ -38,6 +38,9 @@ public final class Blocks {
     public static final Block COBBLESTONE = register("cobblestone", new Block());
     public static final Block BEDROCK = register("bedrock", new Block());
 
+    public static void register() {
+    }
+
     public static Block register(String id, Block block) {
         return Registry.register(Registry.BLOCK, id, block);
     }

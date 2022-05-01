@@ -24,9 +24,8 @@
 
 package io.github.overrun.mc2d.mod;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +47,7 @@ public final class ModLoader {
     private static final Map<String, ClassLoader> MOD_LOADERS = new LinkedHashMap<>();
     private static final Map<String, String> MODS_NAME = new LinkedHashMap<>();
     private static final Map<String, String> MODS_VERSION = new LinkedHashMap<>();
-    private static final Logger logger = LogManager.getLogger("Minecraft2D ModLoader");
+    private static final Logger logger = LoggerFactory.getLogger("Minecraft2D ModLoader");
 
     /**
      * Load all mods from "mods" directory.
@@ -66,7 +65,7 @@ public final class ModLoader {
             for (var file : files) {
                 var filename = file.getName();
                 var isModFile = file.isFile() &&
-                        (filename.endsWith(".jar") || filename.endsWith(".zip"));
+                                (filename.endsWith(".jar") || filename.endsWith(".zip"));
                 if (isModFile) {
                     String modid = null, name, version, main;
                     try {
@@ -107,8 +106,11 @@ public final class ModLoader {
                                                 }
                                             }
                                             clazz.getDeclaredConstructor().setAccessible(false);
-                                        } catch (SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException ignored) { }
-                                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+                                        } catch (SecurityException | IllegalArgumentException | IllegalAccessException |
+                                                 NoSuchMethodException ignored) {
+                                        }
+                                    } catch (InstantiationException | IllegalAccessException |
+                                             InvocationTargetException | NoSuchMethodException | SecurityException e) {
                                         try {
                                             clazz.getMethod(main.split("@", 2)[1]).invoke(null);
                                         } catch (ArrayIndexOutOfBoundsException | NoSuchMethodException ee) {
@@ -120,12 +122,11 @@ public final class ModLoader {
                                     throw new RuntimeException("Could not execute entrypoint due to errors, provided by '" + modid + "'!");
                                 }
                             } catch (IOException e) {
-                                logger.catching(e);
+                                logger.error("Catching", e);
                             }
                         }
                     } catch (MalformedURLException e) {
-                        logger.warn("Error while loading mod: {}", e.getMessage());
-                        logger.catching(Level.WARN, e);
+                        logger.warn("Error while loading mod", e);
                     }
                     if (modid == null || modid.isEmpty() || modid.isBlank()) {
                         throw new RuntimeException("Mod ID is null or empty; this is not allowed!");

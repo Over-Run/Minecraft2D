@@ -24,11 +24,11 @@
 
 package io.github.overrun.mc2d.util;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
+import org.overrun.swgl.core.util.LogFactory9;
+import org.slf4j.Logger;
 
 import java.awt.image.BufferedImage;
 import java.util.Objects;
@@ -42,7 +42,7 @@ import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
  * @since 2021/01/07
  */
 public final class ImageReader {
-    private static final Logger logger = LogManager.getLogger(ImageReader.class.getName());
+    private static final Logger logger = LogFactory9.getLogger();
 
     public static byte[] read(String path, ClassLoader loader) {
         try (var is = Objects.requireNonNullElse(
@@ -54,7 +54,7 @@ public final class ImageReader {
             }
             return is.readAllBytes();
         } catch (Throwable t) {
-            logger.catching(t);
+            logger.error("Catching", t);
             return null;
         }
     }
@@ -74,18 +74,18 @@ public final class ImageReader {
             byte[] img = read(path);
             if (img == null) {
                 return new Texture(2, 2,
-                    stack.malloc(16)
+                    stack.calloc(16)
                         .putInt(0xfff800f8)
                         .putInt(0xff000000)
                         .putInt(0xff000000)
                         .putInt(0xfff800f8)
                         .flip(), false);
             }
-            var bb = MemoryUtil.memAlloc(img.length);
+            var bb = MemoryUtil.memCalloc(img.length);
             bb.put(img).flip();
-            var xp = stack.mallocInt(1);
-            var yp = stack.mallocInt(1);
-            var cp = stack.mallocInt(1);
+            var xp = stack.callocInt(1);
+            var yp = stack.callocInt(1);
+            var cp = stack.callocInt(1);
             var buf = stbi_load_from_memory(bb, xp, yp, cp, STBI_rgb_alpha);
             return new Texture(xp.get(0), yp.get(0), buf, true);
         }
@@ -100,9 +100,8 @@ public final class ImageReader {
      * @return An image as {@link GLFWImage.Buffer}.
      */
     public static GLFWImage.Buffer readGlfwImg(String path) {
-        try (final var image = GLFWImage.malloc();
-             final var buf = readImg(path)) {
-            return GLFWImage.malloc(1).put(0, image.set(buf.getWidth(), buf.getHeight(), buf.getBuffer()));
+        try (final var buf = readImg(path)) {
+            return GLFWImage.calloc(1).width(buf.getWidth()).height(buf.getHeight()).pixels(buf.getBuffer());
         }
     }
 

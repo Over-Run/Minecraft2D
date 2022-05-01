@@ -25,6 +25,7 @@ dependencies {
     // implementation 'com.google.guava:guava:30.1-jre'
     implementation 'it.unimi.dsi:fastutil:8.5.8'
     implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
+    implementation 'org.apache.logging.log4j:log4j-slf4j18-impl:2.17.2'
     implementation 'org.joml:joml:1.10.4'
     implementation 'io.github.over-run:swgl-core:0.2.0-SNAPSHOT'
     compileOnly 'org.jetbrains:annotations:23.0.0'

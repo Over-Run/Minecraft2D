@@ -24,21 +24,22 @@
 
 package io.github.overrun.mc2d.world.block;
 
-import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.client.model.BlockModelMgr;
 import io.github.overrun.mc2d.item.Item;
 import io.github.overrun.mc2d.item.ItemConvertible;
 import io.github.overrun.mc2d.item.Items;
-import io.github.overrun.mc2d.util.GlUtils;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.util.shape.VoxelShapes;
+import io.github.overrun.mc2d.world.World;
 import org.jetbrains.annotations.Nullable;
+import org.overrun.swgl.core.gl.batch.GLBatch;
 import org.overrun.swgl.core.phys.p2d.AABBox2f;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.github.overrun.mc2d.client.gui.DrawableHelper.drawTextureFlip;
+import static io.github.overrun.mc2d.world.block.Blocks.AIR;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
@@ -66,22 +67,36 @@ public class Block implements ItemConvertible {
         return Registry.BLOCK.getId(this);
     }
 
-    public void render(boolean dark, int x, int y, int z) {
-        var id = Registry.BLOCK.getId(this);
+    public boolean shouldRender(World world, int x, int y, int z) {
+        return z == 0 || (world.getBlock(x, y, 0) == AIR);
+    }
+
+    public void render(GLBatch batch, int x, int y, int z) {
         glColor4f(1, 1, 1, 1);
-        Mc2dClient.getInstance().getTextureManager().bindTexture(
-            new Identifier(id.getNamespace(), "textures/block/" + id.getPath() + ".png"));
-        drawTextureFlip(x, y, 32, 32);
-        if (dark) {
-            glDisable(GL_TEXTURE_2D);
-            GlUtils.fillRect(x, y + 32, x + 32, y, 0x80000000, true);
-            glEnable(GL_TEXTURE_2D);
-        }
+        var path = BlockModelMgr.blockTexture(getTexture());
+        var atlas = BlockModelMgr.getBlockAtlas();
+        float u0 = atlas.getU0n(path);
+        float v0 = atlas.getV0n(path);
+        float u1 = atlas.getU1n(path);
+        float v1 = atlas.getV1n(path);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTexCoord2f(u0, v0);
+        glVertex2f(x, y + 32);
+        glTexCoord2f(u0, v1);
+        glVertex2f(x, y);
+        glTexCoord2f(u1, v1);
+        glVertex2f(x + 32, y);
+        glTexCoord2f(u1, v0);
+        glVertex2f(x + 32, y + 32);
+    }
+
+    public Identifier getTexture() {
+        return getId();
     }
 
     @Override
     public String toString() {
-        return Registry.BLOCK.getId(this).toString();
+        return getId().toString();
     }
 
     @Override

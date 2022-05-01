@@ -29,10 +29,10 @@ import com.google.gson.stream.JsonWriter;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.world.block.Block;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.joml.SimplexNoise;
 import org.overrun.swgl.core.phys.p2d.AABBox2f;
+import org.overrun.swgl.core.util.LogFactory9;
+import org.slf4j.Logger;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ import static io.github.overrun.mc2d.world.block.Blocks.*;
  * @since 2021/01/09
  */
 public class World {
-    private static final Logger logger = LogManager.getLogger(World.class.getName());
+    private static final Logger logger = LogFactory9.getLogger();
     private static final long serialVersionUID = 3L;
     public static int z = 0;
     private final Identifier[] blocks;
@@ -94,7 +94,7 @@ public class World {
             for (int z = 0; z < depth; z++) {
                 setBlock(x, 0, z, BEDROCK);
 
-                int layers = (int) sumOctaves(16, x, 0, z, 0.5f, 0.007f, 1, height - 10);
+                int layers = (int) sumOctaves(16, x, 0, z, 0.5f, 0.007f, 1, height - 12);
                 setBlock(x, layers - 1, z, GRASS_BLOCK);
                 for (int y = layers - 4, c = layers - 1; y < c; y++) {
                     setBlock(x, y, z, DIRT);
@@ -167,7 +167,7 @@ public class World {
                 deserialize(jr, player);
                 return true;
             } catch (IOException e) {
-                logger.catching(e);
+                logger.error("Catching", e);
                 return false;
             }
         }
@@ -183,7 +183,7 @@ public class World {
              var jw = new JsonWriter(bw)) {
             serialize(jw, player);
         } catch (IOException e) {
-            logger.catching(e);
+            logger.error("Catching", e);
         }
     }
 

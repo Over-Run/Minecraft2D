@@ -25,8 +25,8 @@
 package io.github.overrun.mc2d.util;
 
 import io.github.overrun.mc2d.mod.ModLoader;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.overrun.swgl.core.util.LogFactory9;
+import org.slf4j.Logger;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -42,7 +42,7 @@ import java.util.Properties;
  * @since 2021/01/29
  */
 public final class Language {
-    private static final Logger logger = LogManager.getLogger(Language.class.getName());
+    private static final Logger logger = LogFactory9.getLogger();
     public static final String EN_US = "en_us";
     public static final String ZH_CN = "zh_cn";
     public static String currentLang;
@@ -58,28 +58,29 @@ public final class Language {
     public static void init() {
         for (Map.Entry<String, Map<String, String>> entry : LANGS.entrySet()) {
             try (InputStream is = Objects.requireNonNull(
-                    ClassLoader.getSystemResourceAsStream(
-                            "assets/" + Identifier.VANILLA + "/lang/" + entry.getKey() + ".lang"
-                    ));
+                ClassLoader.getSystemResourceAsStream(
+                    "assets/" + Identifier.VANILLA + "/lang/" + entry.getKey() + ".lang"
+                ));
                  Reader r = new InputStreamReader(is, StandardCharsets.UTF_8)
             ) {
                 Properties prop = new Properties();
                 prop.load(r);
                 putKv(entry.getKey(), prop);
             } catch (Throwable t) {
-                logger.catching(t);
+                logger.error("Catching", t);
             }
             for (String modid : ModLoader.getMods().keySet()) {
                 try (InputStream is = Objects.requireNonNull(
-                        ModLoader.getLoader(modid).getResourceAsStream(
-                                "assets/" + modid + "/lang/" + entry.getKey() + ".lang"
-                        ));
+                    ModLoader.getLoader(modid).getResourceAsStream(
+                        "assets/" + modid + "/lang/" + entry.getKey() + ".lang"
+                    ));
                      Reader r = new InputStreamReader(is, StandardCharsets.UTF_8)
                 ) {
                     Properties prop = new Properties();
                     prop.load(r);
                     putKv(entry.getKey(), prop);
-                } catch (Throwable ignored) { }
+                } catch (Throwable ignored) {
+                }
             }
         }
     }

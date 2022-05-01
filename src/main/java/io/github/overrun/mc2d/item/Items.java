@@ -39,6 +39,9 @@ public final class Items {
     public static final Item COBBLESTONE = register("cobblestone", Blocks.COBBLESTONE);
     public static final Item BEDROCK = register("bedrock", Blocks.BEDROCK);
 
+    public static void register() {
+    }
+
     public static Item register(String id, Item item) {
         return Registry.register(Registry.ITEM, id, item);
     }

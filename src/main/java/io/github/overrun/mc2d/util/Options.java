@@ -24,8 +24,8 @@
 
 package io.github.overrun.mc2d.util;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.overrun.swgl.core.util.LogFactory9;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,7 +43,7 @@ public final class Options {
     public static final Properties OPTIONS = new Properties();
     public static final String KEY_CREATIVE_TAB = "key.creativeTab";
     public static final String LANG = "lang";
-    private static final Logger logger = LogManager.getLogger(Options.class.getName());
+    private static final Logger logger = LogFactory9.getLogger();
 
     private static void put(String key, int value) {
         OPTIONS.put(key, String.valueOf(value));
@@ -57,20 +57,20 @@ public final class Options {
                 OPTIONS.put(LANG, "en_us");
                 OPTIONS.store(os, null);
             } catch (IOException e) {
-                logger.catching(e);
+                logger.error("Catching", e);
             }
         }
         try (var r = new FileReader(file)) {
             OPTIONS.load(r);
         } catch (IOException e) {
-            logger.catching(e);
+            logger.error("Catching", e);
         }
     }
 
     public static boolean getB(String key, String def) {
         return OPTIONS.containsKey(key)
-                ? Boolean.parseBoolean(OPTIONS.getProperty(key))
-                : Boolean.parseBoolean(def);
+            ? Boolean.parseBoolean(OPTIONS.getProperty(key))
+            : Boolean.parseBoolean(def);
     }
 
     public static int getI(String key, int def) {

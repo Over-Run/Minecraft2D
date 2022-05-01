@@ -44,6 +44,7 @@ public abstract class DrawableHelper {
     public static void fillGradient(int xStart, int yStart, int xEnd, int yEnd, int colorStart, int colorEnd) {
         glDisable(GL_TEXTURE_2D);
         glBegin(GL_QUADS);
+        float inv = 1.0f / 255.0f;
         var sr = colorStart << 8 >>> 24;
         var sg = colorStart << 16 >>> 24;
         var sb = colorStart << 24 >>> 24;
@@ -53,18 +54,18 @@ public abstract class DrawableHelper {
         var eb = colorEnd << 24 >>> 24;
         var ea = colorEnd >>> 24;
         var lerp = (colorStart + colorEnd) >> 1;
-        var lr = (lerp << 8 >>> 24) / 255f;
-        var lg = (lerp << 16 >>> 24) / 255f;
-        var lb = (lerp << 24 >>> 24) / 255f;
-        var la = (lerp >>> 24) / 255f;
+        var lr = (lerp << 8 >>> 24) * inv;
+        var lg = (lerp << 16 >>> 24) * inv;
+        var lb = (lerp << 24 >>> 24) * inv;
+        var la = (lerp >>> 24) * inv;
         // Left top
-        glColor4f(sr / 255f, sg / 255f, sb / 255f, sa / 255f);
+        glColor4f(sr * inv, sg * inv, sb * inv, sa * inv);
         glVertex2f(xStart, yStart);
         // Left down
         glColor4f(lr, lg, lb, la);
         glVertex2f(xStart, yEnd);
         // Right down
-        glColor4f(er / 255f, eg / 255f, eb / 255f, ea / 255f);
+        glColor4f(er * inv, eg * inv, eb * inv, ea * inv);
         glVertex2f(xEnd, yEnd);
         // Right top
         glColor4f(lr, lg, lb, la);
@@ -90,7 +91,8 @@ public abstract class DrawableHelper {
         var g = rgba << 16 >>> 24;
         var b = rgba << 24 >>> 24;
         var a = rgba >>> 24;
-        glColor4f(r / 255f, g / 255f, b / 255f, a / 255f);
+        float inv = 1.0f / 255.0f;
+        glColor4f(r * inv, g * inv, b * inv, a * inv);
         // Left top
         glTexCoord2f((float) u / texW, (float) v / texH);
         glVertex2d(x, y);

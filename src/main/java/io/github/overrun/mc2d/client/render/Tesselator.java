@@ -24,9 +24,59 @@
 
 package io.github.overrun.mc2d.client.render;
 
+import org.overrun.swgl.core.gl.batch.GLBatch;
+import org.overrun.swgl.core.model.BuiltinVertexLayouts;
+
+import java.util.function.Consumer;
+
+import static org.lwjgl.opengl.GL11.*;
+
 /**
  * @author squid233
  * @since 0.6.0
  */
-public class Tesselator {
+public final class Tesselator {
+    private static Tesselator instance;
+    private final GLBatch batch = new GLBatch(false);
+    private int primitives = GL_TRIANGLES;
+
+    private Tesselator() {
+    }
+
+    public static Tesselator getInstance() {
+        if (instance == null) {
+            instance = new Tesselator();
+        }
+        return instance;
+    }
+
+    public GLBatch getBatch() {
+        return batch;
+    }
+
+    public Tesselator begin(int primitives) {
+        batch.begin(BuiltinVertexLayouts.T2F_C3F_V3F);
+        this.primitives = primitives;
+        return this;
+    }
+
+    public Tesselator performBatch(Consumer<GLBatch> consumer) {
+        consumer.accept(getBatch());
+        return this;
+    }
+
+    public void flush() {
+        batch.end();
+        glEnableClientState(GL_VERTEX_ARRAY);
+        if (batch.hasColor()) glEnableClientState(GL_COLOR_ARRAY);
+        if (batch.hasTexture()) glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+        glInterleavedArrays(GL_T2F_C3F_V3F, 0, batch.getBuffer());
+        batch.getIndexBuffer().ifPresentOrElse(buffer -> glDrawElements(GL_UNSIGNED_INT, buffer),
+            () -> glDrawArrays(primitives, 0, batch.getVertexCount()));
+
+        glDisableClientState(GL_VERTEX_ARRAY);
+        if (batch.hasColor()) glDisableClientState(GL_COLOR_ARRAY);
+        if (batch.hasTexture()) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    }
 }
