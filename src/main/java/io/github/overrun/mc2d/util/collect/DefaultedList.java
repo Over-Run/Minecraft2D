@@ -26,33 +26,39 @@ package io.github.overrun.mc2d.util.collect;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Supplier;
 
 /**
  * @author squid233
  * @since 2021/01/27
  */
 public class DefaultedList<E> extends ArrayList<E> {
+    @Serial
     private static final long serialVersionUID = 1L;
-    private final E defaultEntry;
+    private final Supplier<E> defaultSupplier;
+    private E defaultEntry;
 
-    public DefaultedList(E defaultEntry, int initialCapacity) {
+    public DefaultedList(Supplier<E> defaultEntry, int initialCapacity) {
         super(initialCapacity);
-        this.defaultEntry = defaultEntry;
+        defaultSupplier = defaultEntry;
     }
 
-    public DefaultedList(E defaultEntry) {
-        this.defaultEntry = defaultEntry;
+    public DefaultedList(Supplier<E> defaultEntry) {
+        defaultSupplier = defaultEntry;
     }
 
-    public DefaultedList(E defaultEntry, @NotNull Collection<? extends E> c) {
+    public DefaultedList(Supplier<E> defaultEntry, @NotNull Collection<? extends E> c) {
         super(c);
-        this.defaultEntry = defaultEntry;
+        defaultSupplier = defaultEntry;
     }
 
     @Override
     public E get(int index) {
-        return index < 0 || index >= size() ? defaultEntry : super.get(index);
+        return index < 0 || index >= size() ?
+            (defaultEntry == null ? defaultEntry = defaultSupplier.get() : defaultEntry) :
+            super.get(index);
     }
 }

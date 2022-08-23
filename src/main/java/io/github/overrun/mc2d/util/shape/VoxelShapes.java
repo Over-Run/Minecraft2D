@@ -24,20 +24,20 @@
 
 package io.github.overrun.mc2d.util.shape;
 
-import org.overrun.swgl.core.phys.p2d.AABBox2f;
+import org.overrun.swgl.core.phys.p2d.AABRect2f;
 
 /**
  * @author squid233
  * @since 2021/02/03
  */
 public final class VoxelShapes {
-    private static final AABBox2f FULL_SQUARE = new AABBox2f(0, 0, 1, 1);
+    private static final AABRect2f FULL_SQUARE = new AABRect2f(0, 0, 1, 1);
 
-    public static AABBox2f empty() {
+    public static AABRect2f empty() {
         return null;
     }
 
-    public static AABBox2f fullSquare() {
+    public static AABRect2f fullSquare() {
         return FULL_SQUARE;
     }
 }

@@ -24,13 +24,14 @@
 
 package io.github.overrun.mc2d.util;
 
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.system.MemoryStack;
-import org.lwjgl.system.MemoryUtil;
+import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.util.LogFactory9;
 import org.slf4j.Logger;
 
-import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -44,7 +45,8 @@ import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
 public final class ImageReader {
     private static final Logger logger = LogFactory9.getLogger();
 
-    public static byte[] read(String path, ClassLoader loader) {
+    @Nullable
+    public static ByteBuffer read(String path, ClassLoader loader) {
         try (var is = Objects.requireNonNullElse(
             loader,
             ClassLoader.getSystemClassLoader()
@@ -52,7 +54,7 @@ public final class ImageReader {
             if (is == null) {
                 return null;
             }
-            return is.readAllBytes();
+            return IFileProvider.of(loader).res2BBWithRE(path, 8192);
         } catch (Throwable t) {
             logger.error("Catching", t);
             return null;
@@ -60,18 +62,19 @@ public final class ImageReader {
     }
 
     /**
-     * Read an image as {@link BufferedImage}.
+     * Read an image as {@link ByteBuffer}.
      *
      * @param path The image path.
-     * @return Read {@link BufferedImage}.
+     * @return Read {@link ByteBuffer}.
      */
-    public static byte[] read(String path) {
+    @Nullable
+    public static ByteBuffer read(String path) {
         return read(path, ClassLoader.getSystemClassLoader());
     }
 
     public static Texture readImg(String path) {
         try (var stack = MemoryStack.stackPush()) {
-            byte[] img = read(path);
+            var img = read(path);
             if (img == null) {
                 return new Texture(2, 2,
                     stack.calloc(16)
@@ -81,12 +84,10 @@ public final class ImageReader {
                         .putInt(0xfff800f8)
                         .flip(), false);
             }
-            var bb = MemoryUtil.memCalloc(img.length);
-            bb.put(img).flip();
             var xp = stack.callocInt(1);
             var yp = stack.callocInt(1);
             var cp = stack.callocInt(1);
-            var buf = stbi_load_from_memory(bb, xp, yp, cp, STBI_rgb_alpha);
+            var buf = stbi_load_from_memory(img, xp, yp, cp, STBI_rgb_alpha);
             return new Texture(xp.get(0), yp.get(0), buf, true);
         }
     }

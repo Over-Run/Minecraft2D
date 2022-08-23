@@ -41,5 +41,6 @@ public abstract class ScreenHandler {
         return slot;
     }
 
-    public void init(int x, int y) { }
+    public void init(int x, int y) {
+    }
 }

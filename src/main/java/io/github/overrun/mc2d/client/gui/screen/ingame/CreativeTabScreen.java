@@ -44,7 +44,7 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
     private final Player player;
 
     public CreativeTabScreen(Player player, Screen parent) {
-        super(new CreativeTabScreenHandler(), new TranslatableText("Creative.Tab"));
+        super(new CreativeTabScreenHandler(), new TranslatableText("itemGroup.name.creativeTab"));
         this.player = player;
         this.parent = parent;
     }

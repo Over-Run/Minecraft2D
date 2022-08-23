@@ -33,8 +33,8 @@ import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.util.shape.VoxelShapes;
 import io.github.overrun.mc2d.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.overrun.swgl.core.gl.batch.GLBatch;
-import org.overrun.swgl.core.phys.p2d.AABBox2f;
+import org.overrun.swgl.core.gl.GLBatch;
+import org.overrun.swgl.core.phys.p2d.AABRect2f;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,12 +50,12 @@ public class Block implements ItemConvertible {
     public static final Map<Block, Item> BLOCK_ITEMS = new HashMap<>();
 
     @Nullable
-    public AABBox2f getOutlineShape() {
+    public AABRect2f getOutlineShape() {
         return getCollisionShape();
     }
 
     @Nullable
-    public AABBox2f getCollisionShape() {
+    public AABRect2f getCollisionShape() {
         return VoxelShapes.fullSquare();
     }
 

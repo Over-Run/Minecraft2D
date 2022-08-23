@@ -39,7 +39,6 @@ import io.github.overrun.mc2d.text.LiteralText;
 import io.github.overrun.mc2d.util.ImageReader;
 import io.github.overrun.mc2d.util.Language;
 import io.github.overrun.mc2d.util.Options;
-import io.github.overrun.mc2d.world.World;
 import io.github.overrun.mc2d.world.block.Blocks;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -80,8 +79,8 @@ public final class Main implements Runnable, AutoCloseable {
     public void run() {
         logger.info("Loading for game Minecraft2D {}", VERSION);
         init();
-        Items.register();
         Blocks.register();
+        Items.register();
         ModLoader.loadMods();
         BlockModelMgr.loadAtlas();
         Language.init();
@@ -98,7 +97,7 @@ public final class Main implements Runnable, AutoCloseable {
             for (int i = 0; i < timer.ticks; i++) {
                 client.tick();
             }
-            client.render((float) timer.deltaTime);
+            client.render((float) timer.partialTick);
             Window.swapBuffers();
             glfwPollEvents();
             ++frames;
@@ -111,14 +110,12 @@ public final class Main implements Runnable, AutoCloseable {
     }
 
     private void init() {
-        GLFWErrorCallback.create((error, description) -> {
-            logger.error("########## GL ERROR ##########");
-            logger.error("{}: {}", error, GLFWErrorCallback.getDescription(description));
-        }).set();
+        GLFWErrorCallback.create((error, description) ->
+            logger.error("GLFW Error {}: {}", error, GLFWErrorCallback.getDescription(description))
+        ).set();
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         Window.create(896, 512, VERSION_TEXT.asString());
         Window.check();
@@ -159,35 +156,24 @@ public final class Main implements Runnable, AutoCloseable {
                 }
 
                 if (client.world != null) {
-                    if (key == GLFW_KEY_ENTER) {
-                        client.world.save(client.player);
-                    }
-                    if (key == GLFW_KEY_1) {
-                        client.player.handledBlock = GRASS_BLOCK;
-                    }
-                    if (key == GLFW_KEY_2) {
-                        client.player.handledBlock = STONE;
-                    }
-                    if (key == GLFW_KEY_3) {
-                        client.player.handledBlock = DIRT;
-                    }
-                    if (key == GLFW_KEY_4) {
-                        client.player.handledBlock = COBBLESTONE;
-                    }
-                    if (key == GLFW_KEY_5) {
-                        client.player.handledBlock = BEDROCK;
-                    }
-                    if (key == GLFW_KEY_F3) {
-                        client.debugging = !client.debugging;
-                    }
-                    // , || .
-                    if (key == GLFW_KEY_COMMA || key == GLFW_KEY_PERIOD) {
-                        --World.z;
-                        if (World.z < 0) {
-                            World.z = 1;
-                        }
-                        if (World.z > 1) {
-                            World.z = 0;
+                    var world = client.world;
+                    switch (key) {
+                        case GLFW_KEY_ENTER -> world.save(client.player);
+                        case GLFW_KEY_1 -> client.player.handledBlock = GRASS_BLOCK;
+                        case GLFW_KEY_2 -> client.player.handledBlock = STONE;
+                        case GLFW_KEY_3 -> client.player.handledBlock = DIRT;
+                        case GLFW_KEY_4 -> client.player.handledBlock = COBBLESTONE;
+                        case GLFW_KEY_5 -> client.player.handledBlock = BEDROCK;
+                        case GLFW_KEY_F3 -> client.debugging = !client.debugging;
+                        // , || .
+                        case GLFW_KEY_COMMA, GLFW_KEY_PERIOD -> {
+                            --world.pickZ;
+                            if (world.pickZ < 0) {
+                                world.pickZ = 1;
+                            }
+                            if (world.pickZ > 1) {
+                                world.pickZ = 0;
+                            }
                         }
                     }
                     if (key == Options.getI(Options.KEY_CREATIVE_TAB, GLFW_KEY_E)) {
@@ -252,9 +238,9 @@ public final class Main implements Runnable, AutoCloseable {
         logger.info("Stopping!");
         Window.destroy();
         glfwTerminate();
-        var gec = glfwSetErrorCallback(null);
-        if (gec != null) {
-            gec.free();
+        var cb = glfwSetErrorCallback(null);
+        if (cb != null) {
+            cb.free();
         }
     }
 

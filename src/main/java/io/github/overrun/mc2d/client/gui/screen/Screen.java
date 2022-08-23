@@ -65,12 +65,15 @@ public abstract class Screen extends AbstractParentElement implements TickableEl
         init();
     }
 
-    protected void init() { }
+    protected void init() {
+    }
 
     @Override
-    public void tick() { }
+    public void tick() {
+    }
 
-    public void removed(Screen newScreen) { }
+    public void removed(Screen newScreen) {
+    }
 
     public void renderBackground() {
         if (client.world != null) {
@@ -90,7 +93,8 @@ public abstract class Screen extends AbstractParentElement implements TickableEl
         }
     }
 
-    public void onClose() { }
+    public void onClose() {
+    }
 
     public boolean shouldCloseOnEsc() {
         return true;

@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * @author squid233
@@ -44,11 +45,19 @@ public class DefaultedRegistry<T> extends MutableRegistry<T> {
     private final Map<Identifier, T> id2entry = new HashMap<>();
     private final Object2IntMap<T> entry2rawId = new Object2IntArrayMap<>();
     private final List<T> entries;
-    private final T defaultEntry;
+    private final Supplier<T> defaultSupplier;
+    private T defaultEntry;
 
-    public DefaultedRegistry(T defaultEntry) {
-        this.defaultEntry = defaultEntry;
+    public DefaultedRegistry(Supplier<T> defaultEntry) {
+        defaultSupplier = defaultEntry;
         entries = new DefaultedList<>(defaultEntry);
+    }
+
+    public T getDefaultEntry() {
+        if (defaultEntry == null) {
+            defaultEntry = defaultSupplier.get();
+        }
+        return defaultEntry;
     }
 
     public int size() {
@@ -66,7 +75,7 @@ public class DefaultedRegistry<T> extends MutableRegistry<T> {
 
     @Override
     public T getById(Identifier id) {
-        return id2entry.getOrDefault(id, defaultEntry);
+        return id2entry.getOrDefault(id, getDefaultEntry());
     }
 
     @Override

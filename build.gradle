@@ -21,11 +21,12 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation platform('org.lwjgl:lwjgl-bom:3.3.1')
+    implementation 'com.google.code.gson:gson:2.9.1'
     // implementation 'com.google.guava:guava:30.1-jre'
     implementation 'it.unimi.dsi:fastutil:8.5.8'
-    implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
-    implementation 'org.apache.logging.log4j:log4j-slf4j18-impl:2.17.2'
+    implementation 'org.apache.logging.log4j:log4j-core:2.18.0'
+    implementation 'org.apache.logging.log4j:log4j-slf4j18-impl:2.18.0'
     implementation 'org.joml:joml:1.10.4'
     implementation 'io.github.over-run:swgl-core:0.2.0-SNAPSHOT'
     compileOnly 'org.jetbrains:annotations:23.0.0'

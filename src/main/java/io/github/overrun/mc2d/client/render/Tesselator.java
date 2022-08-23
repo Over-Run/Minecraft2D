@@ -24,7 +24,8 @@
 
 package io.github.overrun.mc2d.client.render;
 
-import org.overrun.swgl.core.gl.batch.GLBatch;
+import org.lwjgl.system.MemoryUtil;
+import org.overrun.swgl.core.gl.GLBatch;
 import org.overrun.swgl.core.model.BuiltinVertexLayouts;
 
 import java.util.function.Consumer;
@@ -55,7 +56,7 @@ public final class Tesselator {
     }
 
     public Tesselator begin(int primitives) {
-        batch.begin(BuiltinVertexLayouts.T2F_C3F_V3F);
+        batch.begin(BuiltinVertexLayouts.T2F_C3F_V3F());
         this.primitives = primitives;
         return this;
     }
@@ -72,8 +73,10 @@ public final class Tesselator {
         if (batch.hasTexture()) glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
         glInterleavedArrays(GL_T2F_C3F_V3F, 0, batch.getBuffer());
-        batch.getIndexBuffer().ifPresentOrElse(buffer -> glDrawElements(GL_UNSIGNED_INT, buffer),
-            () -> glDrawArrays(primitives, 0, batch.getVertexCount()));
+        batch.getIndexBuffer().ifPresentOrElse(
+            buffer -> glDrawElements(GL_UNSIGNED_INT, batch.getIndexCount(), GL_UNSIGNED_INT, MemoryUtil.memAddress(buffer)),
+            () -> glDrawArrays(primitives, 0, batch.getVertexCount())
+        );
 
         glDisableClientState(GL_VERTEX_ARRAY);
         if (batch.hasColor()) glDisableClientState(GL_COLOR_ARRAY);

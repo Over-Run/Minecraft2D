@@ -64,7 +64,7 @@ public final class TextureManager implements AutoCloseable {
         glBindTexture(GL_TEXTURE_2D, texId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mode);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mode);
-        byte[] img = read("assets/" + id.getNamespace() + "/" + id.getPath(),
+        var img = read("assets/" + id.getNamespace() + "/" + id.getPath(),
             id.isVanilla()
                 ? ClassLoader.getSystemClassLoader()
                 : ModLoader.getLoader(id.getNamespace()));
@@ -79,12 +79,11 @@ public final class TextureManager implements AutoCloseable {
                 .putInt(0xff000000).putInt(0xfff800f8)
                 .flip();
         } else {
-            var bb = MemoryUtil.memCalloc(img.length).put(img).flip();
             try (var stack = MemoryStack.stackPush()) {
                 var xp = stack.callocInt(1);
                 var yp = stack.callocInt(1);
                 var cp = stack.callocInt(1);
-                pixels = stbi_load_from_memory(bb, xp, yp, cp, STBI_rgb_alpha);
+                pixels = stbi_load_from_memory(img, xp, yp, cp, STBI_rgb_alpha);
                 if (pixels == null) {
                     logger.error("Failed to load image {}: {}",
                         "assets/" + id.getNamespace() + "/" + id.getPath(),

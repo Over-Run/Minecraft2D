@@ -108,7 +108,8 @@ public final class Mc2dClient implements AutoCloseable {
         }
     }
 
-    public void setupCamera() {}
+    public void setupCamera() {
+    }
 
     public void render(float delta) {
         glMatrixMode(GL_PROJECTION);
@@ -136,8 +137,13 @@ public final class Mc2dClient implements AutoCloseable {
         if (screen != null) {
             screen.tick();
         }
-        if (player != null) {
-            player.tick();
+        if (world != null) {
+            if (screen == null) {
+                worldRenderer.processHit();
+            }
+            if (player != null) {
+                player.tick();
+            }
         }
     }
 

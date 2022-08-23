@@ -27,8 +27,8 @@ package io.github.overrun.mc2d.world.block;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.shape.VoxelShapes;
 import org.jetbrains.annotations.Nullable;
-import org.overrun.swgl.core.gl.batch.GLBatch;
-import org.overrun.swgl.core.phys.p2d.AABBox2f;
+import org.overrun.swgl.core.gl.GLBatch;
+import org.overrun.swgl.core.phys.p2d.AABRect2f;
 
 /**
  * @author squid233
@@ -37,7 +37,7 @@ import org.overrun.swgl.core.phys.p2d.AABBox2f;
 public class AirBlock extends Block {
     @Override
     @Nullable
-    public AABBox2f getCollisionShape() {
+    public AABRect2f getCollisionShape() {
         return VoxelShapes.empty();
     }
 

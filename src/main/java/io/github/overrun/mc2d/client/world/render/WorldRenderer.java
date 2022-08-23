@@ -106,18 +106,11 @@ public class WorldRenderer {
                     && mouseX < rtX
                     && mouseY >= ldY
                     && mouseY < rtY) {
-                    target = world.getBlock(x, y, World.z);
+                    target = world.getBlock(x, y, world.pickZ);
                     hitResult.block = target;
                     hitResult.x = x;
                     hitResult.y = y;
-                    hitResult.z = World.z;
-                    if (target == AIR) {
-                        if (isMousePress(GLFW_MOUSE_BUTTON_RIGHT)) {
-                            world.setBlock(x, y, World.z, client.player.handledBlock);
-                        }
-                    } else if (isMousePress(GLFW_MOUSE_BUTTON_LEFT)) {
-                        world.setBlock(x, y, World.z, AIR);
-                    }
+                    hitResult.z = world.pickZ;
                 }
             }
         }
@@ -135,15 +128,31 @@ public class WorldRenderer {
             if (hitResult.z == 0 || dark) {
                 var shape = hitResult.block.getOutlineShape();
                 if (shape != null) {
-                    GlUtils.drawRect(ldX + ((int) shape.getMinX() << 4),
-                        ldY + ((int) shape.getMinY() << 4),
-                        ldX + ((int) shape.getMaxX() << 5),
-                        ldY + ((int) shape.getMaxY() << 5),
+                    GlUtils.drawRect(ldX + ((int) shape.minX() << 4),
+                        ldY + ((int) shape.minY() << 4),
+                        ldX + ((int) shape.maxX() << 5),
+                        ldY + ((int) shape.maxY() << 5),
                         0x80000000,
                         true);
                 }
             }
             glEnable(GL_TEXTURE_2D);
+        }
+    }
+
+    public void processHit() {
+        if (!hitResult.miss) {
+            var target = hitResult.block;
+            int x = hitResult.x;
+            int y = hitResult.y;
+            int z = hitResult.z;
+            if (target == AIR) {
+                if (isMousePress(GLFW_MOUSE_BUTTON_RIGHT)) {
+                    world.setBlock(x, y, z, client.player.handledBlock);
+                }
+            } else if (isMousePress(GLFW_MOUSE_BUTTON_LEFT)) {
+                world.setBlock(x, y, z, AIR);
+            }
         }
     }
 

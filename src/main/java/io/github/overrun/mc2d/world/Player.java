@@ -26,14 +26,14 @@ package io.github.overrun.mc2d.world;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import io.github.overrun.mc2d.world.block.Block;
-import io.github.overrun.mc2d.world.block.Blocks;
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.gui.DrawableHelper;
 import io.github.overrun.mc2d.client.gui.Framebuffer;
 import io.github.overrun.mc2d.util.Identifier;
+import io.github.overrun.mc2d.world.block.Block;
+import io.github.overrun.mc2d.world.block.Blocks;
 import org.joml.Vector3d;
-import org.overrun.swgl.core.phys.p2d.AABBox2f;
+import org.overrun.swgl.core.phys.p2d.AABRect2f;
 import org.overrun.swgl.core.util.math.Numbers;
 
 import java.io.IOException;
@@ -56,7 +56,7 @@ public class Player extends DrawableHelper {
     public final Vector3d position = new Vector3d();
     public boolean facingRight = true;
     public final Vector3d velocity = new Vector3d();
-    public AABBox2f box;
+    public AABRect2f box;
     public boolean onGround = false;
     protected float bbWidth = 0.6f;
     protected float bbHeight = 1.8f;
@@ -70,11 +70,10 @@ public class Player extends DrawableHelper {
     public void setPos(double x, double y, double z) {
         position.set(x, y, z);
         float hw = bbWidth * 0.5f;
-        box = new AABBox2f((float) (x - hw), (float) y, (float) (x + hw), (float) (y + bbHeight));
+        box = new AABRect2f((float) (x - hw), (float) y, (float) (x + hw), (float) (y + bbHeight));
     }
 
-    public void tick() {
-        prevPos.set(position);
+    public double processInput() {
         double xa = 0;
         if (isKeyPress(GLFW_KEY_A)
             || isKeyPress(GLFW_KEY_LEFT)) {
@@ -101,6 +100,15 @@ public class Player extends DrawableHelper {
         ) {
             velocity.y = -0.5f;
         }
+        return xa;
+    }
+
+    public void tick() {
+        double xa = 0.0;
+        if (Mc2dClient.getInstance().screen == null) {
+            xa = processInput();
+        }
+        prevPos.set(position);
         moveRelative(xa, onGround ? 0.1f : 0.02f);
         velocity.y -= 0.08;
         move((float) velocity.x(), (float) velocity.y());
@@ -119,7 +127,7 @@ public class Player extends DrawableHelper {
     public void move(float x, float y) {
         float xaOrg = x;
         float yaOrg = y;
-        var cubes = world.getCubes(0, box.expand(x, y, new AABBox2f()));
+        var cubes = world.getCubes(0, box.expand(x, y, new AABRect2f()));
         for (var cube : cubes) {
             y = box.clipYCollide(y, cube);
         }
@@ -134,8 +142,8 @@ public class Player extends DrawableHelper {
         if (Numbers.isNonEqual(yaOrg, y))
             velocity.y = 0.0f;
         position.set(
-            (box.getMinX() + box.getMaxX()) * 0.5f,
-            box.getMinY(),
+            (box.minX() + box.maxX()) * 0.5f,
+            box.minY(),
             position.z()
         );
     }

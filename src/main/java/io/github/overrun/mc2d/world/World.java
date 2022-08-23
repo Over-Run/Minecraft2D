@@ -30,7 +30,7 @@ import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.world.block.Block;
 import org.joml.SimplexNoise;
-import org.overrun.swgl.core.phys.p2d.AABBox2f;
+import org.overrun.swgl.core.phys.p2d.AABRect2f;
 import org.overrun.swgl.core.util.LogFactory9;
 import org.slf4j.Logger;
 
@@ -50,8 +50,8 @@ import static io.github.overrun.mc2d.world.block.Blocks.*;
  */
 public class World {
     private static final Logger logger = LogFactory9.getLogger();
-    private static final long serialVersionUID = 3L;
-    public static int z = 0;
+    private static final long WORLD_VERSION = 3L;
+    public int pickZ = 0;
     private final Identifier[] blocks;
     public final int width;
     public final int height;
@@ -65,14 +65,16 @@ public class World {
         Arrays.fill(blocks, AIR.getId());
     }
 
-    private float sumOctaves(int numIterations,
-                             float x,
-                             float y,
-                             float z,
-                             float persistence,
-                             float scale,
-                             float low,
-                             float high) {
+    private static float sumOctaves(
+        int numIterations,
+        float x,
+        float y,
+        float z,
+        float persistence,
+        float scale,
+        float low,
+        float high
+    ) {
         float maxAmp = 0;
         float amp = 1;
         float freq = scale;
@@ -123,12 +125,12 @@ public class World {
         return x + y * width + z * width * height;
     }
 
-    public List<AABBox2f> getCubes(int z, AABBox2f origin) {
-        var lst = new ArrayList<AABBox2f>();
-        int x0 = (int) origin.getMinX();
-        int y0 = (int) origin.getMinY();
-        int x1 = (int) (origin.getMaxX() + 1.0f);
-        int y1 = (int) (origin.getMaxY() + 1.0f);
+    public List<AABRect2f> getCubes(int z, AABRect2f origin) {
+        var lst = new ArrayList<AABRect2f>();
+        int x0 = (int) origin.minX();
+        int y0 = (int) origin.minY();
+        int x1 = (int) (origin.maxX() + 1.0f);
+        int y1 = (int) (origin.maxY() + 1.0f);
 
         if (x0 < 0) {
             x0 = 0;
@@ -148,7 +150,10 @@ public class World {
             for (int y = y0; y < y1; y++) {
                 var aabb = getBlock(x, y, z).getCollisionShape();
                 if (aabb != null) {
-                    lst.add(new AABBox2f(aabb.getMinX() + x, aabb.getMinY() + y, aabb.getMaxX() + x, aabb.getMaxY() + y));
+                    lst.add(new AABRect2f(aabb.minX() + x,
+                        aabb.minY() + y,
+                        aabb.maxX() + x,
+                        aabb.maxY() + y));
                 }
             }
         }
@@ -189,7 +194,7 @@ public class World {
 
     public void serialize(JsonWriter writer, Player player) throws IOException {
         writer.beginObject()
-            .name("version").value(serialVersionUID)
+            .name("version").value(WORLD_VERSION)
             .name("width").value(width)
             .name("height").value(height)
             .name("depth").value(depth)
@@ -219,8 +224,8 @@ public class World {
             switch (reader.nextName()) {
                 case "version" -> {
                     var v = reader.nextLong();
-                    if (serialVersionUID != v) {
-                        throw new RuntimeException("Doesn't compatible with version " + v + ". Current is " + serialVersionUID);
+                    if (WORLD_VERSION != v) {
+                        throw new RuntimeException("Doesn't compatible with version " + v + ". Current is " + WORLD_VERSION);
                     }
                 }
                 case "width" -> w = reader.nextInt();

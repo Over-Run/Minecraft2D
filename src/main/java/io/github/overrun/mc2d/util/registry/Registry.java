@@ -35,8 +35,8 @@ import io.github.overrun.mc2d.util.Identifier;
  * @since 2021/01/27
  */
 public final class Registry {
-    public static final DefaultedRegistry<Block> BLOCK = new DefaultedRegistry<>(Blocks.AIR);
-    public static final DefaultedRegistry<Item> ITEM = new DefaultedRegistry<>(Items.AIR);
+    public static final DefaultedRegistry<Block> BLOCK = new DefaultedRegistry<>(() -> Blocks.AIR);
+    public static final DefaultedRegistry<Item> ITEM = new DefaultedRegistry<>(() -> Items.AIR);
 
     public static <T> T register(BaseRegistry<T> registry, Identifier id, T entry) {
         return registry.register(id, entry);
