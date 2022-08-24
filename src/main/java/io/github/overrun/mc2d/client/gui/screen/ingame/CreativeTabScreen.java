@@ -24,7 +24,7 @@
 
 package io.github.overrun.mc2d.client.gui.screen.ingame;
 
-import io.github.overrun.mc2d.world.entity.Player;
+import io.github.overrun.mc2d.world.entity.PlayerEntity;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
 import io.github.overrun.mc2d.world.item.BlockItem;
 import io.github.overrun.mc2d.screen.CreativeTabScreenHandler;
@@ -41,9 +41,9 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
 public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHandler> {
     private static final Identifier TEXTURE = new Identifier("textures/gui/tab_items.png");
     private final Screen parent;
-    private final Player player;
+    private final PlayerEntity player;
 
-    public CreativeTabScreen(Player player, Screen parent) {
+    public CreativeTabScreen(PlayerEntity player, Screen parent) {
         super(new CreativeTabScreenHandler(), new TranslatableText("itemGroup.name.creativeTab"));
         this.player = player;
         this.parent = parent;
@@ -53,7 +53,7 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
     protected void onClickSlot(Slot slot) {
         super.onClickSlot(slot);
         if (slot.item instanceof BlockItem) {
-            player.handledBlock = ((BlockItem) slot.item).getBlock();
+            player.mainHand = ((BlockItem) slot.item).getBlock();
         }
     }
 

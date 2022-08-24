@@ -84,10 +84,10 @@ public abstract class HandledScreen<T extends ScreenHandler> extends Screen {
     protected void onClickSlot(Slot slot) { }
 
     @Override
-    protected void init() {
+    public void init() {
         super.init();
-        x = width - (backgroundWidth << 1) >> 1;
-        y = height - (backgroundHeight << 1) >> 1;
+        x = (width - backgroundWidth * 2) / 2;
+        y = (height - backgroundHeight * 2) / 2;
         handler.slots.clear();
         handler.init(x, y);
     }

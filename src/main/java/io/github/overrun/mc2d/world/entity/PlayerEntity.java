@@ -47,14 +47,15 @@ import static org.lwjgl.opengl.GL11.*;
  * @author squid233
  * @since 2021/01/09
  */
-public class Player extends DrawableHelper {
+public class PlayerEntity extends DrawableHelper {
     public static final Identifier TEXTURE = new Identifier("textures/player.png");
     private static final long serialVersionUID = 2L;
-    public Block handledBlock = Blocks.GRASS_BLOCK;
+    public Block mainHand = Blocks.GRASS_BLOCK;
     public int headTexCoord;
     public int bodyTexCoord;
     public final Vector3d prevPos = new Vector3d();
     public final Vector3d position = new Vector3d();
+    public final Vector3d lerpPos = new Vector3d();
     public boolean facingRight = true;
     public final Vector3d velocity = new Vector3d();
     public AABRect2f box;
@@ -63,7 +64,7 @@ public class Player extends DrawableHelper {
     protected float bbHeight = 1.8f;
     public World world;
 
-    public Player(World world) {
+    public PlayerEntity(World world) {
         this.world = world;
         setPos(Math.random() * world.width, world.height + 10, 1.5);
     }
@@ -151,15 +152,14 @@ public class Player extends DrawableHelper {
 
     public void render(double delta, int mouseX, int mouseY) {
         var client = Mc2dClient.getInstance();
-        double x = Framebuffer.width >> 1;
-        double y = Framebuffer.height >> 1;
+        double x = Framebuffer.width * .5f;
+        double y = Framebuffer.height * .5f;
 
         client.getTextureManager().bindTexture(TEXTURE);
         glPushMatrix();
+        glLoadIdentity();
         // Move to center
         glTranslated(x, y, 0);
-        final float scalar = 1.8f / 2.0f;
-        glScalef(scalar, scalar, scalar);
         glBegin(GL_QUADS);
 
         // Draw head

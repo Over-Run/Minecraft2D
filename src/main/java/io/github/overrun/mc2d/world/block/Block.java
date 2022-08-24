@@ -55,6 +55,11 @@ public class Block implements ItemConvertible {
     }
 
     @Nullable
+    public AABRect2f getRayCastingShape() {
+        return getCollisionShape();
+    }
+
+    @Nullable
     public AABRect2f getCollisionShape() {
         return VoxelShapes.fullSquare();
     }
@@ -72,22 +77,25 @@ public class Block implements ItemConvertible {
     }
 
     public void render(Tesselator t, int x, int y, int z) {
-        glColor4f(1, 1, 1, 1);
         var path = BlockModelMgr.blockTexture(getTexture());
         var atlas = BlockModelMgr.getBlockAtlas();
         float u0 = atlas.getU0n(path);
         float v0 = atlas.getV0n(path);
         float u1 = atlas.getU1n(path);
         float v1 = atlas.getV1n(path);
-        glColor3f(1.0f, 1.0f, 1.0f);
+        if (z == 0) {
+            glColor3f(0.5f, 0.5f, 0.5f);
+        } else {
+            glColor3f(1.0f, 1.0f, 1.0f);
+        }
         glTexCoord2f(u0, v0);
-        glVertex2f(x, y + 32);
+        glVertex2f(x, y + 1);
         glTexCoord2f(u0, v1);
         glVertex2f(x, y);
         glTexCoord2f(u1, v1);
-        glVertex2f(x + 32, y);
+        glVertex2f(x + 1, y);
         glTexCoord2f(u1, v0);
-        glVertex2f(x + 32, y + 32);
+        glVertex2f(x + 1, y + 1);
     }
 
     public Identifier getTexture() {

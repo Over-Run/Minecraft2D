@@ -39,10 +39,10 @@ public final class GlUtils {
      * {@link GL11#glEnable(int) enable}
      * {@link GL11#GL_BLEND blend} before using.</p>
      *
-     * @param x1 The left top coord x.
-     * @param y1 The left top coord y.
-     * @param x2 The right bottom coord x.
-     * @param y2 The right bottom coord y.
+     * @param x1    The left top coord x.
+     * @param y1    The left top coord y.
+     * @param x2    The right bottom coord x.
+     * @param y2    The right bottom coord y.
      * @param color The color. ARGB if {@code alpha} is {@code true}, else RGB.
      * @param alpha The alpha value.
      */
@@ -51,10 +51,11 @@ public final class GlUtils {
         var r = color << 8 >>> 24;
         var g = color << 16 >>> 24;
         var b = color << 24 >>> 24;
+        final float inv = 1f / 255f;
         if (alpha) {
-            glColor4f(r / 255f, g / 255f, b / 255f, (color >>> 24) / 255f);
+            glColor4f(r * inv, g * inv, b * inv, (color >>> 24) * inv);
         } else {
-            glColor3f(r / 255f, g / 255f, b / 255f);
+            glColor3f(r * inv, g * inv, b * inv);
         }
         // Left top
         glVertex2d(x1, y1);

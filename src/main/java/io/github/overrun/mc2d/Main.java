@@ -28,11 +28,8 @@ import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.Mouse;
 import io.github.overrun.mc2d.client.Window;
 import io.github.overrun.mc2d.client.gui.Framebuffer;
-import io.github.overrun.mc2d.client.gui.screen.ingame.CreativeTabScreen;
-import io.github.overrun.mc2d.client.gui.screen.ingame.PauseScreen;
 import io.github.overrun.mc2d.client.model.BlockModelMgr;
 import io.github.overrun.mc2d.event.KeyCallback;
-import io.github.overrun.mc2d.world.item.Items;
 import io.github.overrun.mc2d.mod.ModLoader;
 import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.text.LiteralText;
@@ -40,12 +37,12 @@ import io.github.overrun.mc2d.util.ImageReader;
 import io.github.overrun.mc2d.util.Language;
 import io.github.overrun.mc2d.util.Options;
 import io.github.overrun.mc2d.world.block.Blocks;
+import io.github.overrun.mc2d.world.item.Items;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
-import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.gl.GLBlendFunc;
 import org.overrun.swgl.core.gl.GLClear;
 import org.overrun.swgl.core.gl.GLStateMgr;
@@ -55,7 +52,6 @@ import org.slf4j.Logger;
 
 import java.nio.IntBuffer;
 
-import static io.github.overrun.mc2d.world.block.Blocks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11C.glViewport;
 
@@ -71,12 +67,7 @@ public final class Main implements Runnable, AutoCloseable {
     private static final Logger logger = LogFactory9.getLogger();
     private static int oldX, oldY, oldWidth, oldHeight;
     private final Mc2dClient client = Mc2dClient.getInstance();
-    private final Timer timer;
-
-    public Main() {
-        GlobalConfig.initialTps = Integer.parseInt(System.getProperty("mc2d.tps", "20"));
-        timer = new Timer();
-    }
+    private final Timer timer = new Timer(Integer.parseInt(System.getProperty("mc2d.tps", "20")));
 
     @Override
     public void run() {
@@ -100,6 +91,7 @@ public final class Main implements Runnable, AutoCloseable {
             for (int i = 0; i < timer.ticks; i++) {
                 client.tick();
             }
+            client.update();
             client.render((float) timer.partialTick);
             Window.swapBuffers();
             glfwPollEvents();
@@ -129,16 +121,6 @@ public final class Main implements Runnable, AutoCloseable {
         Window.setKeyCallback((window, key, scancode, action, mods) -> {
             KeyCallback.post(window, key, scancode, action, mods);
             if (action == GLFW_PRESS) {
-                if (client.screen != null) {
-                    client.screen.keyPressed(key, scancode, mods);
-                } else if (client.world != null) {
-                    if (key == GLFW_KEY_ESCAPE) {
-                        client.openScreen(new PauseScreen(null));
-                    } else if (key == Options.getI(Options.KEY_CREATIVE_TAB, GLFW_KEY_E)) {
-                        client.openScreen(new CreativeTabScreen(client.player, null));
-                    }
-                }
-
                 if (key == GLFW_KEY_F11) {
                     var vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
                     if (glfwGetWindowMonitor(window) == 0) {
@@ -165,27 +147,7 @@ public final class Main implements Runnable, AutoCloseable {
                     }
                 }
 
-                if (client.world != null) {
-                    var world = client.world;
-                    switch (key) {
-                        case GLFW_KEY_ENTER -> world.save(client.player);
-                        case GLFW_KEY_1 -> client.player.handledBlock = GRASS_BLOCK;
-                        case GLFW_KEY_2 -> client.player.handledBlock = STONE;
-                        case GLFW_KEY_3 -> client.player.handledBlock = DIRT;
-                        case GLFW_KEY_4 -> client.player.handledBlock = COBBLESTONE;
-                        case GLFW_KEY_5 -> client.player.handledBlock = BEDROCK;
-                        case GLFW_KEY_F3 -> client.debugging = !client.debugging;
-                        // , || .
-                        case GLFW_KEY_COMMA, GLFW_KEY_PERIOD -> {
-                            --world.pickZ;
-                            if (world.pickZ < 0) {
-                                world.pickZ = 1;
-                            } else if (world.pickZ > 1) {
-                                world.pickZ = 0;
-                            }
-                        }
-                    }
-                }
+                client.onKeyPress(key, scancode, mods);
             }
         });
         Window.setMouseButtonCallback((window, button, action, mods) -> {

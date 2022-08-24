@@ -34,14 +34,14 @@ import io.github.overrun.mc2d.world.World;
 import io.github.overrun.mc2d.world.block.Block;
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import org.joml.Vector3d;
-import org.overrun.swgl.core.gl.GLStateMgr;
+import org.joml.Intersectiond;
 
 import static io.github.overrun.mc2d.client.Mouse.isMousePress;
 import static io.github.overrun.mc2d.world.block.Blocks.AIR;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
 import static org.lwjgl.opengl.GL11.*;
+import static org.overrun.swgl.core.gl.GLStateMgr.*;
 
 /**
  * @author squid233
@@ -50,11 +50,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class WorldRenderer {
     private final Mc2dClient client;
     private final World world;
-    /**
-     * Linear interpolation storage. Let it don't create more objects.
-     */
-    private final Vector3d interpolation = new Vector3d();
-    private HitResult hitResult = new HitResult(null, 0, 0, 0, true);
+    private final HitResult hitResult = new HitResult(null, 0, 0, 0, true);
     private final Long2ObjectMap<ClientChunk> chunkMap = new Long2ObjectArrayMap<>();
 
     public WorldRenderer(Mc2dClient client, World world) {
@@ -86,58 +82,76 @@ public class WorldRenderer {
     }
 
     public void render(int z, int mouseX, int mouseY) {
-        Block target = null;
         client.getTextureManager().bindTexture(BlockModelMgr.BLOCK_ATLAS);
         glBegin(GL_QUADS);
         for (int y = 0; y < world.height; y++) {
             for (int x = 0; x < world.width; x++) {
                 var b = world.getBlock(x, y, z);
-                double ldX = (Framebuffer.width >> 1) + (x - interpolation.x) * 32,
-                    ldY = (Framebuffer.height >> 1) + (y - interpolation.y) * 32,
-                    rtX = ldX + 32,
-                    rtY = ldY + 32;
-                if (ldX > Framebuffer.width || ldY > Framebuffer.height || rtX < 0 || rtY < 0) {
-                    continue;
-                }
                 var upAir = world.getBlock(x, y, 1) == AIR;
                 if (z == 1 || upAir) {
-                    b.render(null, (int) ldX, (int) ldY, z);
-                }
-                if (mouseX >= ldX
-                    && mouseX < rtX
-                    && mouseY >= ldY
-                    && mouseY < rtY) {
-                    target = world.getBlock(x, y, world.pickZ);
-                    hitResult.block = target;
-                    hitResult.x = x;
-                    hitResult.y = y;
-                    hitResult.z = world.pickZ;
+                    b.render(null, x, y, z);
                 }
             }
         }
         glEnd();
-        hitResult.miss = (target == null);
         client.getTextureManager().bindTexture(0);
+    }
+
+    public void pick(int mouseX, int mouseY) {
+        Block target = null;
+        int targetX = 0, targetY = 0;
+        final double inv32 = 1. / 32.;
+        int rx = (int) Math.ceil(Framebuffer.width * .5 * inv32);
+        int ry = (int) Math.ceil(Framebuffer.height * .5 * inv32);
+        int ox = (int) Math.floor(client.player.lerpPos.x);
+        int oy = (int) Math.floor(client.player.lerpPos.y);
+        for (int y = Math.min(world.getMinY(), oy - ry), my = Math.min(world.getMaxY(), oy + ry);
+             y <= my; y++) {
+            for (int x = Math.min(world.getMinX(), ox - rx), mx = Math.min(world.getMaxX(), ox + rx);
+                 x <= mx; x++) {
+                var block = world.getBlock(x, y, world.pickZ);
+                var shape = block.getRayCastingShape();
+                if (shape == null) {
+                    continue;
+                }
+                double bx0 = x + shape.minX();
+                double by0 = y + shape.minY();
+                double bx1 = x + shape.maxX();
+                double by1 = y + shape.maxY();
+                if (Intersectiond.testPointAar(
+                    ((mouseX - (Framebuffer.width * .5f)) * inv32 + client.player.lerpPos.x()),
+                    ((mouseY - (Framebuffer.height * .5f)) * inv32 + client.player.lerpPos.y()),
+                    bx0, by0, bx1, by1
+                )) {
+                    target = block;
+                    targetX = x;
+                    targetY = y;
+                }
+            }
+        }
+        hitResult.block = target;
+        hitResult.x = targetX;
+        hitResult.y = targetY;
+        hitResult.z = world.pickZ;
+        hitResult.miss = (target == null);
     }
 
     public void renderHit() {
         if (!hitResult.miss) {
-            double ldX = (Framebuffer.width >> 1) + (hitResult.x - interpolation.x) * 32,
-                ldY = (Framebuffer.height >> 1) + (hitResult.y - interpolation.y) * 32;
-            boolean upAir = world.getBlock(hitResult.x, hitResult.y, 1) == AIR;
-            GLStateMgr.disableTexture2D();
-            if (hitResult.z == 1 || upAir) {
-                var shape = hitResult.block.getOutlineShape();
-                if (shape != null) {
-                    GlUtils.drawRect(ldX + ((int) shape.minX() << 4),
-                        ldY + ((int) shape.minY() << 4),
-                        ldX + ((int) shape.maxX() << 5),
-                        ldY + ((int) shape.maxY() << 5),
-                        0x80000000,
-                        true);
-                }
+            disableTexture2D();
+            var shape = hitResult.block.getOutlineShape();
+            if (shape != null) {
+                float w = getLineWidth();
+                lineWidth(2.0f);
+                GlUtils.drawRect(hitResult.x + shape.minX(),
+                    hitResult.y + shape.minY(),
+                    hitResult.x + shape.maxX(),
+                    hitResult.y + shape.maxY(),
+                    hitResult.z == 0 ? 0x800000FF : 0x80000000,
+                    true);
+                lineWidth(w);
             }
-            GLStateMgr.enableTexture2D();
+            enableTexture2D();
         }
     }
 
@@ -149,7 +163,7 @@ public class WorldRenderer {
             int z = hitResult.z;
             if (target == AIR) {
                 if (isMousePress(GLFW_MOUSE_BUTTON_RIGHT)) {
-                    world.setBlock(x, y, z, client.player.handledBlock);
+                    world.setBlock(x, y, z, client.player.mainHand);
                 }
             } else if (isMousePress(GLFW_MOUSE_BUTTON_LEFT)) {
                 world.setBlock(x, y, z, AIR);
@@ -158,15 +172,13 @@ public class WorldRenderer {
     }
 
     public void render(float delta, int mouseX, int mouseY) {
-        client.player.prevPos.lerp(client.player.position, delta, interpolation);
-        glEnable(GL_LIGHTING);
-        glEnable(GL_COLOR_MATERIAL);
-        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, new float[]{0.5f, 0.5f, 0.5f, 1.0f});
+        pick(mouseX, mouseY);
         render(0, mouseX, mouseY);
-        glDisable(GL_LIGHTING);
         glColor3f(1, 1, 1);
         client.player.render(delta, mouseX, mouseY);
         render(1, mouseX, mouseY);
-        renderHit();
+        if (client.screen == null) {
+            renderHit();
+        }
     }
 }

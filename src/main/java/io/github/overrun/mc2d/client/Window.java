@@ -49,10 +49,14 @@ import static org.lwjgl.glfw.GLFW.*;
 /**
  * @author squid233
  * @since 2021/01/31
+ * @deprecated Replace with swgl window
  */
 @ApiStatus.Internal
+@Deprecated
 public final class Window {
-    /** The window handler */
+    /**
+     * The window handler
+     */
     public static long handler;
     public static int width;
     public static int height;

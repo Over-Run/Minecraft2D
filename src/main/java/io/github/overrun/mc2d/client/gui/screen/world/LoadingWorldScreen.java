@@ -37,7 +37,7 @@ public final class LoadingWorldScreen extends DirtScreen {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         super.init();
     }
 

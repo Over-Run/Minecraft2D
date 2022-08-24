@@ -37,30 +37,32 @@ import io.github.overrun.mc2d.text.TranslatableText;
  */
 public final class PauseScreen extends Screen {
     private final Screen parent;
+    private final double orgTimescale;
 
-    public PauseScreen(Screen parent) {
+    public PauseScreen(Screen parent, double orgTimescale) {
         super(new TranslatableText("screen.mc2d.pausing"));
         this.parent = parent;
+        this.orgTimescale = orgTimescale;
     }
 
     @Override
-    protected void init() {
+    public void init() {
         super.init();
         if (client.world != null) {
             client.world.save(client.player);
         }
         addButton(new ButtonWidget((width >> 1) - 300,
-                90,
-                300,
-                20,
-                new TranslatableText("Back.to.Game"),
-                b -> onClose()));
+            90,
+            300,
+            20,
+            new TranslatableText("Back.to.Game"),
+            b -> onClose()));
         addButton(new ButtonWidget((width >> 1) - 300,
-                140,
-                300,
-                20,
-                new TranslatableText("Save.and.Back.to.Title.Screen"),
-                b -> client.openScreen(new SavingWorldScreen())));
+            140,
+            300,
+            20,
+            new TranslatableText("Save.and.Back.to.Title.Screen"),
+            b -> client.openScreen(new SavingWorldScreen())));
     }
 
     @Override
@@ -73,6 +75,9 @@ public final class PauseScreen extends Screen {
     @Override
     public void onClose() {
         super.onClose();
+        if (client.world != null) {
+            client.world.timer.timescale = orgTimescale;
+        }
         client.openScreen(parent);
     }
 }

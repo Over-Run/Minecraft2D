@@ -37,6 +37,18 @@ import org.overrun.swgl.core.phys.p2d.AABRect2f;
 public class AirBlock extends Block {
     @Override
     @Nullable
+    public AABRect2f getOutlineShape() {
+        return VoxelShapes.fullSquare();
+    }
+
+    @Override
+    @Nullable
+    public AABRect2f getRayCastingShape() {
+        return VoxelShapes.fullSquare();
+    }
+
+    @Override
+    @Nullable
     public AABRect2f getCollisionShape() {
         return VoxelShapes.empty();
     }

@@ -29,10 +29,11 @@ import com.google.gson.stream.JsonWriter;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.world.block.Block;
-import io.github.overrun.mc2d.world.entity.Player;
+import io.github.overrun.mc2d.world.entity.PlayerEntity;
 import org.joml.SimplexNoise;
 import org.overrun.swgl.core.phys.p2d.AABRect2f;
 import org.overrun.swgl.core.util.LogFactory9;
+import org.overrun.swgl.core.util.timing.Timer;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -57,6 +58,7 @@ public class World {
     public final int width;
     public final int height;
     public final int depth;
+    public final Timer timer = new Timer(20);
 
     public World(int w, int h) {
         width = w;
@@ -91,6 +93,30 @@ public class World {
         return noise;
     }
 
+    public int getMinX() {
+        return 0;
+    }
+
+    public int getMinY() {
+        return 0;
+    }
+
+    public int getMinZ() {
+        return 0;
+    }
+
+    public int getMaxX() {
+        return width;
+    }
+
+    public int getMaxY() {
+        return height;
+    }
+
+    public int getMaxZ() {
+        return depth;
+    }
+
     public void genTerrain() {
         // generate the terrain
         for (int x = 0; x < width; x++) {
@@ -109,14 +135,21 @@ public class World {
         }
     }
 
+    public boolean isInBorder(int x, int y, int z) {
+        return x >= getMinX() && x < getMaxX() &&
+               y >= getMinY() && y < getMaxY() &&
+               z >= getMinZ() && z < getMaxZ();
+    }
+
     public void setBlock(int x, int y, int z, Block block) {
-        if (x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < depth) {
+        if (isInBorder(x, y, z)) {
+            // markDirty()
             blocks[getIndex(x, y, z)] = block.getId();
         }
     }
 
     public Block getBlock(int x, int y, int z) {
-        if (x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < depth) {
+        if (isInBorder(x, y, z)) {
             return Registry.BLOCK.getById(blocks[getIndex(x, y, z)]);
         }
         return AIR;
@@ -161,7 +194,7 @@ public class World {
         return lst;
     }
 
-    public boolean load(Player player) {
+    public boolean load(PlayerEntity player) {
         logger.info("Loading world");
         var file = new File("level.dat");
         if (file.exists()) {
@@ -180,7 +213,7 @@ public class World {
         return false;
     }
 
-    public void save(Player player) {
+    public void save(PlayerEntity player) {
         logger.info("Saving world");
         try (var fos = new FileOutputStream("level.dat");
              var gos = new GZIPOutputStream(fos);
@@ -193,7 +226,7 @@ public class World {
         }
     }
 
-    public void serialize(JsonWriter writer, Player player) throws IOException {
+    public void serialize(JsonWriter writer, PlayerEntity player) throws IOException {
         writer.beginObject()
             .name("version").value(WORLD_VERSION)
             .name("width").value(width)
@@ -217,7 +250,7 @@ public class World {
         writer.endArray().endObject();
     }
 
-    public void deserialize(JsonReader reader, Player player) throws IOException {
+    public void deserialize(JsonReader reader, PlayerEntity player) throws IOException {
         var idMap = new HashMap<Integer, Identifier>();
         int w = 0, h = 0, d = 0;
         reader.beginObject();

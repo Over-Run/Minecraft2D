@@ -25,7 +25,7 @@
 package io.github.overrun.mc2d.client.gui.screen;
 
 import io.github.overrun.mc2d.Main;
-import io.github.overrun.mc2d.world.entity.Player;
+import io.github.overrun.mc2d.world.entity.PlayerEntity;
 import io.github.overrun.mc2d.client.gui.screen.world.LoadingWorldScreen;
 import io.github.overrun.mc2d.client.gui.widget.ButtonWidget;
 import io.github.overrun.mc2d.client.world.render.WorldRenderer;
@@ -50,7 +50,7 @@ public final class TitleScreen extends Screen {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         super.init();
         addButton(new ButtonWidget(width - 400 >> 1,
             (height - 40 >> 1) - 50,
@@ -59,7 +59,7 @@ public final class TitleScreen extends Screen {
             new TranslatableText("Play"),
             b -> {
                 client.world = new World(128, 64);
-                client.player = new Player(client.world);
+                client.player = new PlayerEntity(client.world);
                 if (!client.world.load(client.player)) {
                     client.world.genTerrain();
                 }

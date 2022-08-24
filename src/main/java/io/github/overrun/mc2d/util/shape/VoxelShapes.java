@@ -31,7 +31,7 @@ import org.overrun.swgl.core.phys.p2d.AABRect2f;
  * @since 2021/02/03
  */
 public final class VoxelShapes {
-    private static final AABRect2f FULL_SQUARE = new AABRect2f(0, 0, 1, 1);
+    private static final AABRect2f FULL_SQUARE = new AABRect2f(0f, 0f, 1f, 1f);
 
     public static AABRect2f empty() {
         return null;
