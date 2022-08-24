@@ -30,14 +30,21 @@ import io.github.overrun.mc2d.client.model.BlockModelMgr;
 import io.github.overrun.mc2d.client.world.ClientChunk;
 import io.github.overrun.mc2d.util.GlUtils;
 import io.github.overrun.mc2d.world.HitResult;
+import io.github.overrun.mc2d.world.IWorldListener;
 import io.github.overrun.mc2d.world.World;
 import io.github.overrun.mc2d.world.block.Block;
+import io.github.overrun.mc2d.world.block.Blocks;
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import org.joml.Intersectiond;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Consumer;
+
 import static io.github.overrun.mc2d.client.Mouse.isMousePress;
-import static io.github.overrun.mc2d.world.block.Blocks.AIR;
+import static io.github.overrun.mc2d.world.Chunk.CHUNK_SIZE;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
 import static org.lwjgl.opengl.GL11.*;
@@ -47,24 +54,34 @@ import static org.overrun.swgl.core.gl.GLStateMgr.*;
  * @author squid233
  * @since 0.6.0
  */
-public class WorldRenderer {
+public class WorldRenderer implements IWorldListener, AutoCloseable {
+    public static final int MAX_REBUILDS_PER_FRAME = 8;
     private final Mc2dClient client;
     private final World world;
     private final HitResult hitResult = new HitResult(null, 0, 0, 0, true);
+    private final int xChunks, yChunks;
     private final Long2ObjectMap<ClientChunk> chunkMap = new Long2ObjectArrayMap<>();
+    private final List<ClientChunk> dirtyChunks = new ArrayList<>();
 
     public WorldRenderer(Mc2dClient client, World world) {
         this.client = client;
         this.world = world;
+        xChunks = world.width / CHUNK_SIZE;
+        yChunks = world.height / CHUNK_SIZE;
+        for (int y = 0; y < yChunks; y++) {
+            for (int x = 0; x < xChunks; x++) {
+                getOrCreateChunk(x, y);
+            }
+        }
     }
 
     public ClientChunk getOrCreateChunk(int x, int y) {
         return chunkMap.computeIfAbsent(ClientChunk.pos2Long(x, y),
             pos -> {
-                int x0 = x * ClientChunk.CHUNK_SIZE;
-                int y0 = y * ClientChunk.CHUNK_SIZE;
-                int x1 = (x + 1) * ClientChunk.CHUNK_SIZE;
-                int y1 = (y + 1) * ClientChunk.CHUNK_SIZE;
+                int x0 = x * CHUNK_SIZE;
+                int y0 = y * CHUNK_SIZE;
+                int x1 = (x + 1) * CHUNK_SIZE;
+                int y1 = (y + 1) * CHUNK_SIZE;
 
                 if (x1 > world.width) {
                     x1 = world.width;
@@ -81,19 +98,44 @@ public class WorldRenderer {
             });
     }
 
-    public void render(int z, int mouseX, int mouseY) {
-        client.getTextureManager().bindTexture(BlockModelMgr.BLOCK_ATLAS);
-        glBegin(GL_QUADS);
-        for (int y = 0; y < world.height; y++) {
-            for (int x = 0; x < world.width; x++) {
-                var b = world.getBlock(x, y, z);
-                var upAir = world.getBlock(x, y, 1) == AIR;
-                if (z == 1 || upAir) {
-                    b.render(null, x, y, z);
-                }
+    public void forVisibleChunk(Consumer<ClientChunk> consumer) {
+        final double inv32 = 1. / 32.;
+        int rx = (int) Math.ceil(Framebuffer.width * .5 * inv32);
+        int ry = (int) Math.ceil(Framebuffer.height * .5 * inv32);
+        int ox = (int) Math.floor(client.player.lerpPos.x);
+        int oy = (int) Math.floor(client.player.lerpPos.y);
+        for (int y = Math.min(world.getMinY(), oy - ry) / CHUNK_SIZE, my = Math.min(world.getMaxY(), oy + ry) / CHUNK_SIZE;
+             y <= my; y++) {
+            for (int x = Math.min(world.getMinX(), ox - rx) / CHUNK_SIZE, mx = Math.min(world.getMaxX(), ox + rx) / CHUNK_SIZE;
+                 x <= mx; x++) {
+                consumer.accept(getOrCreateChunk(x, y));
             }
         }
-        glEnd();
+    }
+
+    private void getDirtyChunks() {
+        forVisibleChunk(c -> {
+            if (!dirtyChunks.contains(c) && c.isDirty()) {
+                dirtyChunks.add(c);
+            }
+        });
+    }
+
+    public void updateDirtyChunks() {
+        getDirtyChunks();
+        if (dirtyChunks.size() == 0) {
+            return;
+        }
+        dirtyChunks.sort(Comparator.comparingDouble(value -> Math.abs(value.distanceSqr(client.player))));
+        for (int i = 0; i < dirtyChunks.size() && i < MAX_REBUILDS_PER_FRAME; i++) {
+            dirtyChunks.get(i).rebuild();
+            dirtyChunks.remove(i--);
+        }
+    }
+
+    public void render(int z) {
+        client.getTextureManager().bindTexture(BlockModelMgr.BLOCK_ATLAS);
+        forVisibleChunk(c -> c.render(z));
         client.getTextureManager().bindTexture(0);
     }
 
@@ -137,7 +179,8 @@ public class WorldRenderer {
     }
 
     public void renderHit() {
-        if (!hitResult.miss) {
+        if (!hitResult.miss &&
+            world.isInBorder(hitResult.x, hitResult.y, hitResult.z)) {
             disableTexture2D();
             var shape = hitResult.block.getOutlineShape();
             if (shape != null) {
@@ -161,24 +204,64 @@ public class WorldRenderer {
             int x = hitResult.x;
             int y = hitResult.y;
             int z = hitResult.z;
-            if (target == AIR) {
+            if (target.isAir()) {
                 if (isMousePress(GLFW_MOUSE_BUTTON_RIGHT)) {
                     world.setBlock(x, y, z, client.player.mainHand);
                 }
             } else if (isMousePress(GLFW_MOUSE_BUTTON_LEFT)) {
-                world.setBlock(x, y, z, AIR);
+                world.setBlock(x, y, z, Blocks.AIR);
             }
         }
     }
 
     public void render(float delta, int mouseX, int mouseY) {
         pick(mouseX, mouseY);
-        render(0, mouseX, mouseY);
+        updateDirtyChunks();
+        render(0);
         glColor3f(1, 1, 1);
         client.player.render(delta, mouseX, mouseY);
-        render(1, mouseX, mouseY);
+        render(1);
         if (client.screen == null) {
             renderHit();
         }
+    }
+
+    public void markDirty(int x0, int y0, int x1, int y1) {
+        if (x0 < world.getMinX()) {
+            x0 = world.getMinX();
+        }
+        if (y0 < world.getMinY()) {
+            y0 = world.getMinY();
+        }
+        if (x1 > world.getMaxX()) {
+            x1 = world.getMaxX();
+        }
+        if (y1 > world.getMaxY()) {
+            y1 = world.getMaxY();
+        }
+        x0 /= CHUNK_SIZE;
+        y0 /= CHUNK_SIZE;
+        x1 /= CHUNK_SIZE;
+        y1 /= CHUNK_SIZE;
+        for (int y = y0; y <= y1; y++) {
+            for (int x = x0; x <= x1; x++) {
+                getOrCreateChunk(x, y).markDirty();
+            }
+        }
+    }
+
+    @Override
+    public void allChanged() {
+        markDirty(world.getMinX(), world.getMinY(), world.getMaxX(), world.getMaxY());
+    }
+
+    @Override
+    public void blockChanged(int x, int y, int z) {
+        markDirty(x - 1, y - 1, x + 1, y + 1);
+    }
+
+    @Override
+    public void close() {
+        chunkMap.values().forEach(ClientChunk::free);
     }
 }

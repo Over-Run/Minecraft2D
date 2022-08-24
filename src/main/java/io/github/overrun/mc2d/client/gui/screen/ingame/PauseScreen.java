@@ -40,7 +40,7 @@ public final class PauseScreen extends Screen {
     private final double orgTimescale;
 
     public PauseScreen(Screen parent, double orgTimescale) {
-        super(new TranslatableText("screen.mc2d.pausing"));
+        super(new TranslatableText("text.screen.title.pausing"));
         this.parent = parent;
         this.orgTimescale = orgTimescale;
     }
@@ -55,13 +55,13 @@ public final class PauseScreen extends Screen {
             90,
             300,
             20,
-            new TranslatableText("Back.to.Game"),
+            new TranslatableText("text.screen.back_to_game"),
             b -> onClose()));
         addButton(new ButtonWidget((width >> 1) - 300,
             140,
             300,
             20,
-            new TranslatableText("Save.and.Back.to.Title.Screen"),
+            new TranslatableText("text.screen.save_and_back"),
             b -> client.openScreen(new SavingWorldScreen())));
     }
 

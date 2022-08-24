@@ -37,6 +37,8 @@ public final class Blocks {
     public static final Block DIRT = register("dirt", new Block());
     public static final Block COBBLESTONE = register("cobblestone", new Block());
     public static final Block BEDROCK = register("bedrock", new Block());
+    public static final Block OAK_LOG = register("oak_log", new Block());
+    public static final Block OAK_LEAVES = register("oak_leaves", new LeavesBlock());
 
     public static void register() {
     }

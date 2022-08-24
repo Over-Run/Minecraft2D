@@ -34,7 +34,7 @@ import io.github.overrun.mc2d.text.TranslatableText;
  */
 public final class SavingWorldScreen extends DirtScreen {
     public SavingWorldScreen() {
-        super(new TranslatableText("Saving World"));
+        super(new TranslatableText("text.screen.world.saving"));
     }
 
     @Override
@@ -51,6 +51,7 @@ public final class SavingWorldScreen extends DirtScreen {
         super.onClose();
         client.openScreen(new TitleScreen());
         client.world = null;
+        client.worldRenderer.close();
         client.worldRenderer = null;
         client.player = null;
     }

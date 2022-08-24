@@ -31,7 +31,8 @@ import io.github.overrun.mc2d.text.IText;
  * @since 2021/01/25
  */
 public class ButtonWidget extends AbstractPressableButtonWidget {
-    public static final TooltipSupplier EMPTY = (button, mouseX, mouseY) -> { };
+    public static final TooltipSupplier EMPTY = (button, mouseX, mouseY) -> {
+    };
     protected final PressAction onPress;
     protected final TooltipSupplier tooltipSupplier;
 

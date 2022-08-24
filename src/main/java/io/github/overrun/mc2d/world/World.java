@@ -59,6 +59,7 @@ public class World {
     public final int height;
     public final int depth;
     public final Timer timer = new Timer(20);
+    private final List<IWorldListener> listeners = new ArrayList<>();
 
     public World(int w, int h) {
         width = w;
@@ -117,8 +118,10 @@ public class World {
         return depth;
     }
 
+    /**
+     * Generates the terrain.
+     */
     public void genTerrain() {
-        // generate the terrain
         for (int x = 0; x < width; x++) {
             for (int z = 0; z < depth; z++) {
                 setBlock(x, 0, z, BEDROCK);
@@ -135,17 +138,33 @@ public class World {
         }
     }
 
+    public void addListener(IWorldListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(IWorldListener listener) {
+        listeners.remove(listener);
+    }
+
     public boolean isInBorder(int x, int y, int z) {
         return x >= getMinX() && x < getMaxX() &&
                y >= getMinY() && y < getMaxY() &&
                z >= getMinZ() && z < getMaxZ();
     }
 
-    public void setBlock(int x, int y, int z, Block block) {
+    public boolean setBlock(int x, int y, int z, Block block) {
         if (isInBorder(x, y, z)) {
-            // markDirty()
-            blocks[getIndex(x, y, z)] = block.getId();
+            final int index = getIndex(x, y, z);
+            if (blocks[index].equals(block.getId())) {
+                return false;
+            }
+            for (var listener : listeners) {
+                listener.blockChanged(x, y, z);
+            }
+            blocks[index] = block.getId();
+            return true;
         }
+        return false;
     }
 
     public Block getBlock(int x, int y, int z) {
@@ -196,6 +215,9 @@ public class World {
 
     public boolean load(PlayerEntity player) {
         logger.info("Loading world");
+        for (var listener : listeners) {
+            listener.allChanged();
+        }
         var file = new File("level.dat");
         if (file.exists()) {
             try (var fis = new FileInputStream(file);

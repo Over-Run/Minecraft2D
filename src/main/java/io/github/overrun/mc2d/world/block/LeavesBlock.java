@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2022 Overrun Organization
+ * Copyright (c) 2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,39 +22,15 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.client.gui.screen.world;
-
-import io.github.overrun.mc2d.client.gui.screen.DirtScreen;
-import io.github.overrun.mc2d.text.TranslatableText;
+package io.github.overrun.mc2d.world.block;
 
 /**
  * @author squid233
- * @since 2021/01/26
+ * @since 0.6.0
  */
-public final class LoadingWorldScreen extends DirtScreen {
-    public LoadingWorldScreen() {
-        super(new TranslatableText("text.screen.world.loading"));
-    }
-
+public class LeavesBlock extends Block {
     @Override
-    public void init() {
-        super.init();
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-        onClose();
-    }
-
-    @Override
-    public void onClose() {
-        super.onClose();
-        client.openScreen(null);
-    }
-
-    @Override
-    public boolean shouldCloseOnEsc() {
-        return false;
+    public boolean isTexTransparency() {
+        return true;
     }
 }

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2022 Overrun Organization
+ * Copyright (c) 2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,39 +22,14 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.client.gui.screen.world;
-
-import io.github.overrun.mc2d.client.gui.screen.DirtScreen;
-import io.github.overrun.mc2d.text.TranslatableText;
+package io.github.overrun.mc2d.world;
 
 /**
  * @author squid233
- * @since 2021/01/26
+ * @since 0.1.0
  */
-public final class LoadingWorldScreen extends DirtScreen {
-    public LoadingWorldScreen() {
-        super(new TranslatableText("text.screen.world.loading"));
-    }
-
-    @Override
-    public void init() {
-        super.init();
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-        onClose();
-    }
-
-    @Override
-    public void onClose() {
-        super.onClose();
-        client.openScreen(null);
-    }
-
-    @Override
-    public boolean shouldCloseOnEsc() {
-        return false;
-    }
+public class Chunk {
+    public static final int CHUNK_SIZE = 32;
+    public static final double CHUNK_SIZE_INV = 1.0 / CHUNK_SIZE;
+    public static final float CHUNK_SIZE_INVf = 1.0f / CHUNK_SIZE;
 }

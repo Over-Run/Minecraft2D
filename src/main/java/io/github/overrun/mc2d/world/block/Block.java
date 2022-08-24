@@ -26,21 +26,18 @@ package io.github.overrun.mc2d.world.block;
 
 import io.github.overrun.mc2d.client.model.BlockModelMgr;
 import io.github.overrun.mc2d.client.render.Tesselator;
-import io.github.overrun.mc2d.world.item.Item;
-import io.github.overrun.mc2d.world.item.ItemConvertible;
-import io.github.overrun.mc2d.world.item.Items;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.util.shape.VoxelShapes;
 import io.github.overrun.mc2d.world.World;
+import io.github.overrun.mc2d.world.item.Item;
+import io.github.overrun.mc2d.world.item.ItemConvertible;
+import io.github.overrun.mc2d.world.item.Items;
 import org.jetbrains.annotations.Nullable;
 import org.overrun.swgl.core.phys.p2d.AABRect2f;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static io.github.overrun.mc2d.world.block.Blocks.AIR;
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author squid233
@@ -64,6 +61,14 @@ public class Block implements ItemConvertible {
         return VoxelShapes.fullSquare();
     }
 
+    public boolean isAir() {
+        return false;
+    }
+
+    public boolean isTexTransparency() {
+        return false;
+    }
+
     public final int getRawId() {
         return Registry.BLOCK.getRawId(this);
     }
@@ -73,7 +78,7 @@ public class Block implements ItemConvertible {
     }
 
     public boolean shouldRender(World world, int x, int y, int z) {
-        return z == 1 || (world.getBlock(x, y, 1) == AIR);
+        return z == 1 || (world.getBlock(x, y, 1).isTexTransparency());
     }
 
     public void render(Tesselator t, int x, int y, int z) {
@@ -84,18 +89,14 @@ public class Block implements ItemConvertible {
         float u1 = atlas.getU1n(path);
         float v1 = atlas.getV1n(path);
         if (z == 0) {
-            glColor3f(0.5f, 0.5f, 0.5f);
+            t.color(0.5f, 0.5f, 0.5f);
         } else {
-            glColor3f(1.0f, 1.0f, 1.0f);
+            t.color(1.0f, 1.0f, 1.0f);
         }
-        glTexCoord2f(u0, v0);
-        glVertex2f(x, y + 1);
-        glTexCoord2f(u0, v1);
-        glVertex2f(x, y);
-        glTexCoord2f(u1, v1);
-        glVertex2f(x + 1, y);
-        glTexCoord2f(u1, v0);
-        glVertex2f(x + 1, y + 1);
+        t.tex(u0, v0).vertex(x, y + 1, z);
+        t.tex(u0, v1).vertex(x, y, z);
+        t.tex(u1, v1).vertex(x + 1, y, z);
+        t.tex(u1, v0).vertex(x + 1, y + 1, z);
     }
 
     public Identifier getTexture() {

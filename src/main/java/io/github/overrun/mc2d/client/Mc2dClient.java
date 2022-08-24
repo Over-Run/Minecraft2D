@@ -64,7 +64,7 @@ public final class Mc2dClient implements AutoCloseable {
 
     static {
         double maxMemory = Runtime.getRuntime().maxMemory() / 1048576D;
-        MAX_MEMORY = new TranslatableText("Max.memory", maxMemory >= 1024 ? maxMemory / 1024D + " GB" : maxMemory + " MB");
+        MAX_MEMORY = new TranslatableText("text.debug.max_memory", maxMemory >= 1024 ? maxMemory / 1024D + " GB" : maxMemory + " MB");
     }
 
     private Mc2dClient() {
@@ -90,16 +90,16 @@ public final class Mc2dClient implements AutoCloseable {
             if (debugging) {
                 textRenderer.draw(0, 0, Main.VERSION_TEXT);
                 textRenderer.draw(0, 17, IText.of(fps + " fps"));
-                textRenderer.draw(0, 34, new TranslatableText("player.position",
+                textRenderer.draw(0, 34, new TranslatableText("text.debug.player.position",
                     player.position.x,
                     player.position.y,
                     player.position.z));
-                textRenderer.draw(0, 51, new TranslatableText("player.hand.block", player.mainHand));
+                textRenderer.draw(0, 51, new TranslatableText("text.debug.player.hand_block", player.mainHand));
 //            textRenderer.draw(0, 68, new TranslatableText("Point.block.pos", pointBlockX, pointBlockY, pointBlockZ));
 //            textRenderer.draw(0, 85, new TranslatableText("Point.block", pointBlock));
                 textRenderer.draw(0, 102, MAX_MEMORY);
                 if (ModLoader.getModCount() > 0) {
-                    textRenderer.draw(0, 119, new TranslatableText("mods.count", ModLoader.getModCount()));
+                    textRenderer.draw(0, 119, new TranslatableText("text.debug.mod_count", ModLoader.getModCount()));
                 }
             }
 

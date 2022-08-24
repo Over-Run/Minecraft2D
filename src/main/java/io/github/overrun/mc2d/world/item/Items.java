@@ -39,6 +39,8 @@ public final class Items {
     public static final Item DIRT = register("dirt", Blocks.DIRT);
     public static final Item COBBLESTONE = register("cobblestone", Blocks.COBBLESTONE);
     public static final Item BEDROCK = register("bedrock", Blocks.BEDROCK);
+    public static final Item OAK_LOG = register("oak_log", Blocks.OAK_LOG);
+    public static final Item OAK_LEAVES = register("oak_leaves", Blocks.OAK_LEAVES);
 
     public static void register() {
     }

@@ -74,17 +74,20 @@ public abstract class AbstractButtonWidget extends DrawableHelper implements Dra
         drawTexture(x + width, y, 200 - (width >> 1), 46 + i * 20, width >> 1, height);
         renderBg(client, mouseX, mouseY);
         drawCenteredText(client.textRenderer,
-                getMessage().setStyle(Style.EMPTY.withColor(active ? TextColor.WHITE : NOT_ACTIVE_COLOR)),
-                x + width,
-                // y + (height * 2 / 2 - 16 / 2)
-                y + height - 8);
+            getMessage().setStyle(Style.EMPTY.withColor(active ? TextColor.WHITE : NOT_ACTIVE_COLOR)),
+            x + width,
+            // y + (height * 2 / 2 - 16 / 2)
+            y + height - 8);
     }
 
-    protected void renderBg(Mc2dClient client, int mouseX, int mouseY) { }
+    protected void renderBg(Mc2dClient client, int mouseX, int mouseY) {
+    }
 
-    public void onClick(int mouseX, int mouseY) { }
+    public void onClick(int mouseX, int mouseY) {
+    }
 
-    public void renderToolTip(int mouseX, int mouseY) { }
+    public void renderToolTip(int mouseX, int mouseY) {
+    }
 
     public int getWidth() {
         return width;

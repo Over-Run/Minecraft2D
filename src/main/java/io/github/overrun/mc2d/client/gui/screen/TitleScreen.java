@@ -56,7 +56,7 @@ public final class TitleScreen extends Screen {
             (height - 40 >> 1) - 50,
             200,
             20,
-            new TranslatableText("Play"),
+            new TranslatableText("text.screen.singleplayer"),
             b -> {
                 client.world = new World(128, 64);
                 client.player = new PlayerEntity(client.world);
@@ -64,20 +64,21 @@ public final class TitleScreen extends Screen {
                     client.world.genTerrain();
                 }
                 client.worldRenderer = new WorldRenderer(client, client.world);
+                client.world.addListener(client.worldRenderer);
                 client.openScreen(new LoadingWorldScreen());
             }));
         addButton(new ButtonWidget(width - 400 >> 1,
             height - 40 >> 1,
             200,
             20,
-            new TranslatableText("Mods"),
+            new TranslatableText("text.screen.mods"),
             b -> {
             })).active = false;
         addButton(new ButtonWidget(width - 400 >> 1,
             (height - 40 >> 1) + 50,
             200,
             20,
-            new TranslatableText("Exit.Game"),
+            new TranslatableText("text.screen.exit_game"),
             b -> glfwSetWindowShouldClose(glfwGetCurrentContext(), true)));
     }
 

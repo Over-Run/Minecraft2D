@@ -54,6 +54,16 @@ public class AirBlock extends Block {
     }
 
     @Override
+    public boolean isAir() {
+        return true;
+    }
+
+    @Override
+    public boolean isTexTransparency() {
+        return true;
+    }
+
+    @Override
     public void render(Tesselator t, int x, int y, int z) {
     }
 

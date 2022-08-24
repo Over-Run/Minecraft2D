@@ -25,7 +25,9 @@
 package io.github.overrun.mc2d.client.world;
 
 import io.github.overrun.mc2d.client.render.Tesselator;
+import io.github.overrun.mc2d.world.Chunk;
 import io.github.overrun.mc2d.world.World;
+import io.github.overrun.mc2d.world.entity.PlayerEntity;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -33,13 +35,13 @@ import static org.lwjgl.opengl.GL11.*;
  * @author squid233
  * @since 0.6.0
  */
-public class ClientChunk {
-    public static final int CHUNK_SIZE = 32;
-    public static final float CHUNK_SIZE_INV = 1.0f / CHUNK_SIZE;
+public class ClientChunk extends Chunk {
     private final World world;
-    private int x, y;
-    private int x0, y0, x1, y1;
-    private int lists;
+    private final double x, y;
+    private final int x0, y0, x1, y1;
+    private final int lists;
+    private boolean isDirty = true;
+    private boolean built = false;
 
     public ClientChunk(World world,
                        int x0, int y0,
@@ -49,8 +51,8 @@ public class ClientChunk {
         this.y0 = y0;
         this.x1 = x1;
         this.y1 = y1;
-        x = (int) ((x0 + x1) * 0.5f);
-        y = (int) ((y0 + y1) * 0.5f);
+        x = (x0 + x1) * 0.5;
+        y = (y0 + y1) * 0.5;
         lists = glGenLists(2);
     }
 
@@ -70,6 +72,14 @@ public class ClientChunk {
         return (int) (pos >>> 32);
     }
 
+    public boolean isDirty() {
+        return isDirty;
+    }
+
+    public void markDirty() {
+        isDirty = true;
+    }
+
     private void rebuild(int layer) {
         glNewList(lists + layer, GL_COMPILE);
         final var t = Tesselator.getInstance();
@@ -87,12 +97,20 @@ public class ClientChunk {
     }
 
     public void rebuild() {
+        isDirty = false;
+        built = true;
         rebuild(0);
         rebuild(1);
     }
 
     public void render(int layer) {
-        glCallList(lists + layer);
+        if (built) {
+            glCallList(lists + layer);
+        }
+    }
+
+    public double distanceSqr(PlayerEntity player) {
+        return player.position.distanceSquared(x, y, 0);
     }
 
     public void free() {
