@@ -25,7 +25,7 @@
 package io.github.overrun.mc2d.client.gui.screen;
 
 import io.github.overrun.mc2d.Main;
-import io.github.overrun.mc2d.world.Player;
+import io.github.overrun.mc2d.world.entity.Player;
 import io.github.overrun.mc2d.client.gui.screen.world.LoadingWorldScreen;
 import io.github.overrun.mc2d.client.gui.widget.ButtonWidget;
 import io.github.overrun.mc2d.client.world.render.WorldRenderer;

@@ -27,6 +27,7 @@ package io.github.overrun.mc2d.client.gui;
 import io.github.overrun.mc2d.client.TextRenderer;
 import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.util.Identifier;
+import org.overrun.swgl.core.gl.GLStateMgr;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -42,7 +43,7 @@ public abstract class DrawableHelper {
     }
 
     public static void fillGradient(int xStart, int yStart, int xEnd, int yEnd, int colorStart, int colorEnd) {
-        glDisable(GL_TEXTURE_2D);
+        GLStateMgr.disableTexture2D();
         glBegin(GL_QUADS);
         float inv = 1.0f / 255.0f;
         var sr = colorStart << 8 >>> 24;
@@ -71,7 +72,7 @@ public abstract class DrawableHelper {
         glColor4f(lr, lg, lb, la);
         glVertex2f(xEnd, yStart);
         glEnd();
-        glEnable(GL_TEXTURE_2D);
+        GLStateMgr.enableTexture2D();
     }
 
     public static void drawTexture(double x,
@@ -85,7 +86,7 @@ public abstract class DrawableHelper {
                                    int texW,
                                    int texH,
                                    int rgba) {
-        glEnable(GL_TEXTURE_2D);
+        GLStateMgr.enableTexture2D();
         glBegin(GL_QUADS);
         var r = rgba << 8 >>> 24;
         var g = rgba << 16 >>> 24;
@@ -125,7 +126,7 @@ public abstract class DrawableHelper {
                                        double y,
                                        double width,
                                        double height) {
-        glEnable(GL_TEXTURE_2D);
+        GLStateMgr.enableTexture2D();
         glBegin(GL_QUADS);
         // Left top
         glTexCoord2f(0, 0);
@@ -146,7 +147,7 @@ public abstract class DrawableHelper {
                                    double y,
                                    double width,
                                    double height) {
-        glEnable(GL_TEXTURE_2D);
+        GLStateMgr.enableTexture2D();
         glBegin(GL_QUADS);
         // Left top
         glTexCoord2f(0, 0);

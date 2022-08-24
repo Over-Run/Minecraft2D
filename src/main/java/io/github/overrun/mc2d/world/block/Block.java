@@ -25,15 +25,15 @@
 package io.github.overrun.mc2d.world.block;
 
 import io.github.overrun.mc2d.client.model.BlockModelMgr;
-import io.github.overrun.mc2d.item.Item;
-import io.github.overrun.mc2d.item.ItemConvertible;
-import io.github.overrun.mc2d.item.Items;
+import io.github.overrun.mc2d.client.render.Tesselator;
+import io.github.overrun.mc2d.world.item.Item;
+import io.github.overrun.mc2d.world.item.ItemConvertible;
+import io.github.overrun.mc2d.world.item.Items;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.util.shape.VoxelShapes;
 import io.github.overrun.mc2d.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.overrun.swgl.core.gl.GLBatch;
 import org.overrun.swgl.core.phys.p2d.AABRect2f;
 
 import java.util.HashMap;
@@ -68,10 +68,10 @@ public class Block implements ItemConvertible {
     }
 
     public boolean shouldRender(World world, int x, int y, int z) {
-        return z == 0 || (world.getBlock(x, y, 0) == AIR);
+        return z == 1 || (world.getBlock(x, y, 1) == AIR);
     }
 
-    public void render(GLBatch batch, int x, int y, int z) {
+    public void render(Tesselator t, int x, int y, int z) {
         glColor4f(1, 1, 1, 1);
         var path = BlockModelMgr.blockTexture(getTexture());
         var atlas = BlockModelMgr.getBlockAtlas();

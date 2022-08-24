@@ -22,15 +22,23 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.item;
+package io.github.overrun.mc2d.world.item;
+
+import io.github.overrun.mc2d.world.block.Block;
 
 /**
  * @author squid233
  * @since 2021/01/27
  */
-public class Item implements ItemConvertible {
-    @Override
-    public Item asItem() {
-        return this;
+public class BlockItem extends Item {
+    private final Block block;
+
+    public BlockItem(Block block) {
+        this.block = block;
+        Block.BLOCK_ITEMS.put(block, this);
+    }
+
+    public Block getBlock() {
+        return block;
     }
 }

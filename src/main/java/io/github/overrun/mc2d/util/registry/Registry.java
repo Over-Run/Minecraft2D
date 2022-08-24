@@ -26,8 +26,8 @@ package io.github.overrun.mc2d.util.registry;
 
 import io.github.overrun.mc2d.world.block.Block;
 import io.github.overrun.mc2d.world.block.Blocks;
-import io.github.overrun.mc2d.item.Item;
-import io.github.overrun.mc2d.item.Items;
+import io.github.overrun.mc2d.world.item.Item;
+import io.github.overrun.mc2d.world.item.Items;
 import io.github.overrun.mc2d.util.Identifier;
 
 /**

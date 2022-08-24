@@ -28,8 +28,8 @@ import io.github.overrun.mc2d.client.Mouse;
 import io.github.overrun.mc2d.client.TextureManager;
 import io.github.overrun.mc2d.client.gui.DrawableHelper;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
-import io.github.overrun.mc2d.item.BlockItem;
-import io.github.overrun.mc2d.item.Item;
+import io.github.overrun.mc2d.world.item.BlockItem;
+import io.github.overrun.mc2d.world.item.Item;
 import io.github.overrun.mc2d.screen.ScreenHandler;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.text.IText;
@@ -37,6 +37,7 @@ import io.github.overrun.mc2d.text.TextColor;
 import io.github.overrun.mc2d.util.GlUtils;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.Registry;
+import org.overrun.swgl.core.gl.GLStateMgr;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.opengl.GL11.*;
@@ -62,7 +63,7 @@ public abstract class HandledScreen<T extends ScreenHandler> extends Screen {
     }
 
     protected void drawForeground(int mouseX, int mouseY) {
-        textRenderer.draw(x + titleX, y + titleY, title.withColor(new TextColor("", TextColor.WHITE.getBgColor(), 0)));
+        textRenderer.draw(x + titleX, y + titleY, title.withColor(new TextColor("", TextColor.WHITE.bgColor(), 0)));
     }
 
     /**
@@ -107,9 +108,9 @@ public abstract class HandledScreen<T extends ScreenHandler> extends Screen {
                 && mouseX < slot.x + 32
                 && mouseY >= slot.y
                 && mouseY < slot.y + 32) {
-            glDisable(GL_TEXTURE_2D);
+            GLStateMgr.disableTexture2D();
             GlUtils.fillRect(slot.x, slot.y, slot.x + 32, slot.y + 32, 0x80ffffff, true);
-            glEnable(GL_TEXTURE_2D);
+            GLStateMgr.enableTexture2D();
             if (Mouse.isMousePress(GLFW_MOUSE_BUTTON_LEFT)) {
                 onClickSlot(slot);
             }

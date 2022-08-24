@@ -29,6 +29,7 @@ import com.google.gson.stream.JsonWriter;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.world.block.Block;
+import io.github.overrun.mc2d.world.entity.Player;
 import org.joml.SimplexNoise;
 import org.overrun.swgl.core.phys.p2d.AABRect2f;
 import org.overrun.swgl.core.util.LogFactory9;
@@ -51,7 +52,7 @@ import static io.github.overrun.mc2d.world.block.Blocks.*;
 public class World {
     private static final Logger logger = LogFactory9.getLogger();
     private static final long WORLD_VERSION = 3L;
-    public int pickZ = 0;
+    public int pickZ = 1;
     private final Identifier[] blocks;
     public final int width;
     public final int height;

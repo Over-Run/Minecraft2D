@@ -30,18 +30,9 @@ import io.github.overrun.mc2d.util.Colors;
  * @author squid233
  * @since 2021/01/26
  */
-public final class TextColor {
+public record TextColor(String name, int fgColor, int bgColor) {
     public static final TextColor WHITE = new TextColor("white", Colors.WHITE, 0xff3f3f3f);
     private static final TextColor[] VALUES = {WHITE};
-    private final String name;
-    private final int fgColor;
-    private final int bgColor;
-
-    public TextColor(String name, int fgColor, int bgColor) {
-        this.name = name;
-        this.fgColor = fgColor;
-        this.bgColor = bgColor;
-    }
 
     public static TextColor byName(String name, TextColor defaultColor) {
         if (name == null) {
@@ -53,17 +44,5 @@ public final class TextColor {
             }
         }
         return defaultColor;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getFgColor() {
-        return fgColor;
-    }
-
-    public int getBgColor() {
-        return bgColor;
     }
 }

@@ -24,10 +24,10 @@
 
 package io.github.overrun.mc2d.world.block;
 
+import io.github.overrun.mc2d.client.render.Tesselator;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.shape.VoxelShapes;
 import org.jetbrains.annotations.Nullable;
-import org.overrun.swgl.core.gl.GLBatch;
 import org.overrun.swgl.core.phys.p2d.AABRect2f;
 
 /**
@@ -42,7 +42,7 @@ public class AirBlock extends Block {
     }
 
     @Override
-    public void render(GLBatch batch, int x, int y, int z) {
+    public void render(Tesselator t, int x, int y, int z) {
     }
 
     @Override

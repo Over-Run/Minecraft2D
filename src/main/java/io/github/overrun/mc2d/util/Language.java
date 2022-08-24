@@ -59,7 +59,7 @@ public final class Language {
         for (Map.Entry<String, Map<String, String>> entry : LANGS.entrySet()) {
             try (InputStream is = Objects.requireNonNull(
                 ClassLoader.getSystemResourceAsStream(
-                    "assets/" + Identifier.VANILLA + "/lang/" + entry.getKey() + ".lang"
+                        "assets/" + Identifier.DEFAULT + "/lang/" + entry.getKey() + ".lang"
                 ));
                  Reader r = new InputStreamReader(is, StandardCharsets.UTF_8)
             ) {

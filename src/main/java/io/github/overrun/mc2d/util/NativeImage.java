@@ -33,38 +33,8 @@ import java.nio.ByteBuffer;
  * @author squid233
  * @since 2021/01/08
  */
-public final class Texture implements AutoCloseable {
-    private final int width;
-    private final int height;
-    private final ByteBuffer buffer;
-    private final boolean useStb;
-
-    public Texture(int width,
-                   int height,
-                   ByteBuffer buffer,
-                   boolean useStb) {
-        this.width = width;
-        this.height = height;
-        this.buffer = buffer;
-        this.useStb = useStb;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public ByteBuffer getBuffer() {
-        return buffer;
-    }
-
-    public boolean isUseStb() {
-        return useStb;
-    }
-
+public record NativeImage(int width, int height, ByteBuffer buffer, boolean useStb)
+    implements AutoCloseable {
     @Override
     public void close() {
         if (useStb) STBImage.stbi_image_free(buffer);

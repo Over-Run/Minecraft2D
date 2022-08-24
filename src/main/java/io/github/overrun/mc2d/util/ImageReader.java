@@ -25,7 +25,6 @@
 package io.github.overrun.mc2d.util;
 
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.system.MemoryStack;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.util.LogFactory9;
@@ -33,7 +32,6 @@ import org.slf4j.Logger;
 
 import java.nio.ByteBuffer;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 import static org.lwjgl.stb.STBImage.STBI_rgb_alpha;
 import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
@@ -72,55 +70,23 @@ public final class ImageReader {
         return read(path, ClassLoader.getSystemClassLoader());
     }
 
-    public static Texture readImg(String path) {
+    public static NativeImage readImg(String path) {
         try (var stack = MemoryStack.stackPush()) {
             var img = read(path);
             if (img == null) {
-                return new Texture(2, 2,
-                    stack.calloc(16)
+                return new NativeImage(2, 2,
+                    stack.malloc(16)
                         .putInt(0xfff800f8)
                         .putInt(0xff000000)
                         .putInt(0xff000000)
                         .putInt(0xfff800f8)
                         .flip(), false);
             }
-            var xp = stack.callocInt(1);
-            var yp = stack.callocInt(1);
-            var cp = stack.callocInt(1);
+            var xp = stack.mallocInt(1);
+            var yp = stack.mallocInt(1);
+            var cp = stack.mallocInt(1);
             var buf = stbi_load_from_memory(img, xp, yp, cp, STBI_rgb_alpha);
-            return new Texture(xp.get(0), yp.get(0), buf, true);
+            return new NativeImage(xp.get(0), yp.get(0), buf, true);
         }
-    }
-
-    /**
-     * Read an image as {@link GLFWImage.Buffer}.
-     * <p>You should call {@link GLFWImage.Buffer#free() free()} or
-     * {@link GLFWImage.Buffer#close() close()} after use.</p>
-     *
-     * @param path The image path.
-     * @return An image as {@link GLFWImage.Buffer}.
-     */
-    public static GLFWImage.Buffer readGlfwImg(String path) {
-        try (final var buf = readImg(path)) {
-            return GLFWImage.calloc(1).width(buf.getWidth()).height(buf.getHeight()).pixels(buf.getBuffer());
-        }
-    }
-
-    /**
-     * Execute some statements with an image.
-     * <p>Will auto close the buffer.</p>
-     *
-     * @param img      The image buffer.
-     * @param consumer The operator with {@code img}.
-     * @see ImageReader#withGlfwImg(String, Consumer)
-     */
-    public static void withGlfwImg(GLFWImage.Buffer img, Consumer<GLFWImage.Buffer> consumer) {
-        try (img) {
-            consumer.accept(img);
-        }
-    }
-
-    public static void withGlfwImg(String path, Consumer<GLFWImage.Buffer> consumer) {
-        withGlfwImg(readGlfwImg(path), consumer);
     }
 }

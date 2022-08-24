@@ -35,6 +35,7 @@ import io.github.overrun.mc2d.world.block.Block;
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import org.joml.Vector3d;
+import org.overrun.swgl.core.gl.GLStateMgr;
 
 import static io.github.overrun.mc2d.client.Mouse.isMousePress;
 import static io.github.overrun.mc2d.world.block.Blocks.AIR;
@@ -53,7 +54,7 @@ public class WorldRenderer {
      * Linear interpolation storage. Let it don't create more objects.
      */
     private final Vector3d interpolation = new Vector3d();
-    private final HitResult hitResult = new HitResult(null, 0, 0, 0, true);
+    private HitResult hitResult = new HitResult(null, 0, 0, 0, true);
     private final Long2ObjectMap<ClientChunk> chunkMap = new Long2ObjectArrayMap<>();
 
     public WorldRenderer(Mc2dClient client, World world) {
@@ -98,8 +99,8 @@ public class WorldRenderer {
                 if (ldX > Framebuffer.width || ldY > Framebuffer.height || rtX < 0 || rtY < 0) {
                     continue;
                 }
-                var dark = world.getBlock(x, y, 0) == AIR;
-                if (z == 0 || dark) {
+                var upAir = world.getBlock(x, y, 1) == AIR;
+                if (z == 1 || upAir) {
                     b.render(null, (int) ldX, (int) ldY, z);
                 }
                 if (mouseX >= ldX
@@ -123,9 +124,9 @@ public class WorldRenderer {
         if (!hitResult.miss) {
             double ldX = (Framebuffer.width >> 1) + (hitResult.x - interpolation.x) * 32,
                 ldY = (Framebuffer.height >> 1) + (hitResult.y - interpolation.y) * 32;
-            boolean dark = world.getBlock(hitResult.x, hitResult.y, 0) == AIR;
-            glDisable(GL_TEXTURE_2D);
-            if (hitResult.z == 0 || dark) {
+            boolean upAir = world.getBlock(hitResult.x, hitResult.y, 1) == AIR;
+            GLStateMgr.disableTexture2D();
+            if (hitResult.z == 1 || upAir) {
                 var shape = hitResult.block.getOutlineShape();
                 if (shape != null) {
                     GlUtils.drawRect(ldX + ((int) shape.minX() << 4),
@@ -136,7 +137,7 @@ public class WorldRenderer {
                         true);
                 }
             }
-            glEnable(GL_TEXTURE_2D);
+            GLStateMgr.enableTexture2D();
         }
     }
 
@@ -161,11 +162,11 @@ public class WorldRenderer {
         glEnable(GL_LIGHTING);
         glEnable(GL_COLOR_MATERIAL);
         glLightModelfv(GL_LIGHT_MODEL_AMBIENT, new float[]{0.5f, 0.5f, 0.5f, 1.0f});
-        render(1, mouseX, mouseY);
+        render(0, mouseX, mouseY);
         glDisable(GL_LIGHTING);
         glColor3f(1, 1, 1);
         client.player.render(delta, mouseX, mouseY);
-        render(0, mouseX, mouseY);
+        render(1, mouseX, mouseY);
         renderHit();
     }
 }

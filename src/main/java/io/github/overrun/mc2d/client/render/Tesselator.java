@@ -24,11 +24,9 @@
 
 package io.github.overrun.mc2d.client.render;
 
-import org.lwjgl.system.MemoryUtil;
-import org.overrun.swgl.core.gl.GLBatch;
-import org.overrun.swgl.core.model.BuiltinVertexLayouts;
+import org.lwjgl.BufferUtils;
 
-import java.util.function.Consumer;
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -37,9 +35,13 @@ import static org.lwjgl.opengl.GL11.*;
  * @since 0.6.0
  */
 public final class Tesselator {
+    private static final int MEMORY_USE = 4 * 1024 * 1024;
+    private static final int MAX_FLOATS = MEMORY_USE / 4;
     private static Tesselator instance;
-    private final GLBatch batch = new GLBatch(false);
-    private int primitives = GL_TRIANGLES;
+    private final FloatBuffer buffer = BufferUtils.createFloatBuffer(MAX_FLOATS);
+    private float u, v, r, g, b;
+    private int vertexCount = 0;
+    private boolean hasColor, hasTexture;
 
     private Tesselator() {
     }
@@ -51,35 +53,60 @@ public final class Tesselator {
         return instance;
     }
 
-    public GLBatch getBatch() {
-        return batch;
-    }
-
-    public Tesselator begin(int primitives) {
-        batch.begin(BuiltinVertexLayouts.T2F_C3F_V3F());
-        this.primitives = primitives;
+    public Tesselator begin() {
+        vertexCount = 0;
+        buffer.clear();
         return this;
     }
 
-    public Tesselator performBatch(Consumer<GLBatch> consumer) {
-        consumer.accept(getBatch());
+    public Tesselator tex(float u, float v) {
+        hasTexture = true;
+        this.u = u;
+        this.v = v;
         return this;
     }
 
-    public void flush() {
-        batch.end();
+    public Tesselator color(float r, float g, float b) {
+        hasColor = true;
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        return this;
+    }
+
+    public void vertex(float x, float y, float z) {
+        if (hasTexture) {
+            buffer.put(u).put(v);
+        }
+        if (hasColor) {
+            buffer.put(r).put(g).put(b);
+        }
+        buffer.put(x).put(y).put(z);
+        ++vertexCount;
+    }
+
+    public void flush(int mode) {
+        buffer.flip();
+        if (hasTexture) glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        if (hasColor) glEnableClientState(GL_COLOR_ARRAY);
         glEnableClientState(GL_VERTEX_ARRAY);
-        if (batch.hasColor()) glEnableClientState(GL_COLOR_ARRAY);
-        if (batch.hasTexture()) glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-        glInterleavedArrays(GL_T2F_C3F_V3F, 0, batch.getBuffer());
-        batch.getIndexBuffer().ifPresentOrElse(
-            buffer -> glDrawElements(GL_UNSIGNED_INT, batch.getIndexCount(), GL_UNSIGNED_INT, MemoryUtil.memAddress(buffer)),
-            () -> glDrawArrays(primitives, 0, batch.getVertexCount())
-        );
+        if (hasColor) {
+            if (hasTexture) {
+                glInterleavedArrays(GL_T2F_C3F_V3F, 0, buffer);
+            } else {
+                glInterleavedArrays(GL_C3F_V3F, 0, buffer);
+            }
+        } else if (hasTexture) {
+            glInterleavedArrays(GL_T2F_V3F, 0, buffer);
+        } else {
+            glInterleavedArrays(GL_V3F, 0, buffer);
+        }
 
+        glDrawArrays(mode, 0, vertexCount);
+
+        if (hasTexture) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        if (hasColor) glDisableClientState(GL_COLOR_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
-        if (batch.hasColor()) glDisableClientState(GL_COLOR_ARRAY);
-        if (batch.hasTexture()) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
 }

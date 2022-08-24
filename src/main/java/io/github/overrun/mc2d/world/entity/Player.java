@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world;
+package io.github.overrun.mc2d.world.entity;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -30,6 +30,7 @@ import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.gui.DrawableHelper;
 import io.github.overrun.mc2d.client.gui.Framebuffer;
 import io.github.overrun.mc2d.util.Identifier;
+import io.github.overrun.mc2d.world.World;
 import io.github.overrun.mc2d.world.block.Block;
 import io.github.overrun.mc2d.world.block.Blocks;
 import org.joml.Vector3d;
@@ -64,7 +65,7 @@ public class Player extends DrawableHelper {
 
     public Player(World world) {
         this.world = world;
-        setPos(Math.random() * world.width, world.height + 10, 0.5);
+        setPos(Math.random() * world.width, world.height + 10, 1.5);
     }
 
     public void setPos(double x, double y, double z) {
@@ -127,7 +128,7 @@ public class Player extends DrawableHelper {
     public void move(float x, float y) {
         float xaOrg = x;
         float yaOrg = y;
-        var cubes = world.getCubes(0, box.expand(x, y, new AABRect2f()));
+        var cubes = world.getCubes(1, box.expand(x, y, new AABRect2f()));
         for (var cube : cubes) {
             y = box.clipYCollide(y, cube);
         }
@@ -205,7 +206,7 @@ public class Player extends DrawableHelper {
     }
 
     public void deserialize(JsonReader reader) throws IOException {
-        double x = position.x, y = position.y;
+        double x = position.x, y = position.y, z = position.z;
         reader.beginObject();
         while (reader.hasNext()) {
             switch (reader.nextName()) {
@@ -217,10 +218,10 @@ public class Player extends DrawableHelper {
                 }
                 case "x" -> x = reader.nextDouble();
                 case "y" -> y = reader.nextDouble();
-                case "z" -> reader.nextDouble();
+                case "z" -> z = reader.nextDouble();
             }
         }
         reader.endObject();
-        setPos(x, y, position.z);
+        setPos(x, y, z);
     }
 }

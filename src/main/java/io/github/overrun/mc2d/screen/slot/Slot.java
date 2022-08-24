@@ -24,7 +24,7 @@
 
 package io.github.overrun.mc2d.screen.slot;
 
-import io.github.overrun.mc2d.item.Item;
+import io.github.overrun.mc2d.world.item.Item;
 
 /**
  * @author squid233

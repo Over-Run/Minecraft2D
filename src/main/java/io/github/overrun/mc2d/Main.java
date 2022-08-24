@@ -32,7 +32,7 @@ import io.github.overrun.mc2d.client.gui.screen.ingame.CreativeTabScreen;
 import io.github.overrun.mc2d.client.gui.screen.ingame.PauseScreen;
 import io.github.overrun.mc2d.client.model.BlockModelMgr;
 import io.github.overrun.mc2d.event.KeyCallback;
-import io.github.overrun.mc2d.item.Items;
+import io.github.overrun.mc2d.world.item.Items;
 import io.github.overrun.mc2d.mod.ModLoader;
 import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.text.LiteralText;
@@ -42,9 +42,12 @@ import io.github.overrun.mc2d.util.Options;
 import io.github.overrun.mc2d.world.block.Blocks;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 import org.overrun.swgl.core.cfg.GlobalConfig;
+import org.overrun.swgl.core.gl.GLBlendFunc;
+import org.overrun.swgl.core.gl.GLClear;
 import org.overrun.swgl.core.gl.GLStateMgr;
 import org.overrun.swgl.core.util.LogFactory9;
 import org.overrun.swgl.core.util.timing.Timer;
@@ -54,7 +57,7 @@ import java.nio.IntBuffer;
 
 import static io.github.overrun.mc2d.world.block.Blocks.*;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11C.glViewport;
 
 /**
  * @author squid233
@@ -86,10 +89,10 @@ public final class Main implements Runnable, AutoCloseable {
         Language.init();
         Language.currentLang = Options.get("lang", "en_us");
         logger.info("Backend library: LWJGL version {}", Version.getVersion());
-        glClearColor(.4f, .6f, .9f, 1);
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        GLClear.clearColor(.4f, .6f, .9f, 1);
+        GLStateMgr.enableTexture2D();
+        GLStateMgr.enableBlend();
+        GLStateMgr.blendFunc(GLBlendFunc.SRC_ALPHA, GLBlendFunc.ONE_MINUS_SRC_ALPHA);
         long lastTime = System.currentTimeMillis();
         int frames = 0;
         while (!Window.shouldClose()) {
@@ -119,22 +122,29 @@ public final class Main implements Runnable, AutoCloseable {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         Window.create(896, 512, VERSION_TEXT.asString());
         Window.check();
-        ImageReader.withGlfwImg("assets/mc2d/icon.png", Window::setIcon);
+        try (var img = ImageReader.readImg("assets/mc2d/icon.png");
+             var buf = GLFWImage.malloc(1)) {
+            Window.setIcon(buf.width(img.width()).height(img.height()).pixels(img.buffer()));
+        }
         Window.setKeyCallback((window, key, scancode, action, mods) -> {
             KeyCallback.post(window, key, scancode, action, mods);
             if (action == GLFW_PRESS) {
                 if (client.screen != null) {
                     client.screen.keyPressed(key, scancode, mods);
-                } else if (key == GLFW_KEY_ESCAPE && client.world != null) {
-                    client.openScreen(new PauseScreen(null));
+                } else if (client.world != null) {
+                    if (key == GLFW_KEY_ESCAPE) {
+                        client.openScreen(new PauseScreen(null));
+                    } else if (key == Options.getI(Options.KEY_CREATIVE_TAB, GLFW_KEY_E)) {
+                        client.openScreen(new CreativeTabScreen(client.player, null));
+                    }
                 }
 
                 if (key == GLFW_KEY_F11) {
                     var vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
                     if (glfwGetWindowMonitor(window) == 0) {
                         try (MemoryStack stack = MemoryStack.stackPush()) {
-                            IntBuffer pX = stack.callocInt(1);
-                            IntBuffer pY = stack.callocInt(1);
+                            IntBuffer pX = stack.mallocInt(1);
+                            IntBuffer pY = stack.mallocInt(1);
                             glfwGetWindowPos(window, pX, pY);
                             oldX = pX.get(0);
                             oldY = pY.get(0);
@@ -170,14 +180,10 @@ public final class Main implements Runnable, AutoCloseable {
                             --world.pickZ;
                             if (world.pickZ < 0) {
                                 world.pickZ = 1;
-                            }
-                            if (world.pickZ > 1) {
+                            } else if (world.pickZ > 1) {
                                 world.pickZ = 0;
                             }
                         }
-                    }
-                    if (key == Options.getI(Options.KEY_CREATIVE_TAB, GLFW_KEY_E)) {
-                        client.openScreen(new CreativeTabScreen(client.player, null));
                     }
                 }
             }
@@ -201,8 +207,8 @@ public final class Main implements Runnable, AutoCloseable {
             Mouse.mouseY = (int) Math.floor(y);
         });
         try (var stack = MemoryStack.stackPush()) {
-            var pWidth = stack.callocInt(1);
-            var pHeight = stack.callocInt(1);
+            var pWidth = stack.mallocInt(1);
+            var pHeight = stack.mallocInt(1);
             Window.getSize(pWidth, pHeight);
             var vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
             if (vidMode != null) {

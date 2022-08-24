@@ -30,6 +30,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
+import org.overrun.swgl.core.gl.GLStateMgr;
 import org.overrun.swgl.core.util.LogFactory9;
 import org.slf4j.Logger;
 
@@ -46,7 +47,6 @@ import static org.lwjgl.stb.STBImage.*;
 public final class TextureManager implements AutoCloseable {
     private static final Logger logger = LogFactory9.getLogger();
     private final Object2IntMap<Identifier> idMap = new Object2IntOpenHashMap<>(16);
-    private int lastId = 0;
 
     public int loadTexture(Identifier id) {
         return loadTexture(id, GL_NEAREST);
@@ -61,10 +61,11 @@ public final class TextureManager implements AutoCloseable {
             return idMap.getInt(id);
         }
         int texId = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, texId);
+        GLStateMgr.bindTexture2D(texId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mode);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mode);
-        var img = read("assets/" + id.getNamespace() + "/" + id.getPath(),
+        String path = "assets/" + id.getNamespace() + "/" + id.getPath();
+        var img = read(path,
             id.isVanilla()
                 ? ClassLoader.getSystemClassLoader()
                 : ModLoader.getLoader(id.getNamespace()));
@@ -74,21 +75,21 @@ public final class TextureManager implements AutoCloseable {
         if (img == null) {
             failed = true;
             w = h = 2;
-            pixels = MemoryUtil.memCalloc(64)
+            pixels = MemoryUtil.memAlloc(64)
                 .putInt(0xfff800f8).putInt(0xff000000)
                 .putInt(0xff000000).putInt(0xfff800f8)
                 .flip();
         } else {
             try (var stack = MemoryStack.stackPush()) {
-                var xp = stack.callocInt(1);
-                var yp = stack.callocInt(1);
-                var cp = stack.callocInt(1);
+                var xp = stack.mallocInt(1);
+                var yp = stack.mallocInt(1);
+                var cp = stack.mallocInt(1);
                 pixels = stbi_load_from_memory(img, xp, yp, cp, STBI_rgb_alpha);
                 if (pixels == null) {
                     logger.error("Failed to load image {}: {}",
-                        "assets/" + id.getNamespace() + "/" + id.getPath(),
+                        path,
                         stbi_failure_reason());
-                    pixels = MemoryUtil.memCalloc(64)
+                    pixels = MemoryUtil.memAlloc(64)
                         .putInt(0xfff800f8).putInt(0xff000000)
                         .putInt(0xff000000).putInt(0xfff800f8)
                         .flip();
@@ -107,15 +108,12 @@ public final class TextureManager implements AutoCloseable {
         if (failed) MemoryUtil.memFree(pixels);
         else stbi_image_free(pixels);
 
-        idMap.put(id, texId);
+        addTexture(id, texId);
         return texId;
     }
 
     public void bindTexture(int texId) {
-        if (lastId != texId) {
-            glBindTexture(GL_TEXTURE_2D, texId);
-            lastId = texId;
-        }
+        GLStateMgr.bindTexture2D(texId);
     }
 
     public void bindTexture(Identifier id) {

@@ -31,8 +31,7 @@ import java.util.Objects;
  * @since 2021/01/25
  */
 public class Identifier {
-    public static final String VANILLA = "mc2d";
-    private static final long serialVersionUID = 1L;
+    public static final String DEFAULT = "mc2d";
     private final String namespace;
     private final String path;
 
@@ -41,7 +40,7 @@ public class Identifier {
             namespace = id[0];
             path = id[1];
         } else {
-            namespace = VANILLA;
+            namespace = DEFAULT;
             path = id[0];
         }
     }
@@ -63,7 +62,7 @@ public class Identifier {
     }
 
     public boolean isVanilla() {
-        return VANILLA.equals(namespace);
+        return DEFAULT.equals(namespace);
     }
 
     @Override

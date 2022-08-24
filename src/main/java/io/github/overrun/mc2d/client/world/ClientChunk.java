@@ -72,16 +72,17 @@ public class ClientChunk {
 
     private void rebuild(int layer) {
         glNewList(lists + layer, GL_COMPILE);
-        Tesselator.getInstance().begin(GL_QUADS).performBatch(batch -> {
-            for (int x = x0; x < x1; x++) {
-                for (int y = y0; y < y1; y++) {
-                    var b = world.getBlock(x, y, layer);
-                    if (b.shouldRender(world, x, y, layer)) {
-                        b.render(batch, x, y, layer);
-                    }
+        final var t = Tesselator.getInstance();
+        t.begin();
+        for (int x = x0; x < x1; x++) {
+            for (int y = y0; y < y1; y++) {
+                var b = world.getBlock(x, y, layer);
+                if (b.shouldRender(world, x, y, layer)) {
+                    b.render(t, x, y, layer);
                 }
             }
-        }).flush();
+        }
+        t.flush(GL_QUADS);
         glEndList();
     }
 

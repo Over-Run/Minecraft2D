@@ -22,12 +22,32 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.item;
+package io.github.overrun.mc2d.world.item;
+
+import io.github.overrun.mc2d.world.block.Block;
+import io.github.overrun.mc2d.world.block.Blocks;
+import io.github.overrun.mc2d.util.registry.Registry;
 
 /**
  * @author squid233
  * @since 2021/01/27
  */
-public interface ItemConvertible {
-    Item asItem();
+public final class Items {
+    public static final Item AIR = register("air", Blocks.AIR);
+    public static final Item GRASS_BLOCK = register("grass_block", Blocks.GRASS_BLOCK);
+    public static final Item STONE = register("stone", Blocks.STONE);
+    public static final Item DIRT = register("dirt", Blocks.DIRT);
+    public static final Item COBBLESTONE = register("cobblestone", Blocks.COBBLESTONE);
+    public static final Item BEDROCK = register("bedrock", Blocks.BEDROCK);
+
+    public static void register() {
+    }
+
+    public static Item register(String id, Item item) {
+        return Registry.register(Registry.ITEM, id, item);
+    }
+
+    public static Item register(String id, Block block) {
+        return register(id, new BlockItem(block));
+    }
 }

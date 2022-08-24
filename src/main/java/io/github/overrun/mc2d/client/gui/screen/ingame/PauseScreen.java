@@ -39,7 +39,7 @@ public final class PauseScreen extends Screen {
     private final Screen parent;
 
     public PauseScreen(Screen parent) {
-        super(new TranslatableText("Pausing"));
+        super(new TranslatableText("screen.mc2d.pausing"));
         this.parent = parent;
     }
 

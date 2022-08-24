@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.function.Function;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11C.*;
 
 /**
  * @author squid233
