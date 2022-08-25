@@ -70,14 +70,13 @@ public abstract class AbstractButtonWidget extends DrawableHelper implements Dra
         Mc2dClient client = Mc2dClient.getInstance();
         client.getTextureManager().bindTexture(WIDGETS_LOCATION);
         int i = getImageY(isHovered());
-        drawTexture(x, y, 0, 46 + i * 20, width >> 1, height);
-        drawTexture(x + width, y, 200 - (width >> 1), 46 + i * 20, width >> 1, height);
+        drawTexture(x, y, 0, 46 + i * 20, width / 2, height);
+        drawTexture(x + width * .5, y, 200 - width / 2, 46 + i * 20, width / 2, height);
         renderBg(client, mouseX, mouseY);
         drawCenteredText(client.textRenderer,
             getMessage().setStyle(Style.EMPTY.withColor(active ? TextColor.WHITE : NOT_ACTIVE_COLOR)),
-            x + width,
-            // y + (height * 2 / 2 - 16 / 2)
-            y + height - 8);
+            x + width / 2,
+            y + height / 2 - client.textRenderer.drawHeight() / 2);
     }
 
     protected void renderBg(Mc2dClient client, int mouseX, int mouseY) {
@@ -135,7 +134,7 @@ public abstract class AbstractButtonWidget extends DrawableHelper implements Dra
 
     @Override
     public void render(int mouseX, int mouseY, float delta) {
-        hovered = mouseX >= x && mouseY >= y && mouseX < x + (width << 1) && mouseY < y + (height << 1);
+        hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
         renderButton(mouseX, mouseY);
     }
 

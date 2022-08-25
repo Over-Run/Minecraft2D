@@ -44,7 +44,7 @@ import static org.lwjgl.opengl.GL11.glColor4f;
  */
 public abstract class Screen extends AbstractParentElement implements TickableElement, Drawable {
     protected final List<Element> children = new ArrayList<>();
-    public final IText title;
+    protected IText title;
     protected Mc2dClient client;
     protected TextRenderer textRenderer;
     public int width;
@@ -86,9 +86,9 @@ public abstract class Screen extends AbstractParentElement implements TickableEl
     public void renderBackgroundTexture() {
         glColor4f(1, 1, 1, 1);
         client.getTextureManager().bindTexture(OPTIONS_BACKGROUND);
-        for (int i = 0; i < height; i += 32) {
-            for (int j = 0; j < width; j += 32) {
-                drawTexture(j, i, 32, 32);
+        for (int i = 0; i < height; i += 16) {
+            for (int j = 0; j < width; j += 16) {
+                drawTexture(j, i, 16, 16);
             }
         }
     }
@@ -98,6 +98,14 @@ public abstract class Screen extends AbstractParentElement implements TickableEl
 
     public boolean shouldCloseOnEsc() {
         return true;
+    }
+
+    public IText getTitle() {
+        return title;
+    }
+
+    public void setTitle(IText title) {
+        this.title = title;
     }
 
     protected <T extends AbstractButtonWidget> T addButton(T button) {

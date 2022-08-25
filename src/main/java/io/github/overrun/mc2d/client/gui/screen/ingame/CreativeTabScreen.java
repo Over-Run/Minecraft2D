@@ -26,7 +26,7 @@ package io.github.overrun.mc2d.client.gui.screen.ingame;
 
 import io.github.overrun.mc2d.world.entity.PlayerEntity;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
-import io.github.overrun.mc2d.world.item.BlockItem;
+import io.github.overrun.mc2d.world.item.BlockItemType;
 import io.github.overrun.mc2d.screen.CreativeTabScreenHandler;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.text.TranslatableText;
@@ -52,8 +52,8 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
     @Override
     protected void onClickSlot(Slot slot) {
         super.onClickSlot(slot);
-        if (slot.item instanceof BlockItem) {
-            player.mainHand = ((BlockItem) slot.item).getBlock();
+        if (slot.itemStack instanceof BlockItemType item && !item.getBlock().isAir()) {
+            player.mainHand = item.getBlock();
         }
     }
 

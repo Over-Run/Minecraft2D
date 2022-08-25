@@ -24,7 +24,7 @@
 
 package io.github.overrun.mc2d.world.item;
 
-import io.github.overrun.mc2d.world.block.Block;
+import io.github.overrun.mc2d.world.block.BlockType;
 import io.github.overrun.mc2d.world.block.Blocks;
 import io.github.overrun.mc2d.util.registry.Registry;
 
@@ -33,23 +33,23 @@ import io.github.overrun.mc2d.util.registry.Registry;
  * @since 2021/01/27
  */
 public final class Items {
-    public static final Item AIR = register("air", Blocks.AIR);
-    public static final Item GRASS_BLOCK = register("grass_block", Blocks.GRASS_BLOCK);
-    public static final Item STONE = register("stone", Blocks.STONE);
-    public static final Item DIRT = register("dirt", Blocks.DIRT);
-    public static final Item COBBLESTONE = register("cobblestone", Blocks.COBBLESTONE);
-    public static final Item BEDROCK = register("bedrock", Blocks.BEDROCK);
-    public static final Item OAK_LOG = register("oak_log", Blocks.OAK_LOG);
-    public static final Item OAK_LEAVES = register("oak_leaves", Blocks.OAK_LEAVES);
+    public static final ItemType AIR = register("air", Blocks.AIR);
+    public static final ItemType GRASS_BLOCK = register("grass_block", Blocks.GRASS_BLOCK);
+    public static final ItemType STONE = register("stone", Blocks.STONE);
+    public static final ItemType DIRT = register("dirt", Blocks.DIRT);
+    public static final ItemType COBBLESTONE = register("cobblestone", Blocks.COBBLESTONE);
+    public static final ItemType BEDROCK = register("bedrock", Blocks.BEDROCK);
+    public static final ItemType OAK_LOG = register("oak_log", Blocks.OAK_LOG);
+    public static final ItemType OAK_LEAVES = register("oak_leaves", Blocks.OAK_LEAVES);
 
     public static void register() {
     }
 
-    public static Item register(String id, Item item) {
+    public static ItemType register(String id, ItemType item) {
         return Registry.register(Registry.ITEM, id, item);
     }
 
-    public static Item register(String id, Block block) {
-        return register(id, new BlockItem(block));
+    public static ItemType register(String id, BlockType block) {
+        return register(id, new BlockItemType(block));
     }
 }

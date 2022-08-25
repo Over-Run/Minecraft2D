@@ -29,5 +29,5 @@ package io.github.overrun.mc2d.world.item;
  * @since 2021/01/27
  */
 public interface ItemConvertible {
-    Item asItem();
+    ItemType asItem();
 }

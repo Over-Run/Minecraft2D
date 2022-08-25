@@ -37,7 +37,7 @@ public interface IText {
 
     /**
      * Cast to string.
-     * <p>May the translated text.</p>
+     * <p>May be a translated text.</p>
      *
      * @return The text.
      */

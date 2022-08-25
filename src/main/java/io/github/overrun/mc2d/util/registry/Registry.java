@@ -24,9 +24,9 @@
 
 package io.github.overrun.mc2d.util.registry;
 
-import io.github.overrun.mc2d.world.block.Block;
+import io.github.overrun.mc2d.world.block.BlockType;
 import io.github.overrun.mc2d.world.block.Blocks;
-import io.github.overrun.mc2d.world.item.Item;
+import io.github.overrun.mc2d.world.item.ItemType;
 import io.github.overrun.mc2d.world.item.Items;
 import io.github.overrun.mc2d.util.Identifier;
 
@@ -35,8 +35,8 @@ import io.github.overrun.mc2d.util.Identifier;
  * @since 2021/01/27
  */
 public final class Registry {
-    public static final DefaultedRegistry<Block> BLOCK = new DefaultedRegistry<>(() -> Blocks.AIR);
-    public static final DefaultedRegistry<Item> ITEM = new DefaultedRegistry<>(() -> Items.AIR);
+    public static final DefaultedRegistry<BlockType> BLOCK = new DefaultedRegistry<>(() -> Blocks.AIR);
+    public static final DefaultedRegistry<ItemType> ITEM = new DefaultedRegistry<>(() -> Items.AIR);
 
     public static <T> T register(BaseRegistry<T> registry, Identifier id, T entry) {
         return registry.register(id, entry);

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2022 Overrun Organization
+ * Copyright (c) 2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,29 +22,13 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world.block;
-
-import io.github.overrun.mc2d.util.registry.Registry;
+package io.github.overrun.mc2d.client.model;
 
 /**
+ * The entity model manager.
+ *
  * @author squid233
- * @since 2021/01/09
+ * @since 0.6.0
  */
-public final class Blocks {
-    public static final BlockType AIR = register("air", new AirBlockType());
-    public static final BlockType GRASS_BLOCK = register("grass_block", new BlockType());
-    public static final BlockType STONE = register("stone", new BlockType());
-    public static final BlockType DIRT = register("dirt", new BlockType());
-    public static final BlockType COBBLESTONE = register("cobblestone", new BlockType());
-    public static final BlockType BEDROCK = register("bedrock", new BlockType());
-    public static final BlockType OAK_LOG = register("oak_log", new BlockType());
-    public static final BlockType OAK_LEAVES = register("oak_leaves", new LeavesBlockType());
-
-    public static void register() {
-    }
-
-    public static BlockType register(String id, BlockType block) {
-        return Registry.register(Registry.BLOCK, id, block);
-    }
+public class EntityModelMgr {
 }
-

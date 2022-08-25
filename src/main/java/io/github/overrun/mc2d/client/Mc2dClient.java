@@ -37,6 +37,7 @@ import io.github.overrun.mc2d.text.TranslatableText;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.Options;
 import io.github.overrun.mc2d.world.World;
+import io.github.overrun.mc2d.world.entity.HumanEntity;
 import io.github.overrun.mc2d.world.entity.PlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,12 +56,14 @@ public final class Mc2dClient implements AutoCloseable {
     private static final IText MAX_MEMORY;
     public final TextRenderer textRenderer;
     private final TextureManager textureManager;
-    public Screen screen;
-    public @Nullable World world;
-    public WorldRenderer worldRenderer;
-    public PlayerEntity player;
-    public int fps;
-    public boolean debugging;
+    public Screen screen = null;
+    public @Nullable World world = null;
+    public WorldRenderer worldRenderer = null;
+    public PlayerEntity player = null;
+    public int fps = 0;
+    public boolean debugging = false;
+    public double guiScale = Options.getD(Options.GUI_SCALE, 2.0);
+    public double invGuiScale = 1 / guiScale;
 
     static {
         double maxMemory = Runtime.getRuntime().maxMemory() / 1048576D;
@@ -81,35 +84,47 @@ public final class Mc2dClient implements AutoCloseable {
         }
         this.screen = screen;
         if (screen != null) {
-            screen.init(this, Framebuffer.width, Framebuffer.height);
+            screen.init(this,
+                (int) Math.ceil(Framebuffer.width * invGuiScale),
+                (int) Math.ceil(Framebuffer.height * invGuiScale));
         }
     }
 
-    public void renderHud() {
+    public void onResize(int width, int height) {
+        if (screen == null) {
+            openScreen(null);
+        }
+        Framebuffer.setSize(width, height);
+        if (screen != null) {
+            screen.init(this,
+                (int) Math.ceil(width * invGuiScale),
+                (int) Math.ceil(height * invGuiScale));
+        }
+        glViewport(0, 0, width, height);
+    }
+
+    public void renderHud(int width, int height) {
         if (world != null) {
             if (debugging) {
                 textRenderer.draw(0, 0, Main.VERSION_TEXT);
-                textRenderer.draw(0, 17, IText.of(fps + " fps"));
-                textRenderer.draw(0, 34, new TranslatableText("text.debug.player.position",
+                textRenderer.draw(0, textRenderer.drawHeight() + 1, IText.of(fps + " fps"));
+                textRenderer.draw(0, textRenderer.drawHeight() * 2 + 1, new TranslatableText("text.debug.player.position",
                     player.position.x,
                     player.position.y,
                     player.position.z));
-                textRenderer.draw(0, 51, new TranslatableText("text.debug.player.hand_block", player.mainHand));
-//            textRenderer.draw(0, 68, new TranslatableText("Point.block.pos", pointBlockX, pointBlockY, pointBlockZ));
-//            textRenderer.draw(0, 85, new TranslatableText("Point.block", pointBlock));
-                textRenderer.draw(0, 102, MAX_MEMORY);
+                textRenderer.draw(width - textRenderer.drawWidth(MAX_MEMORY), 0, MAX_MEMORY);
                 if (ModLoader.getModCount() > 0) {
                     textRenderer.draw(0, 119, new TranslatableText("text.debug.mod_count", ModLoader.getModCount()));
                 }
+            } else {
+                glPushMatrix();
+                glTranslatef(width - 32, 0, 0);
+                Identifier id = BLOCK.getId(player.mainHand);
+                glColor3f(1, 1, 1);
+                textureManager.bindTexture(new Identifier(id.getNamespace(), "textures/block/" + id.getPath() + ".png"));
+                drawTexture(0, 0, 32, 32);
+                glPopMatrix();
             }
-
-            glPushMatrix();
-            glTranslatef(Framebuffer.width - 64, 0, 0);
-            Identifier id = BLOCK.getId(player.mainHand);
-            glColor3f(1, 1, 1);
-            textureManager.bindTexture(new Identifier(id.getNamespace(), "textures/block/" + id.getPath() + ".png"));
-            drawTexture(0, 0, 64, 64);
-            glPopMatrix();
         }
     }
 
@@ -130,25 +145,22 @@ public final class Mc2dClient implements AutoCloseable {
         if (screen != null) {
             screen.keyPressed(key, scancode, mods);
         } else if (world != null) {
-            if (key == GLFW_KEY_ESCAPE) {
-                openScreen(new PauseScreen(null, world.timer.timescale));
-                world.timer.timescale = 0.0;
-            } else if (key == Options.getI(Options.KEY_CREATIVE_TAB, GLFW_KEY_E)) {
-                openScreen(new CreativeTabScreen(player, null));
-            }
-        }
-
-        if (world != null) {
             switch (key) {
+                case GLFW_KEY_ESCAPE -> {
+                    openScreen(new PauseScreen(null, world.timer.timescale));
+                    world.timer.timescale = 0.0;
+                }
                 case GLFW_KEY_ENTER -> world.save(player);
                 case GLFW_KEY_1 -> player.mainHand = GRASS_BLOCK;
                 case GLFW_KEY_2 -> player.mainHand = STONE;
                 case GLFW_KEY_3 -> player.mainHand = DIRT;
                 case GLFW_KEY_4 -> player.mainHand = COBBLESTONE;
                 case GLFW_KEY_5 -> player.mainHand = BEDROCK;
+                case GLFW_KEY_6 -> player.mainHand = OAK_LOG;
+                case GLFW_KEY_7 -> player.mainHand = OAK_LEAVES;
                 case GLFW_KEY_F3 -> debugging = !debugging;
-                // , || .
-                case GLFW_KEY_COMMA, GLFW_KEY_PERIOD -> {
+                // z || , || .
+                case GLFW_KEY_Z, GLFW_KEY_COMMA, GLFW_KEY_PERIOD -> {
                     --world.pickZ;
                     if (world.pickZ < 0) {
                         world.pickZ = 1;
@@ -156,18 +168,22 @@ public final class Mc2dClient implements AutoCloseable {
                         world.pickZ = 0;
                     }
                 }
+                case GLFW_KEY_G -> {
+                    var entity = new HumanEntity(world);
+                    entity.setPosition(player.position.x(), player.position.y(), player.position.z());
+                    entity.prevPos.set(entity.position);
+                    world.spawnEntity(entity);
+                }
+            }
+            if (key == Options.getI(Options.KEY_CREATIVE_TAB, GLFW_KEY_E)) {
+                openScreen(new CreativeTabScreen(player, null));
             }
         }
     }
 
     public void update() {
         if (world != null) {
-            world.timer.update();
-            for (int i = 0; i < world.timer.ticks; i++) {
-                if (player != null) {
-                    player.tick();
-                }
-            }
+            world.update();
 
             if (screen == null) {
                 worldRenderer.processHit();
@@ -187,15 +203,19 @@ public final class Mc2dClient implements AutoCloseable {
             setupCamera(worldDelta);
             worldRenderer.render(worldDelta, Mouse.mouseX, Framebuffer.height - Mouse.mouseY);
         }
+        final double sw = Framebuffer.width * invGuiScale;
+        final double sh = Framebuffer.height * invGuiScale;
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, Framebuffer.width, Framebuffer.height, 0, 100, -100);
+        glOrtho(0, sw, sh, 0, 100, -100);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         glClear(GL_DEPTH_BUFFER_BIT);
-        renderHud();
+        renderHud((int) Math.ceil(sw), (int) Math.ceil(sh));
         if (screen != null) {
-            screen.render(Mouse.mouseX, Mouse.mouseY, delta);
+            screen.render((int) (Mouse.mouseX * invGuiScale),
+                (int) (Mouse.mouseY * invGuiScale),
+                delta);
         }
     }
 
@@ -216,5 +236,7 @@ public final class Mc2dClient implements AutoCloseable {
     @Override
     public void close() {
         textureManager.close();
+        PlayerEntity.model.close();
+        HumanEntity.model.close();
     }
 }

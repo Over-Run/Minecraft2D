@@ -22,28 +22,75 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world;
-
-import io.github.overrun.mc2d.world.block.BlockType;
+package io.github.overrun.mc2d.client.model;
 
 /**
  * @author squid233
  * @since 0.6.0
  */
-public class HitResult {
-    public BlockType block;
-    public int x, y, z;
-    public boolean miss;
+public class Vertex {
+    private float x, y, z;
+    private float u, v;
 
-    public HitResult(BlockType block, int x, int y, int z, boolean miss) {
-        this.block = block;
+    public Vertex(float x, float y, float z, float u, float v) {
         this.x = x;
         this.y = y;
         this.z = z;
-        this.miss = miss;
+        this.u = u;
+        this.v = v;
     }
 
-    public HitResult(BlockType block, int x, int y, int z) {
-        this(block, x, y, z, false);
+    public Vertex(float x, float y, float z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    public Vertex(Vertex vertex) {
+        x = vertex.x;
+        y = vertex.y;
+        z = vertex.z;
+        u = vertex.u;
+        v = vertex.v;
+    }
+
+    public Vertex remap(float u, float v) {
+        return new Vertex(x(), y(), z(), u, v);
+    }
+
+    public Vertex position(float x, float y, float z) {
+        return new Vertex(x, y, z, u(), v());
+    }
+
+    public Vertex x(float x) {
+        return new Vertex(x, y(), z());
+    }
+
+    public Vertex y(float y) {
+        return new Vertex(x(), y, z());
+    }
+
+    public Vertex z(float z) {
+        return new Vertex(x(), y(), z);
+    }
+
+    public float x() {
+        return x;
+    }
+
+    public float y() {
+        return y;
+    }
+
+    public float z() {
+        return z;
+    }
+
+    public float u() {
+        return u;
+    }
+
+    public float v() {
+        return v;
     }
 }

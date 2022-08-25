@@ -52,13 +52,13 @@ public final class TitleScreen extends Screen {
     @Override
     public void init() {
         super.init();
-        addButton(new ButtonWidget(width - 400 >> 1,
-            (height - 40 >> 1) - 50,
+        addButton(new ButtonWidget((width - 200) / 2,
+            (height - 20) / 2 - 20,
             200,
             20,
             new TranslatableText("text.screen.singleplayer"),
             b -> {
-                client.world = new World(128, 64);
+                client.world = new World(256, 128);
                 client.player = new PlayerEntity(client.world);
                 if (!client.world.load(client.player)) {
                     client.world.genTerrain();
@@ -67,16 +67,30 @@ public final class TitleScreen extends Screen {
                 client.world.addListener(client.worldRenderer);
                 client.openScreen(new LoadingWorldScreen());
             }));
-        addButton(new ButtonWidget(width - 400 >> 1,
-            height - 40 >> 1,
+        addButton(new ButtonWidget((width - 200) / 2,
+            (height - 20) / 2,
+            200,
+            20,
+            new TranslatableText("text.screen.multiplayer"),
+            b -> {
+            })).active = false;
+        addButton(new ButtonWidget((width - 200) / 2,
+            (height - 20) / 2 + 20,
             200,
             20,
             new TranslatableText("text.screen.mods"),
             b -> {
             })).active = false;
-        addButton(new ButtonWidget(width - 400 >> 1,
-            (height - 40 >> 1) + 50,
-            200,
+        addButton(new ButtonWidget((width - 200) / 2,
+            (height - 20) / 2 + 40,
+            100,
+            20,
+            new TranslatableText("text.screen.options"),
+            b -> {
+            })).active = false;
+        addButton(new ButtonWidget(width / 2,
+            (height - 20) / 2 + 40,
+            100,
             20,
             new TranslatableText("text.screen.exit_game"),
             b -> glfwSetWindowShouldClose(glfwGetCurrentContext(), true)));
@@ -88,8 +102,8 @@ public final class TitleScreen extends Screen {
         super.render(mouseX, mouseY, delta);
         glColor4f(1, 1, 1, 1);
         client.getTextureManager().bindTexture(LOGO);
-        drawTexture((width >> 1) - 202, 15, 404, 84);
-        textRenderer.draw(0, height - 16, Main.VERSION_TEXT);
+        drawTexture(width * .5 - 101, 15, 202, 42);
+        textRenderer.draw(0, height - client.textRenderer.drawHeight(), Main.VERSION_TEXT);
     }
 
     @Override

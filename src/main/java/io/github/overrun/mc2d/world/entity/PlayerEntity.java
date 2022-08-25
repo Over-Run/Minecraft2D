@@ -27,15 +27,12 @@ package io.github.overrun.mc2d.world.entity;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import io.github.overrun.mc2d.client.Mc2dClient;
-import io.github.overrun.mc2d.client.gui.DrawableHelper;
 import io.github.overrun.mc2d.client.gui.Framebuffer;
+import io.github.overrun.mc2d.client.model.PlayerEntityModel;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.world.World;
-import io.github.overrun.mc2d.world.block.Block;
+import io.github.overrun.mc2d.world.block.BlockType;
 import io.github.overrun.mc2d.world.block.Blocks;
-import org.joml.Vector3d;
-import org.overrun.swgl.core.phys.p2d.AABRect2f;
-import org.overrun.swgl.core.util.math.Numbers;
 
 import java.io.IOException;
 
@@ -47,70 +44,54 @@ import static org.lwjgl.opengl.GL11.*;
  * @author squid233
  * @since 2021/01/09
  */
-public class PlayerEntity extends DrawableHelper {
-    public static final Identifier TEXTURE = new Identifier("textures/player.png");
-    private static final long serialVersionUID = 2L;
-    public Block mainHand = Blocks.GRASS_BLOCK;
-    public int headTexCoord;
-    public int bodyTexCoord;
-    public final Vector3d prevPos = new Vector3d();
-    public final Vector3d position = new Vector3d();
-    public final Vector3d lerpPos = new Vector3d();
+public class PlayerEntity extends Entity {
+    public static final Identifier TEXTURE = new Identifier("textures/entity/player.png");
+    private static final long PLAYER_VERSION = 2L;
+    public static final PlayerEntityModel model = new PlayerEntityModel();
+    public BlockType mainHand = Blocks.GRASS_BLOCK;
     public boolean facingRight = true;
-    public final Vector3d velocity = new Vector3d();
-    public AABRect2f box;
-    public boolean onGround = false;
-    protected float bbWidth = 0.6f;
-    protected float bbHeight = 1.8f;
-    public World world;
+    private int animation = 0;
 
     public PlayerEntity(World world) {
-        this.world = world;
-        setPos(Math.random() * world.width, world.height + 10, 1.5);
-    }
-
-    public void setPos(double x, double y, double z) {
-        position.set(x, y, z);
-        float hw = bbWidth * 0.5f;
-        box = new AABRect2f((float) (x - hw), (float) y, (float) (x + hw), (float) (y + bbHeight));
+        super(world);
+        setPosition(Math.random() * world.width, world.height + 10, 1.5);
     }
 
     public double processInput() {
         double xa = 0;
-        if (isKeyPress(GLFW_KEY_A)
-            || isKeyPress(GLFW_KEY_LEFT)) {
+        boolean moveL = isKeyPress(GLFW_KEY_A)
+                        || isKeyPress(GLFW_KEY_LEFT);
+        boolean moveR = isKeyPress(GLFW_KEY_D)
+                        || isKeyPress(GLFW_KEY_RIGHT);
+        if (moveL) {
             --xa;
             facingRight = false;
-            headTexCoord = 8;
-            bodyTexCoord = 4;
         }
-        if (isKeyPress(GLFW_KEY_D)
-            || isKeyPress(GLFW_KEY_RIGHT)) {
+        if (moveR) {
             ++xa;
             facingRight = true;
-            headTexCoord = 0;
-            bodyTexCoord = 0;
+        }
+        if (moveL || moveR) {
+            animation++;
+        } else {
+            if (animation > 1) animation = 1;
+            else animation = 0;
         }
         if (isKeyPress(GLFW_KEY_SPACE)
             || isKeyPress(GLFW_KEY_W)
             || isKeyPress(GLFW_KEY_UP)) {
             velocity.y = 0.5f;
         }
-        if (isKeyPress(GLFW_KEY_LEFT_SHIFT)
-            || isKeyPress(GLFW_KEY_S)
-            || isKeyPress(GLFW_KEY_DOWN)
-        ) {
-            velocity.y = -0.5f;
-        }
         return xa;
     }
 
+    @Override
     public void tick() {
+        super.tick();
         double xa = 0.0;
         if (Mc2dClient.getInstance().screen == null) {
             xa = processInput();
         }
-        prevPos.set(position);
         moveRelative(xa, onGround ? 0.1f : 0.02f);
         velocity.y -= 0.08;
         move((float) velocity.x(), (float) velocity.y());
@@ -120,37 +101,7 @@ public class PlayerEntity extends DrawableHelper {
         }
     }
 
-    public void moveRelative(double x, float speed) {
-        if ((x * x) >= 0.01f) {
-            velocity.x += x * speed / Math.abs(x);
-        }
-    }
-
-    public void move(float x, float y) {
-        float xaOrg = x;
-        float yaOrg = y;
-        var cubes = world.getCubes(1, box.expand(x, y, new AABRect2f()));
-        for (var cube : cubes) {
-            y = box.clipYCollide(y, cube);
-        }
-        box.move(0.0f, y);
-        for (var cube : cubes) {
-            x = box.clipXCollide(x, cube);
-        }
-        box.move(x, 0.0f);
-        onGround = yaOrg != y && yaOrg < 0.0f;
-        if (Numbers.isNonEqual(xaOrg, x))
-            velocity.x = 0.0f;
-        if (Numbers.isNonEqual(yaOrg, y))
-            velocity.y = 0.0f;
-        position.set(
-            (box.minX() + box.maxX()) * 0.5f,
-            box.minY(),
-            position.z()
-        );
-    }
-
-    public void render(double delta, int mouseX, int mouseY) {
+    public void render(float delta, int mouseX, int mouseY) {
         var client = Mc2dClient.getInstance();
         double x = Framebuffer.width * .5f;
         double y = Framebuffer.height * .5f;
@@ -160,45 +111,14 @@ public class PlayerEntity extends DrawableHelper {
         glLoadIdentity();
         // Move to center
         glTranslated(x, y, 0);
-        glBegin(GL_QUADS);
-
-        // Draw head
-        glTexCoord2f(facingRight ? 0 : 0.5f, 0);
-        glVertex2f(-8, 64);
-        glTexCoord2f(facingRight ? 0 : 0.5f, 0.4f);
-        glVertex2f(-8, 48);
-        glTexCoord2f(facingRight ? 0.5f : 1, 0.4f);
-        glVertex2f(8, 48);
-        glTexCoord2f(facingRight ? 0.5f : 1, 0);
-        glVertex2f(8, 64);
-
-        // Draw body
-        glTexCoord2f(facingRight ? 0.5f : 0.75f, 0.4f);
-        glVertex2f(-4, 48);
-        glTexCoord2f(facingRight ? 0.5f : 0.75f, 1);
-        glVertex2f(-4, 24);
-        glTexCoord2f(facingRight ? 0.75f : 1, 1);
-        glVertex2f(4, 24);
-        glTexCoord2f(facingRight ? 0.75f : 1, 0.4f);
-        glVertex2f(4, 48);
-
-        // Draw legs
-        glTexCoord2f(facingRight ? 0 : 0.25f, 0.4f);
-        glVertex2f(-4, 24);
-        glTexCoord2f(facingRight ? 0 : 0.25f, 1);
-        glVertex2f(-4, 0);
-        glTexCoord2f(facingRight ? 0.25f : 0.5f, 1);
-        glVertex2f(4, 0);
-        glTexCoord2f(facingRight ? 0.25f : 0.5f, 0.4f);
-        glVertex2f(4, 24);
-
-        glEnd();
+        glScalef(32, 32, 1);
+        model.render(delta, facingRight, animation);
         glPopMatrix();
     }
 
     public void serialize(JsonWriter writer) throws IOException {
         writer.beginObject()
-            .name("version").value(serialVersionUID)
+            .name("version").value(PLAYER_VERSION)
             .name("x").value(position.x)
             .name("y").value(position.y)
             .name("z").value(position.z)
@@ -212,8 +132,8 @@ public class PlayerEntity extends DrawableHelper {
             switch (reader.nextName()) {
                 case "version" -> {
                     var v = reader.nextLong();
-                    if (serialVersionUID != v) {
-                        throw new RuntimeException("Doesn't compatible with version " + v + ". Current is " + serialVersionUID);
+                    if (PLAYER_VERSION != v) {
+                        throw new RuntimeException("Doesn't compatible with version " + v + ". Current is " + PLAYER_VERSION);
                     }
                 }
                 case "x" -> x = reader.nextDouble();
@@ -222,6 +142,6 @@ public class PlayerEntity extends DrawableHelper {
             }
         }
         reader.endObject();
-        setPos(x, y, z);
+        setPosition(x, y, z);
     }
 }

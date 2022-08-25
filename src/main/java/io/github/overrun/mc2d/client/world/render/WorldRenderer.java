@@ -32,8 +32,9 @@ import io.github.overrun.mc2d.util.GlUtils;
 import io.github.overrun.mc2d.world.HitResult;
 import io.github.overrun.mc2d.world.IWorldListener;
 import io.github.overrun.mc2d.world.World;
-import io.github.overrun.mc2d.world.block.Block;
+import io.github.overrun.mc2d.world.block.BlockType;
 import io.github.overrun.mc2d.world.block.Blocks;
+import io.github.overrun.mc2d.world.entity.HumanEntity;
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import org.joml.Intersectiond;
@@ -104,9 +105,9 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         int ry = (int) Math.ceil(Framebuffer.height * .5 * inv32);
         int ox = (int) Math.floor(client.player.lerpPos.x);
         int oy = (int) Math.floor(client.player.lerpPos.y);
-        for (int y = Math.min(world.getMinY(), oy - ry) / CHUNK_SIZE, my = Math.min(world.getMaxY(), oy + ry) / CHUNK_SIZE;
+        for (int y = Math.max(world.getMinY(), oy - ry) / CHUNK_SIZE, my = Math.min(world.getMaxY(), oy + ry) / CHUNK_SIZE;
              y <= my; y++) {
-            for (int x = Math.min(world.getMinX(), ox - rx) / CHUNK_SIZE, mx = Math.min(world.getMaxX(), ox + rx) / CHUNK_SIZE;
+            for (int x = Math.max(world.getMinX(), ox - rx) / CHUNK_SIZE, mx = Math.min(world.getMaxX(), ox + rx) / CHUNK_SIZE;
                  x <= mx; x++) {
                 consumer.accept(getOrCreateChunk(x, y));
             }
@@ -140,16 +141,16 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     }
 
     public void pick(int mouseX, int mouseY) {
-        Block target = null;
+        BlockType target = null;
         int targetX = 0, targetY = 0;
         final double inv32 = 1. / 32.;
         int rx = (int) Math.ceil(Framebuffer.width * .5 * inv32);
         int ry = (int) Math.ceil(Framebuffer.height * .5 * inv32);
         int ox = (int) Math.floor(client.player.lerpPos.x);
         int oy = (int) Math.floor(client.player.lerpPos.y);
-        for (int y = Math.min(world.getMinY(), oy - ry), my = Math.min(world.getMaxY(), oy + ry);
+        for (int y = Math.max(world.getMinY(), oy - ry), my = Math.min(world.getMaxY(), oy + ry);
              y <= my; y++) {
-            for (int x = Math.min(world.getMinX(), ox - rx), mx = Math.min(world.getMaxX(), ox + rx);
+            for (int x = Math.max(world.getMinX(), ox - rx), mx = Math.min(world.getMaxX(), ox + rx);
                  x <= mx; x++) {
                 var block = world.getBlock(x, y, world.pickZ);
                 var shape = block.getRayCastingShape();
@@ -214,11 +215,30 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         }
     }
 
+    public void renderEntities(float delta) {
+        final double inv32 = 1. / 32.;
+        int rx = (int) Math.ceil(Framebuffer.width * .5 * inv32);
+        int ry = (int) Math.ceil(Framebuffer.height * .5 * inv32);
+        int ox = (int) Math.floor(client.player.lerpPos.x);
+        int oy = (int) Math.floor(client.player.lerpPos.y);
+        for (var entity : world.entities) {
+            if (entity instanceof HumanEntity human) {
+                if (Intersectiond.testAarAar(
+                    ox - rx, oy - ry, ox + rx, oy + ry,
+                    entity.box.minX(), entity.box.minY(), entity.box.maxX(), entity.box.maxY()
+                )) {
+                    human.render(delta);
+                }
+            }
+        }
+    }
+
     public void render(float delta, int mouseX, int mouseY) {
         pick(mouseX, mouseY);
         updateDirtyChunks();
         render(0);
         glColor3f(1, 1, 1);
+        renderEntities(delta);
         client.player.render(delta, mouseX, mouseY);
         render(1);
         if (client.screen == null) {

@@ -29,7 +29,7 @@ import io.github.overrun.mc2d.mod.ModLoader;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.BaseRegistry;
 import io.github.overrun.mc2d.util.registry.Registry;
-import io.github.overrun.mc2d.world.block.Block;
+import io.github.overrun.mc2d.world.block.BlockType;
 import org.overrun.swgl.core.asset.tex.SpriteInfo;
 import org.overrun.swgl.core.asset.tex.TextureAtlas;
 import org.overrun.swgl.core.io.IFileProvider;
@@ -66,7 +66,7 @@ public class BlockModelMgr {
         var textures = new HashSet<Identifier>();
         var infoList = new ArrayList<SpriteInfo>();
         for (var e : registry) {
-            var tex = ((Block) e.getValue()).getTexture();
+            var tex = ((BlockType) e.getValue()).getTexture();
             if (tex != null) {
                 textures.add(tex);
             }

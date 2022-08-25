@@ -28,8 +28,8 @@ import io.github.overrun.mc2d.client.Mouse;
 import io.github.overrun.mc2d.client.TextureManager;
 import io.github.overrun.mc2d.client.gui.DrawableHelper;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
-import io.github.overrun.mc2d.world.item.BlockItem;
-import io.github.overrun.mc2d.world.item.Item;
+import io.github.overrun.mc2d.world.item.BlockItemType;
+import io.github.overrun.mc2d.world.item.ItemType;
 import io.github.overrun.mc2d.screen.ScreenHandler;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.text.IText;
@@ -37,6 +37,7 @@ import io.github.overrun.mc2d.text.TextColor;
 import io.github.overrun.mc2d.util.GlUtils;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.Registry;
+import io.github.overrun.mc2d.world.item.Items;
 import org.overrun.swgl.core.gl.GLStateMgr;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
@@ -47,6 +48,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @since 2021/01/25
  */
 public abstract class HandledScreen<T extends ScreenHandler> extends Screen {
+    private static final TextColor TITLE_COLOR = new TextColor(null, TextColor.WHITE.bgColor(), 0);
     protected final T handler;
     protected int backgroundWidth = 195;
     protected int backgroundHeight = 136;
@@ -56,14 +58,14 @@ public abstract class HandledScreen<T extends ScreenHandler> extends Screen {
     protected int y;
 
     protected HandledScreen(T handler, IText title) {
-        super(title);
+        super(title.withColor(TITLE_COLOR));
         this.handler = handler;
-        titleX = 16;
-        titleY = 12;
+        titleX = 8;
+        titleY = 6;
     }
 
     protected void drawForeground(int mouseX, int mouseY) {
-        textRenderer.draw(x + titleX, y + titleY, title.withColor(new TextColor("", TextColor.WHITE.bgColor(), 0)));
+        textRenderer.draw(x + titleX, y + titleY, title);
     }
 
     /**
@@ -81,13 +83,14 @@ public abstract class HandledScreen<T extends ScreenHandler> extends Screen {
      */
     protected abstract void drawBackground(int mouseX, int mouseY);
 
-    protected void onClickSlot(Slot slot) { }
+    protected void onClickSlot(Slot slot) {
+    }
 
     @Override
     public void init() {
         super.init();
-        x = (width - backgroundWidth * 2) / 2;
-        y = (height - backgroundHeight * 2) / 2;
+        x = (width - backgroundWidth) / 2;
+        y = (height - backgroundHeight) / 2;
         handler.slots.clear();
         handler.init(x, y);
     }
@@ -105,11 +108,11 @@ public abstract class HandledScreen<T extends ScreenHandler> extends Screen {
 
     private void mouseOverSlotEffect(Slot slot, int mouseX, int mouseY) {
         if (mouseX >= slot.x
-                && mouseX < slot.x + 32
-                && mouseY >= slot.y
-                && mouseY < slot.y + 32) {
+            && mouseX < slot.x + 16
+            && mouseY >= slot.y
+            && mouseY < slot.y + 16) {
             GLStateMgr.disableTexture2D();
-            GlUtils.fillRect(slot.x, slot.y, slot.x + 32, slot.y + 32, 0x80ffffff, true);
+            GlUtils.fillRect(slot.x, slot.y, slot.x + 16, slot.y + 16, 0x80ffffff, true);
             GLStateMgr.enableTexture2D();
             if (Mouse.isMousePress(GLFW_MOUSE_BUTTON_LEFT)) {
                 onClickSlot(slot);
@@ -118,16 +121,18 @@ public abstract class HandledScreen<T extends ScreenHandler> extends Screen {
     }
 
     private void drawSlot(Slot slot) {
-        Item item = slot.item;
+        ItemType item = slot.itemStack;
+        // todo: should be ItemStack::isEmpty
+        if (item == Items.AIR) return;
         glColor3f(1, 1, 1);
-        if (item instanceof BlockItem) {
-            Identifier id = Registry.BLOCK.getId(((BlockItem) item).getBlock());
+        if (item instanceof BlockItemType block) {
+            Identifier id = Registry.BLOCK.getId(block.getBlock());
             client.getTextureManager().bindTexture(new Identifier(id.getNamespace(), "textures/block/" + id.getPath() + ".png"));
         } else {
             Identifier id = Registry.ITEM.getId(item.asItem());
             client.getTextureManager().bindTexture(new Identifier(id.getNamespace(), "textures/item/" + id.getPath() + ".png"));
         }
-        drawTexture(slot.x, slot.y, 32, 32);
+        drawTexture(slot.x, slot.y, 16, 16);
     }
 
     @Override

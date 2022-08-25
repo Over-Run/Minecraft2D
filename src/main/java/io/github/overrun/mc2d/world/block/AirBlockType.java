@@ -22,23 +22,53 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world.item;
+package io.github.overrun.mc2d.world.block;
 
-import io.github.overrun.mc2d.world.block.Block;
+import io.github.overrun.mc2d.client.render.Tesselator;
+import io.github.overrun.mc2d.util.Identifier;
+import io.github.overrun.mc2d.util.shape.VoxelShapes;
+import org.jetbrains.annotations.Nullable;
+import org.overrun.swgl.core.phys.p2d.AABRect2f;
 
 /**
  * @author squid233
  * @since 2021/01/27
  */
-public class BlockItem extends Item {
-    private final Block block;
-
-    public BlockItem(Block block) {
-        this.block = block;
-        Block.BLOCK_ITEMS.put(block, this);
+public class AirBlockType extends BlockType {
+    @Override
+    @Nullable
+    public AABRect2f getOutlineShape() {
+        return VoxelShapes.fullSquare();
     }
 
-    public Block getBlock() {
-        return block;
+    @Override
+    @Nullable
+    public AABRect2f getRayCastingShape() {
+        return VoxelShapes.fullSquare();
+    }
+
+    @Override
+    @Nullable
+    public AABRect2f getCollisionShape() {
+        return VoxelShapes.empty();
+    }
+
+    @Override
+    public boolean isAir() {
+        return true;
+    }
+
+    @Override
+    public boolean isTexTransparency() {
+        return true;
+    }
+
+    @Override
+    public void render(Tesselator t, int x, int y, int z) {
+    }
+
+    @Override
+    public Identifier getTexture() {
+        return null;
     }
 }

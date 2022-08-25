@@ -28,9 +28,9 @@ package io.github.overrun.mc2d.world.item;
  * @author squid233
  * @since 2021/01/27
  */
-public class Item implements ItemConvertible {
+public class ItemType implements ItemConvertible {
     @Override
-    public Item asItem() {
+    public ItemType asItem() {
         return this;
     }
 }

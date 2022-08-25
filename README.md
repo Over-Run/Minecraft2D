@@ -28,6 +28,10 @@ Since 0.6.0, game is distributed with the [Application Plugin](https://docs.grad
 - COMMA/PERIOD (,/.): Change z mode
 - E: Open/close the inventory
 
+## Jvm Arguments
+
+- `-Dmc2d.vsync=<true|false>`: enable or disable v-sync
+
 ## Links
 
 游戏开发交流群 [![游戏开发交流](https://pub.idqqimg.com/wpa/images/group.png)](https://qm.qq.com/cgi-bin/qm/qr?k=efwa2cjVSs-S_UorWELGd45SPTJBTGV6&jump_from=webapi)

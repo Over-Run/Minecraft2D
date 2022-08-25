@@ -26,6 +26,7 @@ package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.util.registry.Registry;
+import io.github.overrun.mc2d.world.item.Items;
 
 /**
  * @author squid233
@@ -35,9 +36,14 @@ public final class CreativeTabScreenHandler extends ScreenHandler {
     @Override
     public void init(int x, int y) {
         super.init(x, y);
-        for (int i = 1; i < Registry.ITEM.size(); i++) {
-            var slot = addSlot(new Slot(x + 18 + (i - 1) % 9 * 36, y + 36 + (i - 1) / 9 * 36));
-            slot.item = Registry.ITEM.getByRawId(i);
+        // content
+        for (int i = 0; i < 45; i++) {
+            var slot = addSlot(new Slot(x + 9 + i % 9 * 18, y + 18 + i / 9 * 18));
+            slot.itemStack = Registry.ITEM.getByRawId(i + 1);
+        }
+        // hot-bar
+        for (int i = 0; i < 10; i++) {
+            addSlot(new Slot(x + 9 + i * 18, y + 112)).itemStack = Items.AIR;
         }
     }
 }

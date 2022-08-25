@@ -26,9 +26,12 @@ package io.github.overrun.mc2d.world;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.Registry;
-import io.github.overrun.mc2d.world.block.Block;
+import io.github.overrun.mc2d.world.block.BlockType;
+import io.github.overrun.mc2d.world.entity.Entity;
+import io.github.overrun.mc2d.world.entity.HumanEntity;
 import io.github.overrun.mc2d.world.entity.PlayerEntity;
 import org.joml.SimplexNoise;
 import org.overrun.swgl.core.phys.p2d.AABRect2f;
@@ -60,6 +63,7 @@ public class World {
     public final int depth;
     public final Timer timer = new Timer(20);
     private final List<IWorldListener> listeners = new ArrayList<>();
+    public final List<Entity> entities = new ArrayList<>();
 
     public World(int w, int h) {
         width = w;
@@ -67,6 +71,9 @@ public class World {
         depth = 2;
         blocks = new Identifier[w * h * depth];
         Arrays.fill(blocks, AIR.getId());
+        for (int i = 0; i < 100; i++) {
+            spawnEntity(new HumanEntity(this));
+        }
     }
 
     private static float sumOctaves(
@@ -126,7 +133,7 @@ public class World {
             for (int z = 0; z < depth; z++) {
                 setBlock(x, 0, z, BEDROCK);
 
-                int layers = (int) sumOctaves(16, x, 0, z, 0.5f, 0.007f, 1, height - 12);
+                int layers = (int) sumOctaves(16, x, 0, z, 0.5f, 0.007f, 1, 64);
                 setBlock(x, layers - 1, z, GRASS_BLOCK);
                 for (int y = layers - 4, c = layers - 1; y < c; y++) {
                     setBlock(x, y, z, DIRT);
@@ -146,13 +153,36 @@ public class World {
         listeners.remove(listener);
     }
 
+    public void spawnEntity(Entity entity) {
+        entities.add(entity);
+    }
+
+    public void update() {
+        timer.update();
+        var player = Mc2dClient.getInstance().player;
+        for (int i = 0; i < timer.ticks; i++) {
+            player.tick();
+            tick();
+        }
+    }
+
+    public void tick() {
+        for (int i = entities.size() - 1; i >= 0; i--) {
+            var entity = entities.get(i);
+            entity.tick();
+            if (entity.removed) {
+                entities.remove(i);
+            }
+        }
+    }
+
     public boolean isInBorder(int x, int y, int z) {
         return x >= getMinX() && x < getMaxX() &&
                y >= getMinY() && y < getMaxY() &&
                z >= getMinZ() && z < getMaxZ();
     }
 
-    public boolean setBlock(int x, int y, int z, Block block) {
+    public boolean setBlock(int x, int y, int z, BlockType block) {
         if (isInBorder(x, y, z)) {
             final int index = getIndex(x, y, z);
             if (blocks[index].equals(block.getId())) {
@@ -167,7 +197,7 @@ public class World {
         return false;
     }
 
-    public Block getBlock(int x, int y, int z) {
+    public BlockType getBlock(int x, int y, int z) {
         if (isInBorder(x, y, z)) {
             return Registry.BLOCK.getById(blocks[getIndex(x, y, z)]);
         }

@@ -32,7 +32,6 @@ import io.github.overrun.mc2d.client.model.BlockModelMgr;
 import io.github.overrun.mc2d.event.KeyCallback;
 import io.github.overrun.mc2d.mod.ModLoader;
 import io.github.overrun.mc2d.text.IText;
-import io.github.overrun.mc2d.text.LiteralText;
 import io.github.overrun.mc2d.util.ImageReader;
 import io.github.overrun.mc2d.util.Language;
 import io.github.overrun.mc2d.util.Options;
@@ -53,21 +52,20 @@ import org.slf4j.Logger;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11C.glViewport;
 
 /**
  * @author squid233
  * @since 2021/01/07
  */
 public final class Main implements Runnable, AutoCloseable {
-    // todo mods screen
+    // todo: mods and options screen
 
     public static final String VERSION = "0.6.0";
-    public static final IText VERSION_TEXT = new LiteralText("Minecraft2D " + VERSION);
+    public static final IText VERSION_TEXT = IText.of("Minecraft2D " + VERSION);
     private static final Logger logger = LogFactory9.getLogger();
     private static int oldX, oldY, oldWidth, oldHeight;
     private final Mc2dClient client = Mc2dClient.getInstance();
-    private final Timer timer = new Timer(Integer.parseInt(System.getProperty("mc2d.tps", "20")));
+    private final Timer timer = new Timer(20);
 
     @Override
     public void run() {
@@ -162,7 +160,7 @@ public final class Main implements Runnable, AutoCloseable {
                 client.world.save(client.player);
             }
         });
-        Window.setSizeCallback((window, width, height) -> resize(width, height));
+        Window.setSizeCallback((window, width, height) -> client.onResize(width, height));
         Window.setFramebufferSizeCallback((window, width, height) -> Framebuffer.setSize(width, height));
         Window.setCursorPosCallback((window, x, y) -> {
             Mouse.mouseX = (int) Math.floor(x);
@@ -184,20 +182,8 @@ public final class Main implements Runnable, AutoCloseable {
         GL.createCapabilities();
         GLStateMgr.init();
         glfwSwapInterval(Boolean.parseBoolean(System.getProperty("mc2d.vsync", "true")) ? 1 : 0);
+        client.onResize(896, 512);
         Window.show();
-        Framebuffer.setSize(896, 512);
-        resize(896, 512);
-    }
-
-    private void resize(int width, int height) {
-        if (client.screen == null) {
-            client.openScreen(null);
-        }
-        Framebuffer.setSize(width, height);
-        if (client.screen != null) {
-            client.screen.init(client, width, height);
-        }
-        glViewport(0, 0, width, height);
     }
 
     @Override

@@ -24,7 +24,7 @@
 
 package io.github.overrun.mc2d.screen.slot;
 
-import io.github.overrun.mc2d.world.item.Item;
+import io.github.overrun.mc2d.world.item.ItemType;
 
 /**
  * @author squid233
@@ -33,7 +33,7 @@ import io.github.overrun.mc2d.world.item.Item;
 public final class Slot {
     public final int x;
     public final int y;
-    public Item item;
+    public ItemType itemStack;
 
     public Slot(int x, int y) {
         this.x = x;

@@ -39,7 +39,7 @@ public abstract class DrawableHelper {
     public static final Identifier OPTIONS_BACKGROUND = new Identifier("textures/gui/options_background.png");
 
     public static void drawCenteredText(TextRenderer renderer, IText text, int centerX, int y) {
-        renderer.drawWithShadow(centerX - (renderer.width(text) >> 1), y, text);
+        renderer.drawWithShadow(centerX - renderer.drawWidth(text) / 2, y, text);
     }
 
     public static void fillGradient(int xStart, int yStart, int xEnd, int yEnd, int colorStart, int colorEnd) {
@@ -99,13 +99,13 @@ public abstract class DrawableHelper {
         glVertex2d(x, y);
         // Left down
         glTexCoord2f((float) u / texW, (float) (v + regionH) / texH);
-        glVertex2d(x, y + (height << 1));
+        glVertex2d(x, y + height);
         // Right down
         glTexCoord2f((float) (u + regionW) / texW, (float) (v + regionH) / texH);
-        glVertex2d(x + (width << 1), y + (height << 1));
+        glVertex2d(x + width, y + height);
         // Right top
         glTexCoord2f((float) (u + regionW) / texW, (float) v / texH);
-        glVertex2d(x + (width << 1), y);
+        glVertex2d(x + width, y);
         glEnd();
     }
 

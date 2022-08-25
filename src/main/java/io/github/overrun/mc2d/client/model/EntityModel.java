@@ -22,15 +22,13 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world.block;
+package io.github.overrun.mc2d.client.model;
 
 /**
+ * A entity model.
+ *
  * @author squid233
  * @since 0.6.0
  */
-public class LeavesBlock extends Block {
-    @Override
-    public boolean isTexTransparency() {
-        return true;
-    }
+public class EntityModel {
 }

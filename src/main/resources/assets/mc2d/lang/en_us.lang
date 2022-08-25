@@ -1,7 +1,9 @@
 language.name=English (United States)
 language.code=en_us
 text.screen.singleplayer=Single-player
+text.screen.multiplayer=Multi-player
 text.screen.mods=Mods
+text.screen.options=Options
 text.screen.exit_game=Exit Game
 itemGroup.name.creativeTab=Creative Tab
 text.screen.title.pausing=Pausing
@@ -11,7 +13,4 @@ text.screen.world.loading=Loading World
 text.screen.world.saving=Saving World
 text.debug.max_memory=Max memory: %s
 text.debug.player.position=Position: %f, %f, %f
-text.debug.player.hand_block=Block on hand: %s
-Point.block.pos=Point block pos: %d, %d, %d
-Point.block=Point block: %s
 text.debug.mod_count=Mod count: %d

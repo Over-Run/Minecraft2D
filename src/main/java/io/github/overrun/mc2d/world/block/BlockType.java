@@ -30,7 +30,7 @@ import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.util.shape.VoxelShapes;
 import io.github.overrun.mc2d.world.World;
-import io.github.overrun.mc2d.world.item.Item;
+import io.github.overrun.mc2d.world.item.ItemType;
 import io.github.overrun.mc2d.world.item.ItemConvertible;
 import io.github.overrun.mc2d.world.item.Items;
 import org.jetbrains.annotations.Nullable;
@@ -43,8 +43,8 @@ import java.util.Map;
  * @author squid233
  * @since 2021/01/09
  */
-public class Block implements ItemConvertible {
-    public static final Map<Block, Item> BLOCK_ITEMS = new HashMap<>();
+public class BlockType implements ItemConvertible {
+    public static final Map<BlockType, ItemType> BLOCK_ITEMS = new HashMap<>();
 
     @Nullable
     public AABRect2f getOutlineShape() {
@@ -109,7 +109,7 @@ public class Block implements ItemConvertible {
     }
 
     @Override
-    public Item asItem() {
+    public ItemType asItem() {
         return BLOCK_ITEMS.getOrDefault(this, Items.AIR);
     }
 }

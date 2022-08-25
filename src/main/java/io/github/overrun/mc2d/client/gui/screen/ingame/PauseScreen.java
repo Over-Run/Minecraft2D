@@ -51,14 +51,14 @@ public final class PauseScreen extends Screen {
         if (client.world != null) {
             client.world.save(client.player);
         }
-        addButton(new ButtonWidget((width >> 1) - 300,
-            90,
+        addButton(new ButtonWidget(width / 2 - 150,
+            80,
             300,
             20,
             new TranslatableText("text.screen.back_to_game"),
             b -> onClose()));
-        addButton(new ButtonWidget((width >> 1) - 300,
-            140,
+        addButton(new ButtonWidget(width / 2 - 150,
+            110,
             300,
             20,
             new TranslatableText("text.screen.save_and_back"),
@@ -69,7 +69,7 @@ public final class PauseScreen extends Screen {
     public void render(int mouseX, int mouseY, float delta) {
         renderBackground();
         super.render(mouseX, mouseY, delta);
-        drawCenteredText(textRenderer, title.setStyle(Style.EMPTY.withColor(TextColor.WHITE)), width >> 1, 50);
+        drawCenteredText(textRenderer, title.setStyle(Style.EMPTY.withColor(TextColor.WHITE)), width / 2, 50);
     }
 
     @Override

@@ -42,31 +42,35 @@ public final class TextRenderer {
         this.client = client;
     }
 
-    public void draw(int x, int y, char c, int rgba) {
+    public void draw(double x, double y, char c, int rgba) {
         var r = rgba << 8 >>> 24;
         var g = rgba << 16 >>> 24;
         var b = rgba << 24 >>> 24;
         var a = rgba >>> 24;
-        float inv = 1.0f / 255.0f;
-        int width = width();
-        int height = height();
-        int u = c % 256 * width;
-        int v = c / 256 * height;
-        int texW = 4096;
-        int texH = 4096;
+        final float inv = 1.0f / 255.0f;
+        double width = width() * client.invGuiScale;
+        double height = height() * client.invGuiScale;
+        int regionWidth = width();
+        int regionHeight = height();
+        int u = c % 256 * regionWidth;
+        int v = c / 256 * regionHeight;
+        final int texW = 4096;
+        final int texH = 4096;
+        double x1 = (x + width);
+        double y1 = (y + height);
         glColor4f(r * inv, g * inv, b * inv, a * inv);
         // Left top
         glTexCoord2f((float) u / texW, (float) v / texH);
         glVertex2d(x, y);
         // Left down
-        glTexCoord2f((float) u / texW, (float) (v + height) / texH);
-        glVertex2d(x, y + height);
+        glTexCoord2f((float) u / texW, (float) (v + regionHeight) / texH);
+        glVertex2d(x, y1);
         // Right down
-        glTexCoord2f((float) (u + width) / texW, (float) (v + height) / texH);
-        glVertex2d(x + width, y + height);
+        glTexCoord2f((float) (u + regionWidth) / texW, (float) (v + regionHeight) / texH);
+        glVertex2d(x1, y1);
         // Right top
-        glTexCoord2f((float) (u + width) / texW, (float) v / texH);
-        glVertex2d(x + width, y);
+        glTexCoord2f((float) (u + regionWidth) / texW, (float) v / texH);
+        glVertex2d(x1, y);
     }
 
     public void drawWithShadow(int x, int y, IText text) {
@@ -81,10 +85,10 @@ public final class TextRenderer {
         glBegin(GL_QUADS);
         for (char c : chars) {
             if (shadow) {
-                draw(currX + 1, y + 1, c, text.getStyle().getColor().bgColor());
+                draw(currX + client.invGuiScale, y + client.invGuiScale, c, text.getStyle().getColor().bgColor());
             }
             draw(currX, y, c, text.getStyle().getColor().fgColor());
-            currX += width(c);
+            currX += drawWidth(c);
         }
         glEnd();
     }
@@ -93,23 +97,38 @@ public final class TextRenderer {
         draw(x, y, text, false);
     }
 
-    public int width(IText text) {
+    public int drawWidth(IText text) {
         int width = 0;
         for (char c : text.asString().toCharArray()) {
-            width += width(c);
+            width += drawWidth(c);
         }
         return width;
     }
 
-    public int width(char c) {
-        if (c > 31 && c < 256) return 8;
-        return 16;
+    public int drawWidth(char c) {
+        final double s = client.invGuiScale;
+        if (c > 31 && c < 256) return (int) (8 * s);
+        return (int) (16 * s);
     }
 
+    public int drawHeight() {
+        return (int) (16 * client.invGuiScale);
+    }
+
+    /**
+     * Returns the glyph width.
+     *
+     * @return the glyph width
+     */
     public int width() {
         return 16;
     }
 
+    /**
+     * Returns the glyph height.
+     *
+     * @return the glyph height
+     */
     public int height() {
         return 16;
     }

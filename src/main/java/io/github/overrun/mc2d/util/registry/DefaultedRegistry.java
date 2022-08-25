@@ -85,7 +85,7 @@ public class DefaultedRegistry<T> extends MutableRegistry<T> {
 
     @Override
     public T getByRawId(int rawId) {
-        return entries.get(rawId);
+        return entries.size() > rawId ? entries.get(rawId) : getDefaultEntry();
     }
 
     @Override
