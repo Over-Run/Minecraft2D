@@ -25,6 +25,7 @@
 package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.screen.slot.Slot;
+import io.github.overrun.mc2d.world.entity.PlayerEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,11 @@ import java.util.List;
  */
 public abstract class ScreenHandler {
     public final List<Slot> slots = new ArrayList<>();
+    public final PlayerEntity player;
+
+    public ScreenHandler(PlayerEntity player) {
+        this.player = player;
+    }
 
     public Slot addSlot(Slot slot) {
         slots.add(slot);

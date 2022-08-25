@@ -30,20 +30,20 @@ import io.github.overrun.mc2d.client.gui.screen.Screen;
 import io.github.overrun.mc2d.client.gui.screen.TitleScreen;
 import io.github.overrun.mc2d.client.gui.screen.ingame.CreativeTabScreen;
 import io.github.overrun.mc2d.client.gui.screen.ingame.PauseScreen;
+import io.github.overrun.mc2d.client.gui.widget.AbstractButtonWidget;
+import io.github.overrun.mc2d.client.model.BlockModelMgr;
 import io.github.overrun.mc2d.client.world.render.WorldRenderer;
 import io.github.overrun.mc2d.mod.ModLoader;
 import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.text.TranslatableText;
-import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.Options;
 import io.github.overrun.mc2d.world.World;
 import io.github.overrun.mc2d.world.entity.HumanEntity;
 import io.github.overrun.mc2d.world.entity.PlayerEntity;
+import io.github.overrun.mc2d.world.item.BlockItemType;
 import org.jetbrains.annotations.Nullable;
 
 import static io.github.overrun.mc2d.client.gui.DrawableHelper.drawTexture;
-import static io.github.overrun.mc2d.util.registry.Registry.BLOCK;
-import static io.github.overrun.mc2d.world.block.Blocks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
@@ -116,15 +116,30 @@ public final class Mc2dClient implements AutoCloseable {
                 if (ModLoader.getModCount() > 0) {
                     textRenderer.draw(0, 119, new TranslatableText("text.debug.mod_count", ModLoader.getModCount()));
                 }
-            } else {
-                glPushMatrix();
-                glTranslatef(width - 32, 0, 0);
-                Identifier id = BLOCK.getId(player.mainHand);
-                glColor3f(1, 1, 1);
-                textureManager.bindTexture(new Identifier(id.getNamespace(), "textures/block/" + id.getPath() + ".png"));
-                drawTexture(0, 0, 32, 32);
-                glPopMatrix();
             }
+            textureManager.bindTexture(AbstractButtonWidget.WIDGETS_LOCATION);
+            glPushMatrix();
+            double hotBarX = (width - 202) / 2.;
+            glTranslated(hotBarX, height, 0);
+            drawTexture(0, -22, 0, 0, 202, 22);
+            drawTexture(player.hotBarNum * 20, -24, 1, 22, 22, 24);
+            textureManager.bindTexture(BlockModelMgr.BLOCK_ATLAS);
+            for (int i = 0; i < 10; i++) {
+                var stack = player.hotBar[i];
+                if (stack.isEmpty() || !(stack.getItem().asItem() instanceof BlockItemType blockItemType)) continue;
+                var tex = BlockModelMgr.blockTexture(blockItemType.getBlock().getTexture());
+                int u0 = BlockModelMgr.getBlockAtlas().getU0(tex);
+                int v0 = BlockModelMgr.getBlockAtlas().getV0(tex);
+                // todo: atlas::width(tex)
+                drawTexture(3 + i * 20, -19,
+                    u0, v0,
+                    BlockModelMgr.getBlockAtlas().getU1(tex) - u0,
+                    BlockModelMgr.getBlockAtlas().getV1(tex) - v0,
+                    16, 16,
+                    BlockModelMgr.getBlockAtlas().width(),
+                    BlockModelMgr.getBlockAtlas().height());
+            }
+            glPopMatrix();
         }
     }
 
@@ -151,13 +166,16 @@ public final class Mc2dClient implements AutoCloseable {
                     world.timer.timescale = 0.0;
                 }
                 case GLFW_KEY_ENTER -> world.save(player);
-                case GLFW_KEY_1 -> player.mainHand = GRASS_BLOCK;
-                case GLFW_KEY_2 -> player.mainHand = STONE;
-                case GLFW_KEY_3 -> player.mainHand = DIRT;
-                case GLFW_KEY_4 -> player.mainHand = COBBLESTONE;
-                case GLFW_KEY_5 -> player.mainHand = BEDROCK;
-                case GLFW_KEY_6 -> player.mainHand = OAK_LOG;
-                case GLFW_KEY_7 -> player.mainHand = OAK_LEAVES;
+                case GLFW_KEY_1 -> player.hotBarNum = 0;
+                case GLFW_KEY_2 -> player.hotBarNum = 1;
+                case GLFW_KEY_3 -> player.hotBarNum = 2;
+                case GLFW_KEY_4 -> player.hotBarNum = 3;
+                case GLFW_KEY_5 -> player.hotBarNum = 4;
+                case GLFW_KEY_6 -> player.hotBarNum = 5;
+                case GLFW_KEY_7 -> player.hotBarNum = 6;
+                case GLFW_KEY_8 -> player.hotBarNum = 7;
+                case GLFW_KEY_9 -> player.hotBarNum = 8;
+                case GLFW_KEY_0 -> player.hotBarNum = 9;
                 case GLFW_KEY_F3 -> debugging = !debugging;
                 // z || , || .
                 case GLFW_KEY_Z, GLFW_KEY_COMMA, GLFW_KEY_PERIOD -> {

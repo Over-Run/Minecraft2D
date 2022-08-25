@@ -31,8 +31,7 @@ import io.github.overrun.mc2d.client.gui.Framebuffer;
 import io.github.overrun.mc2d.client.model.PlayerEntityModel;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.world.World;
-import io.github.overrun.mc2d.world.block.BlockType;
-import io.github.overrun.mc2d.world.block.Blocks;
+import io.github.overrun.mc2d.world.item.ItemStack;
 
 import java.io.IOException;
 
@@ -48,13 +47,33 @@ public class PlayerEntity extends Entity {
     public static final Identifier TEXTURE = new Identifier("textures/entity/player.png");
     private static final long PLAYER_VERSION = 2L;
     public static final PlayerEntityModel model = new PlayerEntityModel();
-    public BlockType mainHand = Blocks.GRASS_BLOCK;
+    public int hotBarNum = 0;
+    public final ItemStack[] hotBar = new ItemStack[]{
+        ItemStack.ofEmpty(),
+        ItemStack.ofEmpty(),
+        ItemStack.ofEmpty(),
+        ItemStack.ofEmpty(),
+        ItemStack.ofEmpty(),
+        ItemStack.ofEmpty(),
+        ItemStack.ofEmpty(),
+        ItemStack.ofEmpty(),
+        ItemStack.ofEmpty(),
+        ItemStack.ofEmpty()
+    };
     public boolean facingRight = true;
     private int animation = 0;
 
     public PlayerEntity(World world) {
         super(world);
         setPosition(Math.random() * world.width, world.height + 10, 1.5);
+    }
+
+    public void setItemMainHand(ItemStack item) {
+        hotBar[hotBarNum] = item;
+    }
+
+    public ItemStack getItemMainHand() {
+        return hotBar[hotBarNum];
     }
 
     public double processInput() {

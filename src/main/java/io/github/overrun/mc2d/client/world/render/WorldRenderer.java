@@ -35,6 +35,7 @@ import io.github.overrun.mc2d.world.World;
 import io.github.overrun.mc2d.world.block.BlockType;
 import io.github.overrun.mc2d.world.block.Blocks;
 import io.github.overrun.mc2d.world.entity.HumanEntity;
+import io.github.overrun.mc2d.world.item.BlockItemType;
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import org.joml.Intersectiond;
@@ -207,7 +208,10 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
             int z = hitResult.z;
             if (target.isAir()) {
                 if (isMousePress(GLFW_MOUSE_BUTTON_RIGHT)) {
-                    world.setBlock(x, y, z, client.player.mainHand);
+                    var stack = client.player.getItemMainHand();
+                    if (!stack.isEmpty() && stack.getItem().asItem() instanceof BlockItemType blockItemType) {
+                        world.setBlock(x, y, z, blockItemType.getBlock());
+                    }
                 }
             } else if (isMousePress(GLFW_MOUSE_BUTTON_LEFT)) {
                 world.setBlock(x, y, z, Blocks.AIR);

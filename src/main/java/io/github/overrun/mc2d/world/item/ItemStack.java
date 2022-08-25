@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2022 Overrun Organization
+ * Copyright (c) 2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,33 +22,56 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.screen;
+package io.github.overrun.mc2d.world.item;
 
-import io.github.overrun.mc2d.screen.slot.Slot;
-import io.github.overrun.mc2d.util.registry.Registry;
-import io.github.overrun.mc2d.world.entity.PlayerEntity;
-import io.github.overrun.mc2d.world.item.ItemStack;
+import org.joml.Math;
 
 /**
  * @author squid233
- * @since 2021/01/25
+ * @since 0.6.0
  */
-public final class CreativeTabScreenHandler extends ScreenHandler {
-    public CreativeTabScreenHandler(PlayerEntity player) {
-        super(player);
+public final class ItemStack {
+    private ItemConvertible item;
+    private int count;
+
+    private ItemStack(ItemConvertible item, int count) {
+        this.item = item;
+        this.count = count;
     }
 
-    @Override
-    public void init(int x, int y) {
-        super.init(x, y);
-        // content
-        for (int i = 0; i < 45; i++) {
-            var slot = addSlot(new Slot(x + 9 + i % 9 * 18, y + 18 + i / 9 * 18));
-            slot.itemStack = ItemStack.of(Registry.ITEM.getByRawId(i + 1));
-        }
-        // hot-bar
-        for (int i = 0; i < 10; i++) {
-            addSlot(new Slot(x + 9 + i * 18, y + 112)).itemStack = player.hotBar[i];
-        }
+    public static ItemStack of(ItemConvertible item, int count) {
+        return new ItemStack(item, count);
+    }
+
+    public static ItemStack of(ItemConvertible item) {
+        return of(item, 1);
+    }
+
+    public static ItemStack ofEmpty() {
+        return of(Items.AIR, 0);
+    }
+
+    public void setItem(ItemConvertible item) {
+        this.item = item != null ? item : Items.AIR;
+    }
+
+    public void setCount(int count) {
+        this.count = Math.clamp(0, 999, count);
+    }
+
+    public void increment() {
+        setCount(count + 1);
+    }
+
+    public void decrement() {
+        setCount(count - 1);
+    }
+
+    public ItemConvertible getItem() {
+        return item;
+    }
+
+    public boolean isEmpty() {
+        return item == Items.AIR || count < 1 || item.asItem() == Items.AIR;
     }
 }

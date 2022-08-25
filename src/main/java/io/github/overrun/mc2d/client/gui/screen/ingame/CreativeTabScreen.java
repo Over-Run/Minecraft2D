@@ -24,13 +24,12 @@
 
 package io.github.overrun.mc2d.client.gui.screen.ingame;
 
-import io.github.overrun.mc2d.world.entity.PlayerEntity;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
-import io.github.overrun.mc2d.world.item.BlockItemType;
 import io.github.overrun.mc2d.screen.CreativeTabScreenHandler;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.text.TranslatableText;
 import io.github.overrun.mc2d.util.Identifier;
+import io.github.overrun.mc2d.world.entity.PlayerEntity;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
 
@@ -44,7 +43,7 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
     private final PlayerEntity player;
 
     public CreativeTabScreen(PlayerEntity player, Screen parent) {
-        super(new CreativeTabScreenHandler(), new TranslatableText("itemGroup.name.creativeTab"));
+        super(new CreativeTabScreenHandler(player), new TranslatableText("itemGroup.name.creativeTab"));
         this.player = player;
         this.parent = parent;
     }
@@ -52,8 +51,8 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
     @Override
     protected void onClickSlot(Slot slot) {
         super.onClickSlot(slot);
-        if (slot.itemStack instanceof BlockItemType item && !item.getBlock().isAir()) {
-            player.mainHand = item.getBlock();
+        if (!slot.itemStack.isEmpty()) {
+            player.setItemMainHand(slot.itemStack);
         }
     }
 

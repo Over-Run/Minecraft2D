@@ -28,20 +28,18 @@ import io.github.overrun.mc2d.client.Mouse;
 import io.github.overrun.mc2d.client.TextureManager;
 import io.github.overrun.mc2d.client.gui.DrawableHelper;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
-import io.github.overrun.mc2d.world.item.BlockItemType;
-import io.github.overrun.mc2d.world.item.ItemType;
+import io.github.overrun.mc2d.client.model.BlockModelMgr;
 import io.github.overrun.mc2d.screen.ScreenHandler;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.text.TextColor;
 import io.github.overrun.mc2d.util.GlUtils;
 import io.github.overrun.mc2d.util.Identifier;
-import io.github.overrun.mc2d.util.registry.Registry;
-import io.github.overrun.mc2d.world.item.Items;
+import io.github.overrun.mc2d.world.item.BlockItemType;
 import org.overrun.swgl.core.gl.GLStateMgr;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glColor3f;
 
 /**
  * @author squid233
@@ -121,18 +119,23 @@ public abstract class HandledScreen<T extends ScreenHandler> extends Screen {
     }
 
     private void drawSlot(Slot slot) {
-        ItemType item = slot.itemStack;
-        // todo: should be ItemStack::isEmpty
-        if (item == Items.AIR) return;
+        if (slot.itemStack.isEmpty()) return;
         glColor3f(1, 1, 1);
-        if (item instanceof BlockItemType block) {
-            Identifier id = Registry.BLOCK.getId(block.getBlock());
-            client.getTextureManager().bindTexture(new Identifier(id.getNamespace(), "textures/block/" + id.getPath() + ".png"));
-        } else {
-            Identifier id = Registry.ITEM.getId(item.asItem());
-            client.getTextureManager().bindTexture(new Identifier(id.getNamespace(), "textures/item/" + id.getPath() + ".png"));
+        // todo: give block and item model
+        if (slot.itemStack.getItem().asItem() instanceof BlockItemType block) {
+            client.getTextureManager().bindTexture(BlockModelMgr.BLOCK_ATLAS);
+            var tex = BlockModelMgr.blockTexture(block.getBlock().getTexture());
+            int u0 = BlockModelMgr.getBlockAtlas().getU0(tex);
+            int v0 = BlockModelMgr.getBlockAtlas().getV0(tex);
+            // todo: atlas::width(tex)
+            drawTexture(slot.x, slot.y,
+                u0, v0,
+                BlockModelMgr.getBlockAtlas().getU1(tex) - u0,
+                BlockModelMgr.getBlockAtlas().getV1(tex) - v0,
+                16, 16,
+                BlockModelMgr.getBlockAtlas().width(),
+                BlockModelMgr.getBlockAtlas().height());
         }
-        drawTexture(slot.x, slot.y, 16, 16);
     }
 
     @Override
