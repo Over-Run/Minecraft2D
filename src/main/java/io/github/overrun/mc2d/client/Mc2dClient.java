@@ -35,7 +35,7 @@ import io.github.overrun.mc2d.client.world.render.WorldRenderer;
 import io.github.overrun.mc2d.event.KeyCallback;
 import io.github.overrun.mc2d.mod.ModLoader;
 import io.github.overrun.mc2d.screen.CreativeTabScreenHandler;
-import io.github.overrun.mc2d.screen.inv.ingame.CreativeTabInventory;
+import io.github.overrun.mc2d.screen.inv.CreativeTabInventory;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.text.TranslatableText;

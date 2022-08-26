@@ -22,9 +22,8 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.screen.inv.ingame;
+package io.github.overrun.mc2d.screen.inv;
 
-import io.github.overrun.mc2d.screen.inv.IInventory;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.world.entity.PlayerEntity;

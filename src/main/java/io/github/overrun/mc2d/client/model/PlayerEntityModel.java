@@ -55,7 +55,6 @@ public class PlayerEntityModel extends EntityModel implements AutoCloseable {
         var v09 = new Vertex(-0.125f, -0.75f, 0);
         var v10 = new Vertex(0.125f, -0.75f, 0);
         var v11 = new Vertex(0.125f, 0, 0);
-        //todo
         final float w = 40;
         final float h = 32;
         headR = new Cube(new Polygon(v00.remap(0, 0), v01.remap(0, 8 / h), v02.remap(8 / w, 8 / h), v03.remap(8 / w, 0)));

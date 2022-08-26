@@ -28,7 +28,6 @@ import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.TextRenderer;
 import io.github.overrun.mc2d.client.model.BlockModelMgr;
 import io.github.overrun.mc2d.text.TextColor;
-import io.github.overrun.mc2d.world.item.BlockItemType;
 import io.github.overrun.mc2d.world.item.ItemStack;
 
 import static io.github.overrun.mc2d.client.gui.DrawableHelper.drawTexture;
@@ -51,27 +50,25 @@ public class ItemRenderer {
         if (stack.isEmpty()) return;
         glColor3f(1, 1, 1);
         // todo: give block and item model
-        if (stack.getItem() instanceof BlockItemType blockItemType) {
-            client.getTextureManager().bindTexture(BlockModelMgr.BLOCK_ATLAS);
-            var tex = BlockModelMgr.blockTexture(blockItemType.getBlock().getTexture());
-            final var atlas = BlockModelMgr.getBlockAtlas();
-            drawTexture(x, y,
-                atlas.getU0(tex),
-                atlas.getV0(tex),
-                atlas.getWidth(tex),
-                atlas.getHeight(tex),
-                16, 16,
-                atlas.width(),
-                atlas.height());
-            if (stack.getCount() > 1) {
-                var text = String.valueOf(stack.getCount());
-                textRenderer.draw((int) (x + 16 - textRenderer.drawWidth(text)),
-                    (int) (y + textRenderer.drawHeight()),
-                    text,
-                    TextColor.WHITE.bgColor(),
-                    TextColor.WHITE.fgColor(),
-                    true);
-            }
+        client.getTextureManager().bindTexture(BlockModelMgr.BLOCK_ATLAS);
+        var tex = BlockModelMgr.blockTexture(stack.getItem().getTexture());
+        final var atlas = BlockModelMgr.getBlockAtlas();
+        drawTexture(x, y,
+            atlas.getU0(tex),
+            atlas.getV0(tex),
+            atlas.getWidth(tex),
+            atlas.getHeight(tex),
+            16, 16,
+            atlas.width(),
+            atlas.height());
+        if (stack.getCount() > 1) {
+            var text = String.valueOf(stack.getCount());
+            textRenderer.draw((int) (x + 16 - textRenderer.drawWidth(text)),
+                (int) (y + textRenderer.drawHeight()),
+                text,
+                TextColor.WHITE.bgColor(),
+                TextColor.WHITE.fgColor(),
+                true);
         }
     }
 }

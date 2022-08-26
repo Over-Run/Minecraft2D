@@ -219,10 +219,10 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
 
     public void renderEntities(float delta) {
         final double inv32 = 1. / 32.;
-        int rx = (int) Math.ceil(client.window.getWidth() * .5 * inv32);
-        int ry = (int) Math.ceil(client.window.getHeight() * .5 * inv32);
-        int ox = (int) Math.floor(client.player.lerpPos.x);
-        int oy = (int) Math.floor(client.player.lerpPos.y);
+        double rx = client.window.getWidth() * .5 * inv32;
+        double ry = client.window.getHeight() * .5 * inv32;
+        double ox = client.player.lerpPos.x;
+        double oy = client.player.lerpPos.y;
         for (var entity : world.entities) {
             if (entity instanceof HumanEntity human) {
                 if (entity.box.minX() > ox + rx ||

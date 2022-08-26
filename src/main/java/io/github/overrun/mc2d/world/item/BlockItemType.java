@@ -24,6 +24,7 @@
 
 package io.github.overrun.mc2d.world.item;
 
+import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.world.block.BlockType;
 
 /**
@@ -40,5 +41,10 @@ public class BlockItemType extends ItemType {
 
     public BlockType getBlock() {
         return block;
+    }
+
+    @Override
+    public Identifier getTexture() {
+        return getBlock().getTexture();
     }
 }

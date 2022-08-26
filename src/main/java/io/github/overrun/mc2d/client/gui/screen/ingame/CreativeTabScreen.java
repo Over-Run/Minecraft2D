@@ -64,6 +64,7 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
                 // todo: press shift -> ::transferItem
             } else {
                 stack.set(invStack);
+                // ::transferItem
                 if (button == GLFW_MOUSE_BUTTON_MIDDLE || Keyboard.isKeyPress(GLFW_KEY_LEFT_SHIFT)) {
                     stack.setCount(stack.getMaxCount());
                 }
@@ -83,14 +84,14 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
                     }
                 } else {
                     if (button == GLFW_MOUSE_BUTTON_LEFT) {
-                        var oldStack = playerInventory.getStack(slot.id());
-                        if (stack.getItem() == oldStack.getItem()) {
+                        if (stack.getItem() == invStack.getItem()) {
                             // merge
-                            oldStack.increment(stack.getCount());
-                            stack.setCount(0);
+                            int oldCount = invStack.getCount();
+                            invStack.increment(stack.getCount());
+                            stack.setCount(Math.max(0, oldCount + stack.getCount() - invStack.getMaxCount()));
                         } else {
                             // swap
-                            var copyOldStack = ItemStack.copyOf(playerInventory.getStack(slot.id()));
+                            var copyOldStack = ItemStack.copyOf(invStack);
                             playerInventory.setStack(slot.id(), ItemStack.copyOf(stack));
                             stack.set(copyOldStack);
                         }
@@ -104,6 +105,7 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
             } else {
                 if (!invStack.isEmpty()) {
                     if (button == GLFW_MOUSE_BUTTON_LEFT) {
+                        // ::transferItem
                         if (!Keyboard.isKeyPress(GLFW_KEY_LEFT_SHIFT)) {
                             stack.set(invStack);
                         }

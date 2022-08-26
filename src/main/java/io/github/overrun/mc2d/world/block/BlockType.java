@@ -74,14 +74,6 @@ public class BlockType implements ItemConvertible {
         return false;
     }
 
-    public final int getRawId() {
-        return Registry.BLOCK.getRawId(this);
-    }
-
-    public final Identifier getId() {
-        return Registry.BLOCK.getId(this);
-    }
-
     public boolean shouldRender(World world, int x, int y, int z) {
         return z == 1 || (world.getBlock(x, y, 1).isTexTransparency());
     }
@@ -106,6 +98,14 @@ public class BlockType implements ItemConvertible {
 
     public Identifier getTexture() {
         return getId();
+    }
+
+    public final int getRawId() {
+        return Registry.BLOCK.getRawId(this);
+    }
+
+    public final Identifier getId() {
+        return Registry.BLOCK.getId(this);
     }
 
     @Override

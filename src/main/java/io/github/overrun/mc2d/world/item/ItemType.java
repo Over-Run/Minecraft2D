@@ -24,11 +24,31 @@
 
 package io.github.overrun.mc2d.world.item;
 
+import io.github.overrun.mc2d.util.Identifier;
+import io.github.overrun.mc2d.util.registry.Registry;
+
 /**
  * @author squid233
  * @since 2021/01/27
  */
 public class ItemType implements ItemConvertible {
+    public Identifier getTexture() {
+        return getId();
+    }
+
+    public final int getRawId() {
+        return Registry.ITEM.getRawId(this);
+    }
+
+    public final Identifier getId() {
+        return Registry.ITEM.getId(this);
+    }
+
+    @Override
+    public String toString() {
+        return getId().toString();
+    }
+
     @Override
     public ItemType asItem() {
         return this;
