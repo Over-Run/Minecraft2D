@@ -24,7 +24,6 @@
 
 package io.github.overrun.mc2d.client.gui.screen.ingame;
 
-import io.github.overrun.mc2d.client.Mouse;
 import io.github.overrun.mc2d.client.TextureManager;
 import io.github.overrun.mc2d.client.gui.DrawableHelper;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
@@ -112,7 +111,7 @@ public abstract class HandledScreen<T extends ScreenHandler> extends Screen {
             GLStateMgr.disableTexture2D();
             GlUtils.fillRect(slot.x, slot.y, slot.x + 16, slot.y + 16, 0x80ffffff, true);
             GLStateMgr.enableTexture2D();
-            if (Mouse.isMousePress(GLFW_MOUSE_BUTTON_LEFT)) {
+            if (client.mouse.isBtnDown(GLFW_MOUSE_BUTTON_LEFT)) {
                 onClickSlot(slot);
             }
         }

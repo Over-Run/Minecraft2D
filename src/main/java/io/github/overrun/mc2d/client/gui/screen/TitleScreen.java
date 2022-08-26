@@ -24,15 +24,15 @@
 
 package io.github.overrun.mc2d.client.gui.screen;
 
-import io.github.overrun.mc2d.Main;
-import io.github.overrun.mc2d.world.entity.PlayerEntity;
+import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.gui.screen.world.LoadingWorldScreen;
 import io.github.overrun.mc2d.client.gui.widget.ButtonWidget;
 import io.github.overrun.mc2d.client.world.render.WorldRenderer;
-import io.github.overrun.mc2d.world.World;
 import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.text.TranslatableText;
 import io.github.overrun.mc2d.util.Identifier;
+import io.github.overrun.mc2d.world.World;
+import io.github.overrun.mc2d.world.entity.PlayerEntity;
 
 import static org.lwjgl.glfw.GLFW.glfwGetCurrentContext;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
@@ -103,7 +103,7 @@ public final class TitleScreen extends Screen {
         glColor4f(1, 1, 1, 1);
         client.getTextureManager().bindTexture(LOGO);
         drawTexture(width * .5 - 101, 15, 202, 42);
-        textRenderer.draw(0, height - client.textRenderer.drawHeight(), Main.VERSION_TEXT);
+        textRenderer.draw(0, height - client.textRenderer.drawHeight(), Mc2dClient.VERSION_TEXT);
     }
 
     @Override

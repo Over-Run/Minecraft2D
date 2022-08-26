@@ -25,7 +25,6 @@
 package io.github.overrun.mc2d.client.world.render;
 
 import io.github.overrun.mc2d.client.Mc2dClient;
-import io.github.overrun.mc2d.client.gui.Framebuffer;
 import io.github.overrun.mc2d.client.model.BlockModelMgr;
 import io.github.overrun.mc2d.client.world.ClientChunk;
 import io.github.overrun.mc2d.util.GlUtils;
@@ -45,11 +44,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static io.github.overrun.mc2d.client.Mouse.isMousePress;
 import static io.github.overrun.mc2d.world.Chunk.CHUNK_SIZE;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glColor3f;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 
 /**
@@ -102,8 +100,8 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
 
     public void forVisibleChunk(Consumer<ClientChunk> consumer) {
         final double inv32 = 1. / 32.;
-        int rx = (int) Math.ceil(Framebuffer.width * .5 * inv32);
-        int ry = (int) Math.ceil(Framebuffer.height * .5 * inv32);
+        int rx = (int) Math.ceil(client.window.getWidth() * .5 * inv32);
+        int ry = (int) Math.ceil(client.window.getHeight() * .5 * inv32);
         int ox = (int) Math.floor(client.player.lerpPos.x);
         int oy = (int) Math.floor(client.player.lerpPos.y);
         for (int y = Math.max(world.getMinY(), oy - ry) / CHUNK_SIZE, my = Math.min(world.getMaxY(), oy + ry) / CHUNK_SIZE;
@@ -145,8 +143,8 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         BlockType target = null;
         int targetX = 0, targetY = 0;
         final double inv32 = 1. / 32.;
-        int rx = (int) Math.ceil(Framebuffer.width * .5 * inv32);
-        int ry = (int) Math.ceil(Framebuffer.height * .5 * inv32);
+        int rx = (int) Math.ceil(client.window.getWidth() * .5 * inv32);
+        int ry = (int) Math.ceil(client.window.getHeight() * .5 * inv32);
         int ox = (int) Math.floor(client.player.lerpPos.x);
         int oy = (int) Math.floor(client.player.lerpPos.y);
         for (int y = Math.max(world.getMinY(), oy - ry), my = Math.min(world.getMaxY(), oy + ry);
@@ -163,8 +161,8 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
                 double bx1 = x + shape.maxX();
                 double by1 = y + shape.maxY();
                 if (Intersectiond.testPointAar(
-                    ((mouseX - (Framebuffer.width * .5f)) * inv32 + client.player.lerpPos.x()),
-                    ((mouseY - (Framebuffer.height * .5f)) * inv32 + client.player.lerpPos.y()),
+                    ((mouseX - (client.window.getWidth() * .5f)) * inv32 + client.player.lerpPos.x()),
+                    ((mouseY - (client.window.getHeight() * .5f)) * inv32 + client.player.lerpPos.y()),
                     bx0, by0, bx1, by1
                 )) {
                     target = block;
@@ -207,13 +205,13 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
             int y = hitResult.y;
             int z = hitResult.z;
             if (target.isAir()) {
-                if (isMousePress(GLFW_MOUSE_BUTTON_RIGHT)) {
+                if (client.mouse.isBtnDown(GLFW_MOUSE_BUTTON_RIGHT)) {
                     var stack = client.player.getItemMainHand();
                     if (!stack.isEmpty() && stack.getItem().asItem() instanceof BlockItemType blockItemType) {
                         world.setBlock(x, y, z, blockItemType.getBlock());
                     }
                 }
-            } else if (isMousePress(GLFW_MOUSE_BUTTON_LEFT)) {
+            } else if (client.mouse.isBtnDown(GLFW_MOUSE_BUTTON_LEFT)) {
                 world.setBlock(x, y, z, Blocks.AIR);
             }
         }
@@ -221,8 +219,8 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
 
     public void renderEntities(float delta) {
         final double inv32 = 1. / 32.;
-        int rx = (int) Math.ceil(Framebuffer.width * .5 * inv32);
-        int ry = (int) Math.ceil(Framebuffer.height * .5 * inv32);
+        int rx = (int) Math.ceil(client.window.getWidth() * .5 * inv32);
+        int ry = (int) Math.ceil(client.window.getHeight() * .5 * inv32);
         int ox = (int) Math.floor(client.player.lerpPos.x);
         int oy = (int) Math.floor(client.player.lerpPos.y);
         for (var entity : world.entities) {

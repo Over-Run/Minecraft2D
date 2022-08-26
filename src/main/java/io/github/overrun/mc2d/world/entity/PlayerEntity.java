@@ -27,7 +27,6 @@ package io.github.overrun.mc2d.world.entity;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import io.github.overrun.mc2d.client.Mc2dClient;
-import io.github.overrun.mc2d.client.gui.Framebuffer;
 import io.github.overrun.mc2d.client.model.PlayerEntityModel;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.world.World;
@@ -93,7 +92,8 @@ public class PlayerEntity extends Entity {
         if (moveL || moveR) {
             animation++;
         } else {
-            if (animation > 1) animation = 1;
+            if (animation > 4) animation %= 4;
+            else if (animation > 0) animation--;
             else animation = 0;
         }
         if (isKeyPress(GLFW_KEY_SPACE)
@@ -122,8 +122,8 @@ public class PlayerEntity extends Entity {
 
     public void render(float delta, int mouseX, int mouseY) {
         var client = Mc2dClient.getInstance();
-        double x = Framebuffer.width * .5f;
-        double y = Framebuffer.height * .5f;
+        double x = client.window.getWidth() * .5;
+        double y = client.window.getHeight() * .5;
 
         client.getTextureManager().bindTexture(TEXTURE);
         glPushMatrix();

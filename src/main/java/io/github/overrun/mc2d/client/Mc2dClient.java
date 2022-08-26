@@ -24,8 +24,6 @@
 
 package io.github.overrun.mc2d.client;
 
-import io.github.overrun.mc2d.Main;
-import io.github.overrun.mc2d.client.gui.Framebuffer;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
 import io.github.overrun.mc2d.client.gui.screen.TitleScreen;
 import io.github.overrun.mc2d.client.gui.screen.ingame.CreativeTabScreen;
@@ -33,15 +31,32 @@ import io.github.overrun.mc2d.client.gui.screen.ingame.PauseScreen;
 import io.github.overrun.mc2d.client.gui.widget.AbstractButtonWidget;
 import io.github.overrun.mc2d.client.model.BlockModelMgr;
 import io.github.overrun.mc2d.client.world.render.WorldRenderer;
+import io.github.overrun.mc2d.event.KeyCallback;
 import io.github.overrun.mc2d.mod.ModLoader;
 import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.text.TranslatableText;
+import io.github.overrun.mc2d.util.Language;
 import io.github.overrun.mc2d.util.Options;
 import io.github.overrun.mc2d.world.World;
+import io.github.overrun.mc2d.world.block.Blocks;
 import io.github.overrun.mc2d.world.entity.HumanEntity;
 import io.github.overrun.mc2d.world.entity.PlayerEntity;
 import io.github.overrun.mc2d.world.item.BlockItemType;
+import io.github.overrun.mc2d.world.item.Items;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.Version;
+import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.system.MemoryStack;
+import org.overrun.swgl.core.gl.GLBlendFunc;
+import org.overrun.swgl.core.gl.GLClear;
+import org.overrun.swgl.core.gl.GLStateMgr;
+import org.overrun.swgl.core.io.IFileProvider;
+import org.overrun.swgl.core.io.Mouse;
+import org.overrun.swgl.core.io.Window;
+import org.overrun.swgl.core.util.LogFactory9;
+import org.overrun.swgl.core.util.timing.Timer;
+import org.slf4j.Logger;
 
 import static io.github.overrun.mc2d.client.gui.DrawableHelper.drawTexture;
 import static org.lwjgl.glfw.GLFW.*;
@@ -51,12 +66,19 @@ import static org.lwjgl.opengl.GL11.*;
  * @author squid233
  * @since 2021/01/25
  */
-public final class Mc2dClient implements AutoCloseable {
-    private static final Mc2dClient INSTANCE = new Mc2dClient();
+public final class Mc2dClient implements Runnable, AutoCloseable {
+    private static final Logger logger = LogFactory9.getLogger();
+    private static Mc2dClient instance;
+    public static final String VERSION = "0.6.0";
+    public static final IText VERSION_TEXT = IText.of("Minecraft2D " + VERSION);
     private static final IText MAX_MEMORY;
+    private static int oldX, oldY, oldWidth, oldHeight;
     public final TextRenderer textRenderer;
     private final TextureManager textureManager;
+    public Window window;
+    public Mouse mouse;
     public Screen screen = null;
+    public final Timer timer = new Timer(20);
     public @Nullable World world = null;
     public WorldRenderer worldRenderer = null;
     public PlayerEntity player = null;
@@ -71,8 +93,104 @@ public final class Mc2dClient implements AutoCloseable {
     }
 
     private Mc2dClient() {
+        GLFWErrorCallback.create((error, description) ->
+            logger.error("GLFW Error {}: {}", error, GLFWErrorCallback.getDescription(description))
+        ).set();
+        if (!glfwInit()) {
+            throw new IllegalStateException("Unable to initialize GLFW");
+        }
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        window = new Window();
+        window.createHandle(896, 512, VERSION_TEXT.asString(), handle -> {
+            throw new IllegalStateException("Failed to create the GLFW window");
+        });
+        window.setIcon(IFileProvider.ofCaller(), "assets/mc2d/icon.png");
+        mouse = new Mouse((x, y, xd, yd) -> {
+        });
+        mouse.registerToWindow(window);
+        window.setKeyCb((handle, key, scancode, action, mods) -> {
+            KeyCallback.post(handle, key, scancode, action, mods);
+            if (action == GLFW_PRESS) {
+                if (key == GLFW_KEY_F11) {
+                    var vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+                    if (glfwGetWindowMonitor(handle) == 0) {
+                        try (var stack = MemoryStack.stackPush()) {
+                            var pX = stack.mallocInt(1);
+                            var pY = stack.mallocInt(1);
+                            glfwGetWindowPos(handle, pX, pY);
+                            oldX = pX.get(0);
+                            oldY = pY.get(0);
+                        }
+                        oldWidth = window.getWidth();
+                        oldHeight = window.getHeight();
+                        if (vidMode != null) {
+                            glfwSetWindowMonitor(handle,
+                                glfwGetPrimaryMonitor(),
+                                0,
+                                0,
+                                vidMode.width(),
+                                vidMode.height(),
+                                vidMode.refreshRate());
+                        }
+                    } else {
+                        glfwSetWindowMonitor(handle, 0, oldX, oldY, oldWidth, oldHeight, 0);
+                    }
+                }
+
+                onKeyPress(key, scancode, mods);
+            }
+        });
+        window.setMouseBtnCb((handle, button, action, mods) -> {
+            if (action == GLFW_PRESS) {
+                if (screen != null) {
+                    screen.mousePressed(mouse.getIntLastX(), mouse.getIntLastY(), button);
+                }
+            }
+        });
+        glfwSetWindowCloseCallback(window.getHandle(), handle -> {
+            if (world != null) {
+                world.save(player);
+            }
+        });
+        window.setFBResizeCb((handle, width, height) -> onResize(width, height));
+        window.setScrollCb((handle, xo, yo) -> {
+            if (world != null && player != null) {
+                player.hotBarNum -= (int) yo;
+                if (player.hotBarNum < 0) {
+                    player.hotBarNum = 9;
+                } else if (player.hotBarNum > 9) {
+                    player.hotBarNum = 0;
+                }
+            }
+        });
+        var vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        if (vidMode != null) {
+            window.moveToCenter(vidMode.width(), vidMode.height());
+        }
+        window.makeContextCurr();
+        GL.createCapabilities();
+        GLStateMgr.init();
+        glfwSwapInterval(Boolean.parseBoolean(System.getProperty("mc2d.vsync", "true")) ? 1 : 0);
+        window.show();
+
         textRenderer = new TextRenderer(this);
         textureManager = new TextureManager();
+    }
+
+    public void init() {
+        onResize(window.getWidth(), window.getHeight());
+
+        Blocks.register();
+        Items.register();
+        ModLoader.loadMods();
+        BlockModelMgr.loadAtlas();
+        Language.init();
+        Language.currentLang = Options.get("lang", "en_us");
+        logger.info("Backend library: LWJGL version {}", Version.getVersion());
+        GLClear.clearColor(.4f, .6f, .9f, 1);
+        GLStateMgr.enableTexture2D();
+        GLStateMgr.enableBlend();
+        GLStateMgr.blendFunc(GLBlendFunc.SRC_ALPHA, GLBlendFunc.ONE_MINUS_SRC_ALPHA);
     }
 
     public void openScreen(@Nullable Screen screen) {
@@ -85,8 +203,8 @@ public final class Mc2dClient implements AutoCloseable {
         this.screen = screen;
         if (screen != null) {
             screen.init(this,
-                (int) Math.ceil(Framebuffer.width * invGuiScale),
-                (int) Math.ceil(Framebuffer.height * invGuiScale));
+                (int) Math.ceil(window.getWidth() * invGuiScale),
+                (int) Math.ceil(window.getHeight() * invGuiScale));
         }
     }
 
@@ -94,7 +212,6 @@ public final class Mc2dClient implements AutoCloseable {
         if (screen == null) {
             openScreen(null);
         }
-        Framebuffer.setSize(width, height);
         if (screen != null) {
             screen.init(this,
                 (int) Math.ceil(width * invGuiScale),
@@ -106,7 +223,7 @@ public final class Mc2dClient implements AutoCloseable {
     public void renderHud(int width, int height) {
         if (world != null) {
             if (debugging) {
-                textRenderer.draw(0, 0, Main.VERSION_TEXT);
+                textRenderer.draw(0, 0, VERSION_TEXT);
                 textRenderer.draw(0, textRenderer.drawHeight() + 1, IText.of(fps + " fps"));
                 textRenderer.draw(0, textRenderer.drawHeight() * 2 + 1, new TranslatableText("text.debug.player.position",
                     player.position.x,
@@ -144,8 +261,8 @@ public final class Mc2dClient implements AutoCloseable {
     }
 
     public void setupCamera(float delta) {
-        double x = Framebuffer.width * .5;
-        double y = Framebuffer.height * .5;
+        double x = window.getWidth() * .5;
+        double y = window.getHeight() * .5;
         glTranslated(x, y, 0);
         glScalef(32, 32, 1);
         player.prevPos.lerp(player.position, delta, player.lerpPos);
@@ -209,20 +326,42 @@ public final class Mc2dClient implements AutoCloseable {
         }
     }
 
+    @Override
+    public void run() {
+        double lastTime = glfwGetTime();
+        int frames = 0;
+        while (!window.shouldClose()) {
+            timer.update();
+            for (int i = 0; i < timer.ticks; i++) {
+                tick();
+            }
+            update();
+            render((float) timer.partialTick);
+            window.swapBuffers();
+            glfwPollEvents();
+            ++frames;
+            while (glfwGetTime() >= lastTime + 1.) {
+                fps = frames;
+                lastTime += 1.;
+                frames = 0;
+            }
+        }
+    }
+
     public void render(float delta) {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, Framebuffer.width, 0, Framebuffer.height, 100, -100);
+        glOrtho(0, window.getWidth(), 0, window.getHeight(), 100, -100);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         if (world != null) {
             float worldDelta = (float) world.timer.partialTick;
             setupCamera(worldDelta);
-            worldRenderer.render(worldDelta, Mouse.mouseX, Framebuffer.height - Mouse.mouseY);
+            worldRenderer.render(worldDelta, mouse.getIntLastX(), window.getHeight() - mouse.getIntLastY());
         }
-        final double sw = Framebuffer.width * invGuiScale;
-        final double sh = Framebuffer.height * invGuiScale;
+        final double sw = window.getWidth() * invGuiScale;
+        final double sh = window.getHeight() * invGuiScale;
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glOrtho(0, sw, sh, 0, 100, -100);
@@ -231,8 +370,8 @@ public final class Mc2dClient implements AutoCloseable {
         glClear(GL_DEPTH_BUFFER_BIT);
         renderHud((int) Math.ceil(sw), (int) Math.ceil(sh));
         if (screen != null) {
-            screen.render((int) (Mouse.mouseX * invGuiScale),
-                (int) (Mouse.mouseY * invGuiScale),
+            screen.render((int) (mouse.getLastX() * invGuiScale),
+                (int) (mouse.getLastY() * invGuiScale),
                 delta);
         }
     }
@@ -248,7 +387,10 @@ public final class Mc2dClient implements AutoCloseable {
     }
 
     public static Mc2dClient getInstance() {
-        return INSTANCE;
+        if (instance == null) {
+            instance = new Mc2dClient();
+        }
+        return instance;
     }
 
     @Override
@@ -256,5 +398,13 @@ public final class Mc2dClient implements AutoCloseable {
         textureManager.close();
         PlayerEntity.model.close();
         HumanEntity.model.close();
+
+        logger.info("Stopping!");
+        window.destroy();
+        glfwTerminate();
+        var cb = glfwSetErrorCallback(null);
+        if (cb != null) {
+            cb.free();
+        }
     }
 }
