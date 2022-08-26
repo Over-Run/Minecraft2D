@@ -22,19 +22,59 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world.block;
+package io.github.overrun.mc2d.screen.inv.ingame;
+
+import io.github.overrun.mc2d.screen.inv.IInventory;
+import io.github.overrun.mc2d.screen.slot.Slot;
+import io.github.overrun.mc2d.util.registry.Registry;
+import io.github.overrun.mc2d.world.entity.PlayerEntity;
+import io.github.overrun.mc2d.world.item.ItemStack;
 
 /**
  * @author squid233
  * @since 0.6.0
  */
-public class LeavesBlockType extends BlockType {
-    public LeavesBlockType(BlockSettings settings) {
-        super(settings);
+public class CreativeTabInventory implements IInventory {
+    @Override
+    public int size() {
+        return 45;
     }
 
     @Override
-    public boolean isTexTransparency() {
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public ItemStack getStack(int slot) {
+        return ItemStack.of(Registry.BLOCK.getByRawId(slot - Slot.CONTAINER_ID0 + 1));
+    }
+
+    @Override
+    public ItemStack removeStack(int slot, int count) {
+        return removeStack(slot);
+    }
+
+    @Override
+    public ItemStack removeStack(int slot) {
+        return ItemStack.copyOf(getStack(slot));
+    }
+
+    @Override
+    public void setStack(int slot, ItemStack stack) {
+        // todo: Settings::tab
+    }
+
+    @Override
+    public void clear() {
+    }
+
+    @Override
+    public void markDirty() {
+    }
+
+    @Override
+    public boolean canPlayerUse(PlayerEntity player) {
         return true;
     }
 }

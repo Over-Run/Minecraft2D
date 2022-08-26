@@ -47,6 +47,7 @@ public class DefaultedRegistry<T> extends MutableRegistry<T> {
     private final List<T> entries;
     private final Supplier<T> defaultSupplier;
     private T defaultEntry;
+    private int nextId = 0;
 
     public DefaultedRegistry(Supplier<T> defaultEntry) {
         defaultSupplier = defaultEntry;
@@ -95,13 +96,21 @@ public class DefaultedRegistry<T> extends MutableRegistry<T> {
 
     @Override
     public T add(Identifier id, T entry) {
+        return set(nextId++, id, entry);
+    }
+
+    @Override
+    public T set(int rawId, Identifier id, T entry) {
         if (id2entry.containsKey(id)) {
             throw new IllegalArgumentException("Registry entry is present!");
         }
         id2entry.put(id, entry);
         entry2id.put(entry, id);
         entries.add(entry);
-        entry2rawId.put(entry, entries.size() - 1);
+        entry2rawId.put(entry, rawId);
+        if (rawId > nextId) {
+            nextId = rawId;
+        }
         return entry;
     }
 

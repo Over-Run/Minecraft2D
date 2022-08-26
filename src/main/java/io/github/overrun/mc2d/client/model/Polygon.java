@@ -24,67 +24,23 @@
 
 package io.github.overrun.mc2d.client.model;
 
-import static org.lwjgl.opengl.GL11.*;
+import org.lwjgl.opengl.GL11;
 
 /**
  * @author squid233
  * @since 0.6.0
  */
-public class Vertices implements AutoCloseable {
+public class Polygon {
     private final Vertex[] vertices;
-    private boolean compiled = false;
-    private int list;
-    private double rotateZ;
-    private double x, y, z;
 
-    public Vertices(Vertex... vertices) {
+    public Polygon(Vertex... vertices) {
         this.vertices = vertices;
     }
 
-    private void compile() {
-        list = glGenLists(1);
-        glNewList(list, GL_COMPILE);
-        glBegin(GL_QUADS);
-        for (var v : vertices) {
-            glTexCoord2f(v.u(), v.v());
-            glVertex3f(v.x(), v.y(), v.z());
-        }
-        glEnd();
-        glEndList();
-    }
-
     public void render() {
-        if (!compiled) {
-            compile();
-            compiled = true;
-        }
-        glPushMatrix();
-        glTranslated(x, y, z);
-        glRotated(rotateZ, 0, 0, 1);
-        glCallList(list);
-        glPopMatrix();
-    }
-
-    public Vertices setPosition(double x, double y, double z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        return this;
-    }
-
-    public Vertices setRotateZ(double ang) {
-        return setRotateZDeg(Math.toDegrees(ang));
-    }
-
-    public Vertices setRotateZDeg(double ang) {
-        rotateZ = ang;
-        return this;
-    }
-
-    @Override
-    public void close() {
-        if (list != 0 && glIsList(list)) {
-            glDeleteLists(list, 1);
+        for (var v : vertices) {
+            GL11.glTexCoord2f(v.u(), v.v());
+            GL11.glVertex3f(v.x(), v.y(), v.z());
         }
     }
 }

@@ -22,19 +22,37 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world.block;
+package io.github.overrun.mc2d.screen.inv;
+
+import io.github.overrun.mc2d.world.item.ItemStack;
+
+import java.util.function.IntFunction;
 
 /**
  * @author squid233
  * @since 0.6.0
  */
-public class LeavesBlockType extends BlockType {
-    public LeavesBlockType(BlockSettings settings) {
-        super(settings);
+public final class Inventories {
+    public static ItemStack splitStack(IntFunction<ItemStack> map,
+                                       int slot,
+                                       int count) {
+        if (count < 1) return ItemStack.ofEmpty();
+        var stack = map.apply(slot);
+        if (stack.isEmpty()) return ItemStack.ofEmpty();
+        var copy = ItemStack.copyOf(stack);
+        if (count >= stack.getCount()) {
+            stack.setCount(0);
+        } else {
+            stack.decrement(count);
+        }
+        return copy;
     }
 
-    @Override
-    public boolean isTexTransparency() {
-        return true;
+    public static ItemStack removeStack(IntFunction<ItemStack> map,
+                                        int slot) {
+        var stack = map.apply(slot);
+        var copy = ItemStack.copyOf(stack);
+        stack.setCount(0);
+        return copy;
     }
 }

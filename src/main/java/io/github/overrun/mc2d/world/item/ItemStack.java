@@ -31,11 +31,12 @@ import org.joml.Math;
  * @since 0.6.0
  */
 public final class ItemStack {
-    private ItemConvertible item;
+    private ItemType item;
     private int count;
+    private int maxCount = 999;
 
     private ItemStack(ItemConvertible item, int count) {
-        this.item = item;
+        this.item = item.asItem();
         this.count = count;
     }
 
@@ -51,27 +52,64 @@ public final class ItemStack {
         return of(Items.AIR, 0);
     }
 
+    public static ItemStack copyOf(ItemStack stack, int count) {
+        var itemStack = of(stack.getItem(), count);
+        itemStack.setMaxCount(stack.getMaxCount());
+        itemStack.setCount(itemStack.getCount());
+        return itemStack;
+    }
+
+    public static ItemStack copyOf(ItemStack stack) {
+        return copyOf(stack, stack.getCount());
+    }
+
+    public void set(ItemStack stack) {
+        setItem(stack.getItem());
+        setMaxCount(stack.getMaxCount());
+        setCount(stack.getCount());
+    }
+
+    public void setMaxCount(int maxCount) {
+        this.maxCount = Math.clamp(0, 999, maxCount);
+    }
+
+    public int getMaxCount() {
+        return maxCount;
+    }
+
     public void setItem(ItemConvertible item) {
-        this.item = item != null ? item : Items.AIR;
+        this.item = item != null ? item.asItem() : Items.AIR;
     }
 
     public void setCount(int count) {
-        this.count = Math.clamp(0, 999, count);
+        this.count = Math.clamp(0, getMaxCount(), count);
+    }
+
+    public void increment(int count) {
+        setCount(getCount() + count);
     }
 
     public void increment() {
-        setCount(count + 1);
+        increment(1);
+    }
+
+    public void decrement(int count) {
+        setCount(getCount() - count);
     }
 
     public void decrement() {
-        setCount(count - 1);
+        decrement(1);
     }
 
-    public ItemConvertible getItem() {
+    public ItemType getItem() {
         return item;
     }
 
+    public int getCount() {
+        return count;
+    }
+
     public boolean isEmpty() {
-        return item == Items.AIR || count < 1 || item.asItem() == Items.AIR;
+        return count < 1 || item == Items.AIR;
     }
 }

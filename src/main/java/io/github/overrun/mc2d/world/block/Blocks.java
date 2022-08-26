@@ -24,6 +24,7 @@
 
 package io.github.overrun.mc2d.world.block;
 
+import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.Registry;
 
 /**
@@ -31,20 +32,19 @@ import io.github.overrun.mc2d.util.registry.Registry;
  * @since 2021/01/09
  */
 public final class Blocks {
-    public static final BlockType AIR = register("air", new AirBlockType());
-    public static final BlockType GRASS_BLOCK = register("grass_block", new BlockType());
-    public static final BlockType STONE = register("stone", new BlockType());
-    public static final BlockType DIRT = register("dirt", new BlockType());
-    public static final BlockType COBBLESTONE = register("cobblestone", new BlockType());
-    public static final BlockType BEDROCK = register("bedrock", new BlockType());
-    public static final BlockType OAK_LOG = register("oak_log", new BlockType());
-    public static final BlockType OAK_LEAVES = register("oak_leaves", new LeavesBlockType());
+    public static final BlockType AIR = register(0, "air", new AirBlockType(BlockSettings.of().air()));
+    public static final BlockType STONE = register(1, "stone", new BlockType(BlockSettings.of()));
+    public static final BlockType GRASS_BLOCK = register(2, "grass_block", new BlockType(BlockSettings.of()));
+    public static final BlockType DIRT = register(3, "dirt", new BlockType(BlockSettings.of()));
+    public static final BlockType COBBLESTONE = register(4, "cobblestone", new BlockType(BlockSettings.of()));
+    public static final BlockType BEDROCK = register(5, "bedrock", new BlockType(BlockSettings.of()));
+    public static final BlockType OAK_LOG = register(6, "oak_log", new BlockType(BlockSettings.of()));
+    public static final BlockType OAK_LEAVES = register(12, "oak_leaves", new LeavesBlockType(BlockSettings.of()));
 
     public static void register() {
     }
 
-    public static BlockType register(String id, BlockType block) {
-        return Registry.register(Registry.BLOCK, id, block);
+    private static BlockType register(int rawId, String id, BlockType block) {
+        return Registry.BLOCK.set(rawId, new Identifier(id), block);
     }
 }
-

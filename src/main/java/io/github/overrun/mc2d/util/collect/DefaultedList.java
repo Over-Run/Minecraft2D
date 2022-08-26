@@ -55,10 +55,17 @@ public class DefaultedList<E> extends ArrayList<E> {
         defaultSupplier = defaultEntry;
     }
 
+    public E getDefaultEntry() {
+        if (defaultEntry == null) {
+            defaultEntry = defaultSupplier.get();
+        }
+        return defaultEntry;
+    }
+
     @Override
     public E get(int index) {
         return index < 0 || index >= size() ?
-            (defaultEntry == null ? defaultEntry = defaultSupplier.get() : defaultEntry) :
+            getDefaultEntry() :
             super.get(index);
     }
 }

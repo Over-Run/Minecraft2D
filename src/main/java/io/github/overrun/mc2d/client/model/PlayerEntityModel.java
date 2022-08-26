@@ -33,10 +33,13 @@ import org.joml.Math;
  * @since 0.6.0
  */
 public class PlayerEntityModel extends EntityModel implements AutoCloseable {
-    public final Vertices headR, headL;
-    public final Vertices bodyR, bodyL;
-    public final Vertices armR, armL;
-    public final Vertices legR, legL;
+    public final Cube headR, headL;
+    public final Cube bodyR, bodyL;
+    // The right1/left1 face of the right2/left2 arm/leg -> arm/legR1/L1R2/L2
+    public final Cube armRR, armLR;
+    public final Cube legRR, legLR;
+    public final Cube armRL, armLL;
+    public final Cube legRL, legLL;
     private double prevRot = 0;
 
     public PlayerEntityModel() {
@@ -52,36 +55,47 @@ public class PlayerEntityModel extends EntityModel implements AutoCloseable {
         var v09 = new Vertex(-0.125f, -0.75f, 0);
         var v10 = new Vertex(0.125f, -0.75f, 0);
         var v11 = new Vertex(0.125f, 0, 0);
-        final float w = 24;
-        final float h = 20;
-        headR = new Vertices(v00.remap(0, 0), v01.remap(0, 8 / h), v02.remap(8 / w, 8 / h), v03.remap(8 / w, 0));
-        headL = new Vertices(v03.remap(24 / w, 0), v02.remap(24 / w, 8 / h), v01.remap(16 / w, 8 / h), v00.remap(16 / w, 0));
-        bodyR = new Vertices(v04.remap(8 / w, 8 / h), v05.remap(8 / w, 20 / h), v06.remap(12 / w, 20 / h), v07.remap(12 / w, 8 / h));
-        bodyL = new Vertices(v07.remap(16 / w, 8 / h), v06.remap(16 / w, 20 / h), v05.remap(12 / w, 20 / h), v04.remap(12 / w, 8 / h));
-        armR = new Vertices(v08.remap(16 / w, 8 / h), v09.remap(16 / w, 20 / h), v10.remap(20 / w, 20 / h), v11.remap(20 / w, 8 / h)).setPosition(0, 1.5, 0);
-        armL = new Vertices(v11.remap(24 / w, 8 / h), v10.remap(24 / w, 20 / h), v09.remap(20 / w, 20 / h), v08.remap(20 / w, 8 / h)).setPosition(0, 1.5, 0);
-        legR = new Vertices(v08.remap(0, 8 / h), v09.remap(0, 20 / h), v10.remap(4 / w, 20 / h), v11.remap(4 / w, 8 / h)).setPosition(0, 0.75, 0);
-        legL = new Vertices(v11.remap(8 / w, 8 / h), v10.remap(8 / w, 20 / h), v09.remap(4 / w, 20 / h), v08.remap(4 / w, 8 / h)).setPosition(0, 0.75, 0);
-    }
-
-    private void renderL(double rot) {
-        headL.render();
-        bodyL.render();
-        armL.setRotateZDeg(-rot).render();
-        legL.setRotateZDeg(rot).render();
+        //todo
+        final float w = 40;
+        final float h = 32;
+        headR = new Cube(new Polygon(v00.remap(0, 0), v01.remap(0, 8 / h), v02.remap(8 / w, 8 / h), v03.remap(8 / w, 0)));
+        headL = new Cube(new Polygon(v03.remap(24 / w, 0), v02.remap(24 / w, 8 / h), v01.remap(16 / w, 8 / h), v00.remap(16 / w, 0)));
+        bodyR = new Cube(new Polygon(v04.remap(0, 8 / h), v05.remap(0, 20 / h), v06.remap(4 / w, 20 / h), v07.remap(4 / w, 8 / h)));
+        bodyL = new Cube(new Polygon(v07.remap(12 / w, 8 / h), v06.remap(12 / w, 20 / h), v05.remap(8 / w, 20 / h), v04.remap(8 / w, 8 / h)));
+        armRR = new Cube(new Polygon(v08.remap(16 / w, 8 / h), v09.remap(16 / w, 20 / h), v10.remap(20 / w, 20 / h), v11.remap(20 / w, 8 / h))).setPosition(0, 1.5, 0);
+        armLR = new Cube(new Polygon(v11.remap(28 / w, 8 / h), v10.remap(28 / w, 20 / h), v09.remap(24 / w, 20 / h), v08.remap(24 / w, 8 / h))).setPosition(0, 1.5, 0);
+        legRR = new Cube(new Polygon(v08.remap(0, 20 / h), v09.remap(0, 32 / h), v10.remap(4 / w, 32 / h), v11.remap(4 / w, 20 / h))).setPosition(0, 0.75, 0);
+        legLR = new Cube(new Polygon(v11.remap(12 / w, 20 / h), v10.remap(12 / w, 32 / h), v09.remap(8 / w, 32 / h), v08.remap(8 / w, 20 / h))).setPosition(0, 0.75, 0);
+        armRL = new Cube(new Polygon(v08.remap(32 / w, 8 / h), v09.remap(32 / w, 20 / h), v10.remap(36 / w, 20 / h), v11.remap(36 / w, 8 / h))).setPosition(0, 1.5, 0);
+        armLL = new Cube(new Polygon(v11.remap(36 / w, 20 / h), v10.remap(36 / w, 32 / h), v09.remap(32 / w, 32 / h), v08.remap(32 / w, 20 / h))).setPosition(0, 1.5, 0);
+        legRL = new Cube(new Polygon(v08.remap(16 / w, 20 / h), v09.remap(16 / w, 32 / h), v10.remap(20 / w, 32 / h), v11.remap(20 / w, 20 / h))).setPosition(0, 0.75, 0);
+        legLL = new Cube(new Polygon(v11.remap(28 / w, 20 / h), v10.remap(28 / w, 32 / h), v09.remap(24 / w, 32 / h), v08.remap(24 / w, 20 / h))).setPosition(0, 0.75, 0);
     }
 
     public void render(float delta, boolean facingRight, int animation) {
         double rot = Math.lerp(prevRot, Math.sin(animation * 0.5) * 35, delta);
         if (facingRight) {
-            renderL(rot);
-        }
-        headR.render();
-        bodyR.render();
-        armR.setRotateZDeg(rot).render();
-        legR.setRotateZDeg(-rot).render();
-        if (!facingRight) {
-            renderL(rot);
+            headR.render();
+            armLR.setRotateZDeg(rot);
+            armLR.render();
+            legLR.setRotateZDeg(-rot);
+            legLR.render();
+            bodyR.render();
+            armRR.setRotateZDeg(-rot);
+            armRR.render();
+            legRR.setRotateZDeg(rot);
+            legRR.render();
+        } else {
+            headL.render();
+            armLL.setRotateZDeg(rot);
+            armLL.render();
+            legLL.setRotateZDeg(-rot);
+            legLL.render();
+            bodyL.render();
+            armRL.setRotateZDeg(-rot);
+            armRL.render();
+            legRL.setRotateZDeg(rot);
+            legRL.render();
         }
         prevRot = rot;
     }
@@ -92,9 +106,13 @@ public class PlayerEntityModel extends EntityModel implements AutoCloseable {
         headL.close();
         bodyR.close();
         bodyL.close();
-        armR.close();
-        armL.close();
-        legR.close();
-        legL.close();
+        armRR.close();
+        armLR.close();
+        legRR.close();
+        legLR.close();
+        armRL.close();
+        armLL.close();
+        legRL.close();
+        legLL.close();
     }
 }

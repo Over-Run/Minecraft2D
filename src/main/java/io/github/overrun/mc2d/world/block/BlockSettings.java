@@ -25,16 +25,33 @@
 package io.github.overrun.mc2d.world.block;
 
 /**
+ * The block type settings.
+ *
  * @author squid233
  * @since 0.6.0
  */
-public class LeavesBlockType extends BlockType {
-    public LeavesBlockType(BlockSettings settings) {
-        super(settings);
+public final class BlockSettings {
+    boolean isAir = false;
+
+    private BlockSettings() {
     }
 
-    @Override
-    public boolean isTexTransparency() {
-        return true;
+    public static BlockSettings of() {
+        return new BlockSettings();
+    }
+
+    public static BlockSettings copyOf(BlockSettings settings) {
+        var s = new BlockSettings();
+        s.isAir = settings.isAir;
+        return s;
+    }
+
+    public static BlockSettings copyOf(BlockType blockType) {
+        return copyOf(blockType.settings);
+    }
+
+    public BlockSettings air() {
+        isAir = true;
+        return this;
     }
 }

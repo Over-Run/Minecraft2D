@@ -30,9 +30,13 @@ import io.github.overrun.mc2d.client.gui.screen.ingame.CreativeTabScreen;
 import io.github.overrun.mc2d.client.gui.screen.ingame.PauseScreen;
 import io.github.overrun.mc2d.client.gui.widget.AbstractButtonWidget;
 import io.github.overrun.mc2d.client.model.BlockModelMgr;
+import io.github.overrun.mc2d.client.render.ItemRenderer;
 import io.github.overrun.mc2d.client.world.render.WorldRenderer;
 import io.github.overrun.mc2d.event.KeyCallback;
 import io.github.overrun.mc2d.mod.ModLoader;
+import io.github.overrun.mc2d.screen.CreativeTabScreenHandler;
+import io.github.overrun.mc2d.screen.inv.ingame.CreativeTabInventory;
+import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.text.TranslatableText;
 import io.github.overrun.mc2d.util.Language;
@@ -75,6 +79,7 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
     private static int oldX, oldY, oldWidth, oldHeight;
     public final TextRenderer textRenderer;
     private final TextureManager textureManager;
+    public final ItemRenderer itemRenderer;
     public Window window;
     public Mouse mouse;
     public Screen screen = null;
@@ -154,7 +159,7 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
         });
         window.setFBResizeCb((handle, width, height) -> onResize(width, height));
         window.setScrollCb((handle, xo, yo) -> {
-            if (world != null && player != null) {
+            if (world != null && player != null && screen == null) {
                 player.hotBarNum -= (int) yo;
                 if (player.hotBarNum < 0) {
                     player.hotBarNum = 9;
@@ -175,6 +180,7 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
 
         textRenderer = new TextRenderer(this);
         textureManager = new TextureManager();
+        itemRenderer = new ItemRenderer(this);
     }
 
     public void init() {
@@ -238,23 +244,12 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
             glPushMatrix();
             double hotBarX = (width - 202) / 2.;
             glTranslated(hotBarX, height, 0);
-            drawTexture(0, -22, 0, 0, 202, 22);
+            drawTexture(0, -23, 0, 0, 202, 22);
             drawTexture(player.hotBarNum * 20, -24, 1, 22, 22, 24);
-            textureManager.bindTexture(BlockModelMgr.BLOCK_ATLAS);
             for (int i = 0; i < 10; i++) {
-                var stack = player.hotBar[i];
-                if (stack.isEmpty() || !(stack.getItem().asItem() instanceof BlockItemType blockItemType)) continue;
-                var tex = BlockModelMgr.blockTexture(blockItemType.getBlock().getTexture());
-                int u0 = BlockModelMgr.getBlockAtlas().getU0(tex);
-                int v0 = BlockModelMgr.getBlockAtlas().getV0(tex);
-                // todo: atlas::width(tex)
-                drawTexture(3 + i * 20, -19,
-                    u0, v0,
-                    BlockModelMgr.getBlockAtlas().getU1(tex) - u0,
-                    BlockModelMgr.getBlockAtlas().getV1(tex) - v0,
-                    16, 16,
-                    BlockModelMgr.getBlockAtlas().width(),
-                    BlockModelMgr.getBlockAtlas().height());
+                var stack = player.inventory.getStack(Slot.HOT_BAR_ID0 + i);
+                if (!(stack.getItem() instanceof BlockItemType)) continue;
+                itemRenderer.renderItemStack(textRenderer, stack, 3 + i * 20, -20);
             }
             glPopMatrix();
         }
@@ -311,7 +306,7 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
                 }
             }
             if (key == Options.getI(Options.KEY_CREATIVE_TAB, GLFW_KEY_E)) {
-                openScreen(new CreativeTabScreen(player, null));
+                openScreen(new CreativeTabScreen(new CreativeTabScreenHandler(player.inventory, new CreativeTabInventory()), player.inventory, null));
             }
         }
     }

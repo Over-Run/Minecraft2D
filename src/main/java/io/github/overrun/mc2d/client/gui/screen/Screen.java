@@ -134,12 +134,14 @@ public abstract class Screen extends AbstractParentElement implements TickableEl
 
     @Override
     public boolean mousePressed(int mouseX, int mouseY, int button) {
+        boolean pressed = false;
         for (AbstractButtonWidget b : buttons) {
             if (b.isMouseOver(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
                 b.onClick(mouseX, mouseY);
+                pressed = true;
             }
         }
-        return false;
+        return pressed;
     }
 
     @Override

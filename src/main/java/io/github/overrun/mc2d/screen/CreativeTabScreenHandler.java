@@ -24,31 +24,32 @@
 
 package io.github.overrun.mc2d.screen;
 
+import io.github.overrun.mc2d.screen.inv.IInventory;
+import io.github.overrun.mc2d.screen.inv.PlayerInventory;
 import io.github.overrun.mc2d.screen.slot.Slot;
-import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.world.entity.PlayerEntity;
-import io.github.overrun.mc2d.world.item.ItemStack;
 
 /**
  * @author squid233
  * @since 2021/01/25
  */
 public final class CreativeTabScreenHandler extends ScreenHandler {
-    public CreativeTabScreenHandler(PlayerEntity player) {
-        super(player);
-    }
+    public final IInventory inventory;
 
-    @Override
-    public void init(int x, int y) {
-        super.init(x, y);
+    public CreativeTabScreenHandler(PlayerInventory playerInventory, IInventory inventory) {
+        this.inventory = inventory;
         // content
         for (int i = 0; i < 45; i++) {
-            var slot = addSlot(new Slot(x + 9 + i % 9 * 18, y + 18 + i / 9 * 18));
-            slot.itemStack = ItemStack.of(Registry.ITEM.getByRawId(i + 1));
+            addSlot(new Slot(inventory, Slot.CONTAINER_ID0 + i, 9 + i % 9 * 18, 18 + i / 9 * 18));
         }
         // hot-bar
         for (int i = 0; i < 10; i++) {
-            addSlot(new Slot(x + 9 + i * 18, y + 112)).itemStack = player.hotBar[i];
+            addSlot(new Slot(playerInventory, Slot.HOT_BAR_ID0 + i, 9 + i * 18, 112));
         }
+    }
+
+    @Override
+    public boolean canUse(PlayerEntity player) {
+        return inventory.canPlayerUse(player);
     }
 }

@@ -24,14 +24,16 @@
 
 package io.github.overrun.mc2d.client.gui.screen.ingame;
 
+import io.github.overrun.mc2d.client.Keyboard;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
 import io.github.overrun.mc2d.screen.CreativeTabScreenHandler;
+import io.github.overrun.mc2d.screen.inv.PlayerInventory;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.text.TranslatableText;
 import io.github.overrun.mc2d.util.Identifier;
-import io.github.overrun.mc2d.world.entity.PlayerEntity;
+import io.github.overrun.mc2d.world.item.ItemStack;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
+import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * @author squid233
@@ -40,19 +42,87 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
 public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHandler> {
     private static final Identifier TEXTURE = new Identifier("textures/gui/tab_items.png");
     private final Screen parent;
-    private final PlayerEntity player;
+    private final ItemStack stack = ItemStack.ofEmpty();
 
-    public CreativeTabScreen(PlayerEntity player, Screen parent) {
-        super(new CreativeTabScreenHandler(player), new TranslatableText("itemGroup.name.creativeTab"));
-        this.player = player;
+    public CreativeTabScreen(CreativeTabScreenHandler handler, PlayerInventory playerInventory, Screen parent) {
+        super(handler, playerInventory, new TranslatableText("itemGroup.name.creativeTab"));
         this.parent = parent;
     }
 
     @Override
-    protected void onClickSlot(Slot slot) {
-        super.onClickSlot(slot);
-        if (!slot.itemStack.isEmpty()) {
-            player.setItemMainHand(slot.itemStack);
+    protected void onClickSlot(Slot slot, int button) {
+        super.onClickSlot(slot, button);
+        // click on items
+        if (slot.id() >= Slot.CONTAINER_ID0) {
+            var invStack = handler.inventory.getStack(slot.id());
+            if (!stack.isEmpty()) {
+                if (stack.getItem() == invStack.getItem()) {
+                    stack.increment();
+                } else {
+                    stack.setCount(0);
+                }
+                // todo: press shift -> ::transferItem
+            } else {
+                stack.set(invStack);
+                if (button == GLFW_MOUSE_BUTTON_MIDDLE || Keyboard.isKeyPress(GLFW_KEY_LEFT_SHIFT)) {
+                    stack.setCount(stack.getMaxCount());
+                }
+            }
+        }
+        // click on hot-bar
+        else {
+            var invStack = playerInventory.getStack(slot.id());
+            if (!stack.isEmpty()) {
+                if (invStack.isEmpty()) {
+                    if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+                        playerInventory.setStack(slot.id(), ItemStack.copyOf(stack, 1));
+                        stack.decrement();
+                    } else {
+                        playerInventory.setStack(slot.id(), ItemStack.copyOf(stack));
+                        stack.setCount(0);
+                    }
+                } else {
+                    if (button == GLFW_MOUSE_BUTTON_LEFT) {
+                        var oldStack = playerInventory.getStack(slot.id());
+                        if (stack.getItem() == oldStack.getItem()) {
+                            // merge
+                            oldStack.increment(stack.getCount());
+                            stack.setCount(0);
+                        } else {
+                            // swap
+                            var copyOldStack = ItemStack.copyOf(playerInventory.getStack(slot.id()));
+                            playerInventory.setStack(slot.id(), ItemStack.copyOf(stack));
+                            stack.set(copyOldStack);
+                        }
+                    } else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+                        if (invStack.getCount() < invStack.getMaxCount()) {
+                            invStack.increment();
+                            stack.decrement();
+                        }
+                    }
+                }
+            } else {
+                if (!invStack.isEmpty()) {
+                    if (button == GLFW_MOUSE_BUTTON_LEFT) {
+                        if (!Keyboard.isKeyPress(GLFW_KEY_LEFT_SHIFT)) {
+                            stack.set(invStack);
+                        }
+                        playerInventory.removeStack(slot.id());
+                    } else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
+                        stack.setItem(invStack.getItem());
+                        stack.setMaxCount(invStack.getMaxCount());
+                        stack.setCount(stack.getMaxCount());
+                    } else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+                        if (invStack.getCount() == 1) {
+                            stack.set(playerInventory.removeStack(slot.id(), 1));
+                        } else {
+                            int half = invStack.getCount() / 2;
+                            stack.set(playerInventory.removeStack(slot.id(), half));
+                            stack.setCount(half);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -66,6 +136,9 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
     public void render(int mouseX, int mouseY, float delta) {
         renderBackground();
         super.render(mouseX, mouseY, delta);
+        if (!stack.isEmpty()) {
+            client.itemRenderer.renderItemStack(textRenderer, stack, mouseX - 8, mouseY - 8);
+        }
     }
 
     @Override

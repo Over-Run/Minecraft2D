@@ -77,32 +77,41 @@ public final class TextRenderer {
         draw(x, y, text, true);
     }
 
-    public void draw(int x, int y, IText text, boolean shadow) {
-        final char[] chars = text.asString().toCharArray();
+    public void draw(int x, int y, String text, int bgColor, int fgColor, boolean shadow) {
+        final char[] chars = text.toCharArray();
         int currX = x;
         client.getTextureManager().bindTexture(UNIFONT_0);
         GLStateMgr.enableTexture2D();
         glBegin(GL_QUADS);
         for (char c : chars) {
             if (shadow) {
-                draw(currX + client.invGuiScale, y + client.invGuiScale, c, text.getStyle().getColor().bgColor());
+                draw(currX + client.invGuiScale, y + client.invGuiScale, c, bgColor);
             }
-            draw(currX, y, c, text.getStyle().getColor().fgColor());
+            draw(currX, y, c, fgColor);
             currX += drawWidth(c);
         }
         glEnd();
+    }
+
+    public void draw(int x, int y, IText text, boolean shadow) {
+        var color = text.getStyle().getColor();
+        draw(x, y, text.asString(), color.bgColor(), color.fgColor(), shadow);
     }
 
     public void draw(int x, int y, IText text) {
         draw(x, y, text, false);
     }
 
-    public int drawWidth(IText text) {
+    public int drawWidth(String text) {
         int width = 0;
-        for (char c : text.asString().toCharArray()) {
+        for (char c : text.toCharArray()) {
             width += drawWidth(c);
         }
         return width;
+    }
+
+    public int drawWidth(IText text) {
+        return drawWidth(text.asString());
     }
 
     public int drawWidth(char c) {

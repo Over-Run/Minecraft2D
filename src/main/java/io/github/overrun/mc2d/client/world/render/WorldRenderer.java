@@ -207,7 +207,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
             if (target.isAir()) {
                 if (client.mouse.isBtnDown(GLFW_MOUSE_BUTTON_RIGHT)) {
                     var stack = client.player.getItemMainHand();
-                    if (!stack.isEmpty() && stack.getItem().asItem() instanceof BlockItemType blockItemType) {
+                    if (!stack.isEmpty() && stack.getItem() instanceof BlockItemType blockItemType) {
                         world.setBlock(x, y, z, blockItemType.getBlock());
                     }
                 }
@@ -225,12 +225,13 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         int oy = (int) Math.floor(client.player.lerpPos.y);
         for (var entity : world.entities) {
             if (entity instanceof HumanEntity human) {
-                if (Intersectiond.testAarAar(
-                    ox - rx, oy - ry, ox + rx, oy + ry,
-                    entity.box.minX(), entity.box.minY(), entity.box.maxX(), entity.box.maxY()
-                )) {
-                    human.render(delta);
+                if (entity.box.minX() > ox + rx ||
+                    entity.box.minY() > oy + ry ||
+                    entity.box.maxX() < ox - rx ||
+                    entity.box.maxY() < oy - ry) {
+                    continue;
                 }
+                human.render(delta);
             }
         }
     }

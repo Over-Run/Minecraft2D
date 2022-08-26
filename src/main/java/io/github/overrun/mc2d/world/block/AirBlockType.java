@@ -35,6 +35,10 @@ import org.overrun.swgl.core.phys.p2d.AABRect2f;
  * @since 2021/01/27
  */
 public class AirBlockType extends BlockType {
+    public AirBlockType(BlockSettings settings) {
+        super(settings);
+    }
+
     @Override
     @Nullable
     public AABRect2f getOutlineShape() {
@@ -51,11 +55,6 @@ public class AirBlockType extends BlockType {
     @Nullable
     public AABRect2f getCollisionShape() {
         return VoxelShapes.empty();
-    }
-
-    @Override
-    public boolean isAir() {
-        return true;
     }
 
     @Override

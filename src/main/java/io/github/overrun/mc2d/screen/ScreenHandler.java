@@ -26,27 +26,29 @@ package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.world.entity.PlayerEntity;
-
-import java.util.ArrayList;
-import java.util.List;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
 /**
  * @author squid233
  * @since 2021/01/25
  */
 public abstract class ScreenHandler {
-    public final List<Slot> slots = new ArrayList<>();
-    public final PlayerEntity player;
+    public final Int2ObjectMap<Slot> slots = new Int2ObjectArrayMap<>();
 
-    public ScreenHandler(PlayerEntity player) {
-        this.player = player;
+    public ScreenHandler() {
     }
 
     public Slot addSlot(Slot slot) {
-        slots.add(slot);
+        slots.put(slot.id(), slot);
         return slot;
     }
 
-    public void init(int x, int y) {
+    public Slot getSlot(int id) {
+        return slots.get(id);
+    }
+
+    public boolean canUse(PlayerEntity player) {
+        return true;
     }
 }

@@ -45,6 +45,11 @@ import java.util.Map;
  */
 public class BlockType implements ItemConvertible {
     public static final Map<BlockType, ItemType> BLOCK_ITEMS = new HashMap<>();
+    final BlockSettings settings;
+
+    public BlockType(BlockSettings settings) {
+        this.settings = settings;
+    }
 
     @Nullable
     public AABRect2f getOutlineShape() {
@@ -62,7 +67,7 @@ public class BlockType implements ItemConvertible {
     }
 
     public boolean isAir() {
-        return false;
+        return settings.isAir;
     }
 
     public boolean isTexTransparency() {

@@ -33,5 +33,7 @@ import io.github.overrun.mc2d.util.Identifier;
 public abstract class MutableRegistry<T> extends BaseRegistry<T> {
     public abstract T add(Identifier id, T entry);
 
+    public abstract T set(int rawId, Identifier id, T entry);
+
     public abstract void remove(T entry);
 }

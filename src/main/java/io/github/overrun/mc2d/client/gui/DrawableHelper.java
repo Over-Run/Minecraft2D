@@ -45,7 +45,7 @@ public abstract class DrawableHelper {
     public static void fillGradient(int xStart, int yStart, int xEnd, int yEnd, int colorStart, int colorEnd) {
         GLStateMgr.disableTexture2D();
         glBegin(GL_QUADS);
-        float inv = 1.0f / 255.0f;
+        final float inv = 1.0f / 255.0f;
         var sr = colorStart << 8 >>> 24;
         var sg = colorStart << 16 >>> 24;
         var sb = colorStart << 24 >>> 24;
@@ -92,7 +92,7 @@ public abstract class DrawableHelper {
         var g = rgba << 16 >>> 24;
         var b = rgba << 24 >>> 24;
         var a = rgba >>> 24;
-        float inv = 1.0f / 255.0f;
+        final float inv = 1.0f / 255.0f;
         glColor4f(r * inv, g * inv, b * inv, a * inv);
         // Left top
         glTexCoord2f((float) u / texW, (float) v / texH);

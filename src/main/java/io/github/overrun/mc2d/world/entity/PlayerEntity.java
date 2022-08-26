@@ -28,6 +28,8 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.model.PlayerEntityModel;
+import io.github.overrun.mc2d.screen.inv.PlayerInventory;
+import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.world.World;
 import io.github.overrun.mc2d.world.item.ItemStack;
@@ -47,18 +49,7 @@ public class PlayerEntity extends Entity {
     private static final long PLAYER_VERSION = 2L;
     public static final PlayerEntityModel model = new PlayerEntityModel();
     public int hotBarNum = 0;
-    public final ItemStack[] hotBar = new ItemStack[]{
-        ItemStack.ofEmpty(),
-        ItemStack.ofEmpty(),
-        ItemStack.ofEmpty(),
-        ItemStack.ofEmpty(),
-        ItemStack.ofEmpty(),
-        ItemStack.ofEmpty(),
-        ItemStack.ofEmpty(),
-        ItemStack.ofEmpty(),
-        ItemStack.ofEmpty(),
-        ItemStack.ofEmpty()
-    };
+    public final PlayerInventory inventory = new PlayerInventory(this);
     public boolean facingRight = true;
     private int animation = 0;
 
@@ -68,11 +59,11 @@ public class PlayerEntity extends Entity {
     }
 
     public void setItemMainHand(ItemStack item) {
-        hotBar[hotBarNum] = item;
+        inventory.setStack(Slot.HOT_BAR_ID0 + hotBarNum, item);
     }
 
     public ItemStack getItemMainHand() {
-        return hotBar[hotBarNum];
+        return inventory.getStack(Slot.HOT_BAR_ID0 + hotBarNum);
     }
 
     public double processInput() {

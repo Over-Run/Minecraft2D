@@ -24,19 +24,27 @@
 
 package io.github.overrun.mc2d.screen.slot;
 
-import io.github.overrun.mc2d.world.item.ItemStack;
+import io.github.overrun.mc2d.screen.inv.IInventory;
 
 /**
  * @author squid233
  * @since 2021/01/23
  */
-public final class Slot {
-    public final int x;
-    public final int y;
-    public ItemStack itemStack;
-
-    public Slot(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
+public record Slot(IInventory inventory, int id, int x, int y) {
+    public static final int HOT_BAR_ID0 = 0;
+    public static final int HOT_BAR_ID1 = 1;
+    public static final int HOT_BAR_ID2 = 2;
+    public static final int HOT_BAR_ID3 = 3;
+    public static final int HOT_BAR_ID4 = 4;
+    public static final int HOT_BAR_ID5 = 5;
+    public static final int HOT_BAR_ID6 = 6;
+    public static final int HOT_BAR_ID7 = 7;
+    public static final int HOT_BAR_ID8 = 8;
+    public static final int HOT_BAR_ID9 = 9;
+    public static final int OFFHAND_ID = 10;
+    public static final int PLAYER_INV_ID0 = 11;
+    public static final int CONTAINER_ID0 = 38;
+    public static final int WEAR_ID0 = 294;
+    public static final int ARMOR_ID0 = 298;
+    public static final int FLYING_ID0 = 302;
 }
