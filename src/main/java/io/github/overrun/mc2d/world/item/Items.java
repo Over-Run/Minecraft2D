@@ -42,6 +42,7 @@ public final class Items {
     public static final ItemType BEDROCK = register(5, "bedrock", Blocks.BEDROCK);
     public static final ItemType OAK_LOG = register(6, "oak_log", Blocks.OAK_LOG);
     public static final ItemType OAK_LEAVES = register(12, "oak_leaves", Blocks.OAK_LEAVES);
+    public static final ItemType OAK_PLANKS = register(18, "oak_planks", Blocks.OAK_PLANKS);
 
     public static void register() {
     }

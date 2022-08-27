@@ -40,6 +40,7 @@ public final class Blocks {
     public static final BlockType BEDROCK = register(5, "bedrock", new BlockType(BlockSettings.of()));
     public static final BlockType OAK_LOG = register(6, "oak_log", new BlockType(BlockSettings.of()));
     public static final BlockType OAK_LEAVES = register(12, "oak_leaves", new LeavesBlockType(BlockSettings.of()));
+    public static final BlockType OAK_PLANKS = register(18, "oak_planks", new BlockType(BlockSettings.of()));
 
     public static void register() {
     }
