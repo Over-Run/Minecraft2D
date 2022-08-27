@@ -13,24 +13,34 @@ This game is also on [itch.io](https://squid233.itch.io/minecraft2d).
 - Java: 17+
 - OpenGL: 1.1+
 
-## Playing
+## Downloading
 
-Minecraft2D 0.3.0 has shadowed all libraries, so you can use command `java -jar mc2d-0.3.0.jar` in terminal.
-
-Since 0.5.0, you must play game with the [launcher](https://over-run.github.io/mc2d/launcher/mc2d-launcher-0.1.0.jar).
+> Due to the official website has refactored, the content this below are invalid.
+>
+> ---
+>
+> Minecraft2D 0.3.0 has shadowed all libraries, so you can use command `java -jar mc2d-0.3.0.jar` in terminal.
+>
+> Since 0.5.0, you must play game with the [launcher](https://over-run.github.io/mc2d/launcher/mc2d-launcher-0.1.0.jar).
 
 Since 0.6.0, game is distributed with the [Application Plugin](https://docs.gradle.org/current/userguide/application_plugin.html).
 
 ## Keybindings
 
-- ENTER: Save the world
+- Esc: Pause and save the world
+- A/Left Arrow: Move left
+- D/Right Arrow: Move right
+- Space/W/Up Arrow: Jump
+- Enter: Save the world
 - F3: Turn on/off the debug HUD
-- COMMA/PERIOD (,/.): Change z mode
+- Z/Comma/Period (z/,/.): Change z mode
 - E: Open/close the inventory
+- G: Generate human entity
 
 ## Jvm Arguments
 
-- `-Dmc2d.vsync=<true|false>`: enable or disable v-sync
+- `-Dmc2d.log.disableAnsi=<default true|false>`: disable or enable ansi escaping (color, etc.)
+- `-Dmc2d.vsync=<default true|false>`: enable or disable v-sync
 
 ## Links
 

@@ -25,6 +25,7 @@
 package io.github.overrun.mc2d.screen.slot;
 
 import io.github.overrun.mc2d.screen.inv.IInventory;
+import io.github.overrun.mc2d.world.item.ItemStack;
 
 /**
  * @author squid233
@@ -47,4 +48,20 @@ public record Slot(IInventory inventory, int id, int x, int y) {
     public static final int WEAR_ID0 = 294;
     public static final int ARMOR_ID0 = 298;
     public static final int FLYING_ID0 = 302;
+
+    public boolean hasStack() {
+        return !getStack().isEmpty();
+    }
+
+    public ItemStack getStack() {
+        return inventory.getStack(id);
+    }
+
+    public void setStack(ItemStack stack) {
+        inventory.setStack(id, stack);
+    }
+
+    public void markDirty() {
+        inventory.markDirty();
+    }
 }

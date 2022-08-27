@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2022 Overrun Organization
+ * Copyright (c) 2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,43 +22,15 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.text;
+package io.github.overrun.mc2d.mod;
 
-import io.github.overrun.mc2d.util.Language;
-
-import java.util.Arrays;
-import java.util.StringJoiner;
+import java.net.URLClassLoader;
 
 /**
+ * A mod instance.
+ *
  * @author squid233
- * @since 2021/01/29
+ * @since 0.6.0
  */
-public class TranslatableText extends LiteralText {
-    private final Object[] args;
-
-    public TranslatableText(String key, Object... args) {
-        super(key);
-        this.args = args;
-    }
-
-    @Override
-    public String asString() {
-        return String.format(Language.getByKey(text), args);
-    }
-
-    @Override
-    public TranslatableText setStyle(Style style) {
-        TranslatableText newText = new TranslatableText(text);
-        newText.style = style;
-        return newText;
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", TranslatableText.class.getSimpleName() + "{", "}")
-                .add("text='" + text + "'")
-                .add("style=" + style)
-                .add("args=" + Arrays.toString(args))
-                .toString();
-    }
+public record ModInstance(ModInitializer initializer, URLClassLoader classLoader, String name, String version) {
 }

@@ -29,7 +29,6 @@ import io.github.overrun.mc2d.client.gui.screen.world.LoadingWorldScreen;
 import io.github.overrun.mc2d.client.gui.widget.ButtonWidget;
 import io.github.overrun.mc2d.client.world.render.WorldRenderer;
 import io.github.overrun.mc2d.text.IText;
-import io.github.overrun.mc2d.text.TranslatableText;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.world.World;
 import io.github.overrun.mc2d.world.entity.PlayerEntity;
@@ -53,10 +52,10 @@ public final class TitleScreen extends Screen {
     public void init() {
         super.init();
         addButton(new ButtonWidget((width - 200) / 2,
-            (height - 20) / 2 - 20,
+            (height - 20) / 2 - 25,
             200,
             20,
-            new TranslatableText("text.screen.singleplayer"),
+            IText.translatable("text.screen.singleplayer"),
             b -> {
                 client.world = new World(256, 128);
                 client.player = new PlayerEntity(client.world);
@@ -71,28 +70,28 @@ public final class TitleScreen extends Screen {
             (height - 20) / 2,
             200,
             20,
-            new TranslatableText("text.screen.multiplayer"),
+            IText.translatable("text.screen.multiplayer"),
             b -> {
             })).active = false;
         addButton(new ButtonWidget((width - 200) / 2,
-            (height - 20) / 2 + 20,
+            (height - 20) / 2 + 25,
             200,
             20,
-            new TranslatableText("text.screen.mods"),
+            IText.translatable("text.screen.mods"),
             b -> {
             })).active = false;
         addButton(new ButtonWidget((width - 200) / 2,
-            (height - 20) / 2 + 40,
+            (height - 20) / 2 + 50,
             100,
             20,
-            new TranslatableText("text.screen.options"),
+            IText.translatable("text.screen.options"),
             b -> {
             })).active = false;
         addButton(new ButtonWidget(width / 2,
-            (height - 20) / 2 + 40,
+            (height - 20) / 2 + 50,
             100,
             20,
-            new TranslatableText("text.screen.exit_game"),
+            IText.translatable("text.screen.exit_game"),
             b -> glfwSetWindowShouldClose(glfwGetCurrentContext(), true)));
     }
 

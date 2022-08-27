@@ -29,7 +29,7 @@ import io.github.overrun.mc2d.client.gui.screen.Screen;
 import io.github.overrun.mc2d.screen.CreativeTabScreenHandler;
 import io.github.overrun.mc2d.screen.inv.PlayerInventory;
 import io.github.overrun.mc2d.screen.slot.Slot;
-import io.github.overrun.mc2d.text.TranslatableText;
+import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.world.item.ItemStack;
 
@@ -45,7 +45,7 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
     private final ItemStack stack = ItemStack.ofEmpty();
 
     public CreativeTabScreen(CreativeTabScreenHandler handler, PlayerInventory playerInventory, Screen parent) {
-        super(handler, playerInventory, new TranslatableText("itemGroup.name.creativeTab"));
+        super(handler, playerInventory, IText.translatable("itemGroup.name.creativeTab"));
         this.parent = parent;
     }
 
@@ -53,18 +53,18 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
     protected void onClickSlot(Slot slot, int button) {
         super.onClickSlot(slot, button);
         // click on items
+        var invStack = slot.getStack();
         if (slot.id() >= Slot.CONTAINER_ID0) {
-            var invStack = handler.inventory.getStack(slot.id());
             if (!stack.isEmpty()) {
                 if (stack.getItem() == invStack.getItem()) {
                     stack.increment();
                 } else {
                     stack.setCount(0);
                 }
-                // todo: press shift -> ::transferItem
+                // todo: press shift -> ::transferSlot
             } else {
                 stack.set(invStack);
-                // ::transferItem
+                // ::transferSlot
                 if (button == GLFW_MOUSE_BUTTON_MIDDLE || Keyboard.isKeyPress(GLFW_KEY_LEFT_SHIFT)) {
                     stack.setCount(stack.getMaxCount());
                 }
@@ -72,14 +72,13 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
         }
         // click on hot-bar
         else {
-            var invStack = playerInventory.getStack(slot.id());
             if (!stack.isEmpty()) {
                 if (invStack.isEmpty()) {
                     if (button == GLFW_MOUSE_BUTTON_RIGHT) {
-                        playerInventory.setStack(slot.id(), ItemStack.copyOf(stack, 1));
+                        slot.setStack(stack.copy(1));
                         stack.decrement();
                     } else {
-                        playerInventory.setStack(slot.id(), ItemStack.copyOf(stack));
+                        slot.setStack(stack.copy());
                         stack.setCount(0);
                     }
                 } else {
@@ -91,8 +90,8 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
                             stack.setCount(Math.max(0, oldCount + stack.getCount() - invStack.getMaxCount()));
                         } else {
                             // swap
-                            var copyOldStack = ItemStack.copyOf(invStack);
-                            playerInventory.setStack(slot.id(), ItemStack.copyOf(stack));
+                            var copyOldStack = invStack.copy();
+                            playerInventory.setStack(slot.id(), stack.copy());
                             stack.set(copyOldStack);
                         }
                     } else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
@@ -105,7 +104,7 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
             } else {
                 if (!invStack.isEmpty()) {
                     if (button == GLFW_MOUSE_BUTTON_LEFT) {
-                        // ::transferItem
+                        // ::transferSlot
                         if (!Keyboard.isKeyPress(GLFW_KEY_LEFT_SHIFT)) {
                             stack.set(invStack);
                         }
@@ -120,7 +119,6 @@ public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHand
                         } else {
                             int half = invStack.getCount() / 2;
                             stack.set(playerInventory.removeStack(slot.id(), half));
-                            stack.setCount(half);
                         }
                     }
                 }

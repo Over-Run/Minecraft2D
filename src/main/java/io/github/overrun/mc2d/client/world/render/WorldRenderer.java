@@ -58,7 +58,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     public static final int MAX_REBUILDS_PER_FRAME = 8;
     private final Mc2dClient client;
     private final World world;
-    private final HitResult hitResult = new HitResult(null, 0, 0, 0, true);
+    public final HitResult hitResult = new HitResult(null, 0, 0, 0, true);
     private final int xChunks, yChunks;
     private final Long2ObjectMap<ClientChunk> chunkMap = new Long2ObjectArrayMap<>();
     private final List<ClientChunk> dirtyChunks = new ArrayList<>();

@@ -27,9 +27,9 @@ package io.github.overrun.mc2d.client.gui.screen.ingame;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
 import io.github.overrun.mc2d.client.gui.screen.world.SavingWorldScreen;
 import io.github.overrun.mc2d.client.gui.widget.ButtonWidget;
+import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.text.Style;
 import io.github.overrun.mc2d.text.TextColor;
-import io.github.overrun.mc2d.text.TranslatableText;
 
 /**
  * @author squid233
@@ -40,7 +40,7 @@ public final class PauseScreen extends Screen {
     private final double orgTimescale;
 
     public PauseScreen(Screen parent, double orgTimescale) {
-        super(new TranslatableText("text.screen.title.pausing"));
+        super(IText.translatable("text.screen.title.pausing"));
         this.parent = parent;
         this.orgTimescale = orgTimescale;
     }
@@ -55,13 +55,13 @@ public final class PauseScreen extends Screen {
             80,
             300,
             20,
-            new TranslatableText("text.screen.back_to_game"),
+            IText.translatable("text.screen.back_to_game"),
             b -> onClose()));
         addButton(new ButtonWidget(width / 2 - 150,
             110,
             300,
             20,
-            new TranslatableText("text.screen.save_and_back"),
+            IText.translatable("text.screen.save_and_back"),
             b -> client.openScreen(new SavingWorldScreen())));
     }
 

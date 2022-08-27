@@ -33,7 +33,7 @@ dependencies {
     for (String depend in ['', '-glfw', '-opengl', '-stb', '-jemalloc']) {
         for (String platform in [
             'linux-arm32', 'linux-arm64', 'linux',
-            'macos-arm64', 'macos',
+//            'macos-arm64', 'macos',
             'windows-arm64', 'windows-x86', 'windows'
         ]) {
             runtimeOnly "org.lwjgl:lwjgl$depend::natives-$platform"

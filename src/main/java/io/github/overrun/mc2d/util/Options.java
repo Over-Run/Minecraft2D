@@ -41,7 +41,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
  */
 public final class Options {
     public static final Properties OPTIONS = new Properties();
-    private static final File FILE =new File("options.txt");
+    private static final File FILE = new File("options.txt");
     public static final String KEY_CREATIVE_TAB = "key.creativeTab";
     public static final String LANG = "lang";
     public static final String GUI_SCALE = "guiScale";
@@ -67,7 +67,7 @@ public final class Options {
         if (!FILE.exists()) {
             put(KEY_CREATIVE_TAB, GLFW_KEY_E);
             OPTIONS.put(LANG, "en_us");
-            OPTIONS.put(GUI_SCALE, 2.0);
+            put(GUI_SCALE, 2.0);
             save();
         }
         try (var r = new FileReader(FILE)) {

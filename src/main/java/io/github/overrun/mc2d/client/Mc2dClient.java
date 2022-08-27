@@ -38,7 +38,6 @@ import io.github.overrun.mc2d.screen.CreativeTabScreenHandler;
 import io.github.overrun.mc2d.screen.inv.CreativeTabInventory;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.text.IText;
-import io.github.overrun.mc2d.text.TranslatableText;
 import io.github.overrun.mc2d.util.Language;
 import io.github.overrun.mc2d.util.Options;
 import io.github.overrun.mc2d.world.World;
@@ -46,6 +45,7 @@ import io.github.overrun.mc2d.world.block.Blocks;
 import io.github.overrun.mc2d.world.entity.HumanEntity;
 import io.github.overrun.mc2d.world.entity.PlayerEntity;
 import io.github.overrun.mc2d.world.item.BlockItemType;
+import io.github.overrun.mc2d.world.item.ItemStack;
 import io.github.overrun.mc2d.world.item.Items;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.Version;
@@ -62,6 +62,8 @@ import org.overrun.swgl.core.util.LogFactory9;
 import org.overrun.swgl.core.util.timing.Timer;
 import org.slf4j.Logger;
 
+import java.io.IOException;
+
 import static io.github.overrun.mc2d.client.gui.DrawableHelper.drawTexture;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -74,9 +76,17 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
     private static final Logger logger = LogFactory9.getLogger();
     private static Mc2dClient instance;
     public static final String VERSION = "0.6.0";
-    public static final IText VERSION_TEXT = IText.of("Minecraft2D " + VERSION);
-    private static final IText MAX_MEMORY;
+    public static final IText VERSION_TEXT = IText.literal("Minecraft2D " + VERSION);
+    private static final IText JAVA_TXT = IText.formatTranslatable("text.debug.java");
+    private static final long maxMemory;
+    private static final String maxMemoryStr;
+    private static final IText MEM_TXT = IText.formatTranslatable("text.debug.mem");
+    //    private static final IText CPU_TXT = IText.formatTranslatable("text.debug.cpu");
+    private static final IText DISPLAY_0_TXT = IText.formatTranslatable("text.debug.display_0");
+    private static final IText DISPLAY_1_TXT = IText.formatTranslatable("text.debug.display_1");
+    private static final IText DISPLAY_2_TXT = IText.formatTranslatable("text.debug.display_2");
     private static int oldX, oldY, oldWidth, oldHeight;
+    public final String glVendor, glRenderer, glVersion;
     public final TextRenderer textRenderer;
     private final TextureManager textureManager;
     public final ItemRenderer itemRenderer;
@@ -93,8 +103,8 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
     public double invGuiScale = 1 / guiScale;
 
     static {
-        double maxMemory = Runtime.getRuntime().maxMemory() / 1048576D;
-        MAX_MEMORY = new TranslatableText("text.debug.max_memory", maxMemory >= 1024 ? maxMemory / 1024D + " GB" : maxMemory + " MB");
+        maxMemory = Runtime.getRuntime().maxMemory();
+        maxMemoryStr = maxMemory == Long.MAX_VALUE ? "no limit" : (maxMemory / 1048576) + "MB";
     }
 
     private Mc2dClient() {
@@ -149,6 +159,45 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
             if (action == GLFW_PRESS) {
                 if (screen != null) {
                     screen.mousePressed(mouse.getIntLastX(), mouse.getIntLastY(), button);
+                } else if (world != null) {
+                    if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
+                        int id = Slot.HOT_BAR_ID0 + player.hotBarNum;
+                        var invStack = player.inventory.getStack(id);
+                        // has item on main-hand
+                        if (!invStack.isEmpty()) {
+                            int invSelect;
+                            if ((invSelect = player.inventory.indexOf(worldRenderer.hitResult.block)) > -1) {
+                                if (invSelect >= Slot.CONTAINER_ID0) {
+                                    // swap
+                                    player.inventory.setStack(id, player.inventory.getStack(invSelect).copy());
+                                    player.inventory.removeStack(invSelect);
+                                } else {
+                                    player.hotBarNum = invSelect - Slot.HOT_BAR_ID0;
+                                }
+                            } else /* is creaative mode */ {
+                                for (int i = 0; i < 10; i++) {
+                                    if (player.inventory.getStack(Slot.HOT_BAR_ID0 + i).isEmpty()) {
+                                        player.inventory.setStack(Slot.HOT_BAR_ID0 + i, ItemStack.of(worldRenderer.hitResult.block));
+                                        player.hotBarNum = i;
+                                        break;
+                                    }
+                                }
+                            }
+                        } else {
+                            int invSelect;
+                            if ((invSelect = player.inventory.indexOf(worldRenderer.hitResult.block)) > -1) {
+                                if (invSelect >= Slot.CONTAINER_ID0) {
+                                    // swap
+                                    player.inventory.setStack(id, player.inventory.getStack(invSelect).copy());
+                                    player.inventory.removeStack(invSelect);
+                                } else {
+                                    player.hotBarNum = invSelect - Slot.HOT_BAR_ID0;
+                                }
+                            } else {
+                                player.inventory.setStack(id, ItemStack.of(worldRenderer.hitResult.block));
+                            }
+                        }
+                    }
                 }
             }
         });
@@ -175,6 +224,9 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
         window.makeContextCurr();
         GL.createCapabilities();
         GLStateMgr.init();
+        glVendor = glGetString(GL_VENDOR);
+        glRenderer = glGetString(GL_RENDERER);
+        glVersion = glGetString(GL_VERSION);
         glfwSwapInterval(Boolean.parseBoolean(System.getProperty("mc2d.vsync", "true")) ? 1 : 0);
         window.show();
 
@@ -226,32 +278,81 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
         glViewport(0, 0, width, height);
     }
 
+    private void renderHotBar(int width, int height) {
+        textureManager.bindTexture(AbstractButtonWidget.WIDGETS_LOCATION);
+        glPushMatrix();
+        double hotBarX = (width - 202) / 2.;
+        glTranslated(hotBarX, height, 0);
+        drawTexture(0, -23, 0, 0, 202, 22);
+        drawTexture(player.hotBarNum * 20, -24, 1, 22, 22, 24);
+        for (int i = 0; i < 10; i++) {
+            var stack = player.inventory.getStack(Slot.HOT_BAR_ID0 + i);
+            if (!(stack.getItem() instanceof BlockItemType)) continue;
+            itemRenderer.renderItemStack(textRenderer, stack, 3 + i * 20, -20);
+        }
+        glPopMatrix();
+    }
+
     public void renderHud(int width, int height) {
         if (world != null) {
             if (debugging) {
+                final int lineH = textRenderer.drawHeight() + 1;
                 textRenderer.draw(0, 0, VERSION_TEXT);
-                textRenderer.draw(0, textRenderer.drawHeight() + 1, IText.of(fps + " fps"));
-                textRenderer.draw(0, textRenderer.drawHeight() * 2 + 1, new TranslatableText("text.debug.player.position",
+                textRenderer.draw(0, lineH, IText.literal(fps + " fps"));
+                textRenderer.draw(0, lineH * 3, IText.formatTranslatable("text.debug.player.position"),
                     player.position.x,
                     player.position.y,
-                    player.position.z));
-                textRenderer.draw(width - textRenderer.drawWidth(MAX_MEMORY), 0, MAX_MEMORY);
+                    player.position.z);
+                textRenderer.draw(0, lineH * 4, IText.formatTranslatable("text.debug.player.block_position"),
+                    (int) Math.floor(player.position.x),
+                    (int) Math.floor(player.position.y),
+                    (int) Math.floor(player.position.z));
                 if (ModLoader.getModCount() > 0) {
-                    textRenderer.draw(0, 119, new TranslatableText("text.debug.mod_count", ModLoader.getModCount()));
+                    textRenderer.draw(0, lineH * 6, IText.formatTranslatable("text.debug.mod_count"), ModLoader.getModCount());
                 }
+
+                glPushMatrix();
+                glTranslatef(width, 0, 0);
+                textRenderer.drawAtRight(0, 0,
+                    JAVA_TXT,
+                    false,
+                    Runtime.version());
+                long usedMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+                textRenderer.drawAtRight(0, textRenderer.drawHeight() + 1,
+                    MEM_TXT,
+                    false,
+                    usedMem * 100 / maxMemory, usedMem / 1048576, maxMemoryStr);
+
+//                textRenderer.drawAtRight(0, lineH * 3, CPU_TXT, false);
+
+                textRenderer.drawAtRight(0, lineH * 5,
+                    DISPLAY_0_TXT,
+                    false,
+                    window.getWidth(), window.getHeight(), glVendor);
+                textRenderer.drawAtRight(0, lineH * 6,
+                    DISPLAY_1_TXT,
+                    false,
+                    glRenderer);
+                textRenderer.drawAtRight(0, lineH * 7,
+                    DISPLAY_2_TXT,
+                    false,
+                    glVersion);
+
+                if (!worldRenderer.hitResult.miss) {
+                    textRenderer.drawAtRight(0, lineH * 9,
+                        IText.formatTranslatable("text.debug.target_block"),
+                        false,
+                        worldRenderer.hitResult.x,
+                        worldRenderer.hitResult.y,
+                        worldRenderer.hitResult.z);
+                    textRenderer.drawAtRight(0, lineH * 10,
+                        IText.literal(worldRenderer.hitResult.block.getId().toString()),
+                        false
+                    );
+                }
+                glPopMatrix();
             }
-            textureManager.bindTexture(AbstractButtonWidget.WIDGETS_LOCATION);
-            glPushMatrix();
-            double hotBarX = (width - 202) / 2.;
-            glTranslated(hotBarX, height, 0);
-            drawTexture(0, -23, 0, 0, 202, 22);
-            drawTexture(player.hotBarNum * 20, -24, 1, 22, 22, 24);
-            for (int i = 0; i < 10; i++) {
-                var stack = player.inventory.getStack(Slot.HOT_BAR_ID0 + i);
-                if (!(stack.getItem() instanceof BlockItemType)) continue;
-                itemRenderer.renderItemStack(textRenderer, stack, 3 + i * 20, -20);
-            }
-            glPopMatrix();
+            renderHotBar(width, height);
         }
     }
 
@@ -313,6 +414,13 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
 
     public void update() {
         if (world != null) {
+            //todo:remove
+            if (screen == null && Keyboard.isKeyPress(GLFW_KEY_G)) {
+                var entity = new HumanEntity(world);
+                entity.setPosition(player.position.x(), player.position.y(), player.position.z());
+                entity.prevPos.set(entity.position);
+                world.spawnEntity(entity);
+            }
             world.update();
 
             if (screen == null) {
@@ -390,9 +498,20 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
 
     @Override
     public void close() {
+        if (world != null) {
+            world.save(player);
+        }
         textureManager.close();
         PlayerEntity.model.close();
         HumanEntity.model.close();
+
+        for (var instances : ModLoader.getMods().values()) {
+            try {
+                instances.classLoader().close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         logger.info("Stopping!");
         window.destroy();

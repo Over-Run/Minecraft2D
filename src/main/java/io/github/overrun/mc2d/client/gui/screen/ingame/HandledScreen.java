@@ -27,7 +27,6 @@ package io.github.overrun.mc2d.client.gui.screen.ingame;
 import io.github.overrun.mc2d.client.TextureManager;
 import io.github.overrun.mc2d.client.gui.DrawableHelper;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
-import io.github.overrun.mc2d.client.model.BlockModelMgr;
 import io.github.overrun.mc2d.screen.ScreenHandler;
 import io.github.overrun.mc2d.screen.inv.PlayerInventory;
 import io.github.overrun.mc2d.screen.slot.Slot;
@@ -107,8 +106,8 @@ public abstract class HandledScreen<T extends ScreenHandler> extends Screen {
     private boolean mouseOverSlotEffect(Slot slot, int mouseX, int mouseY) {
         int fx0 = x + slot.x();
         int fy0 = y + slot.y();
-        int fx1 = fx0 + 16;
-        int fy1 = fy0 + 16;
+        int fx1 = fx0 + 18;
+        int fy1 = fy0 + 18;
         if (mouseX >= fx0
             && mouseX < fx1
             && mouseY >= fy0
@@ -133,7 +132,8 @@ public abstract class HandledScreen<T extends ScreenHandler> extends Screen {
     }
 
     private void drawSlot(Slot slot) {
-        client.itemRenderer.renderItemStack(textRenderer, slot.inventory().getStack(slot.id()), x + slot.x(), y + slot.y());
+        client.itemRenderer.renderItemStack(textRenderer, slot.getStack(),
+            x + slot.x() + 1, y + slot.y() + 1);
     }
 
     @Override

@@ -25,20 +25,26 @@
 package io.github.overrun.mc2d.screen.inv;
 
 import io.github.overrun.mc2d.world.entity.PlayerEntity;
+import io.github.overrun.mc2d.world.item.ItemConvertible;
 import io.github.overrun.mc2d.world.item.ItemStack;
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
  * @author squid233
  * @since 0.6.0
  */
 public class PlayerInventory implements IInventory {
-    private final Int2ObjectMap<ItemStack> stacks = new Int2ObjectArrayMap<>(size());
+    private final Int2ObjectMap<ItemStack> stacks = new Int2ObjectOpenHashMap<>(size());
     public final PlayerEntity player;
 
     public PlayerInventory(PlayerEntity player) {
         this.player = player;
+    }
+
+    @Override
+    public Int2ObjectMap<ItemStack> getItems() {
+        return stacks;
     }
 
     @Override
@@ -54,6 +60,16 @@ public class PlayerInventory implements IInventory {
             }
         }
         return true;
+    }
+
+    @Override
+    public int indexOf(ItemConvertible item) {
+        for (var e : stacks.int2ObjectEntrySet()) {
+            if (e.getValue().getItem() == item.asItem()) {
+                return e.getIntKey();
+            }
+        }
+        return -1;
     }
 
     @Override
@@ -81,6 +97,7 @@ public class PlayerInventory implements IInventory {
         if (stack.getCount() > stack.getMaxCount()) {
             stack.setCount(stack.getMaxCount());
         }
+        markDirty();
     }
 
     @Override

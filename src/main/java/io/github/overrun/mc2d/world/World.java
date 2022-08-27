@@ -129,11 +129,10 @@ public class World {
      * Generates the terrain.
      */
     public void genTerrain() {
+        // generate terrain
         for (int x = 0; x < width; x++) {
             for (int z = 0; z < depth; z++) {
-                setBlock(x, 0, z, BEDROCK);
-
-                int layers = (int) sumOctaves(16, x, 0, z, 0.5f, 0.007f, 1, 64);
+                int layers = (int) sumOctaves(16, x, z, 0, 0.5f, 0.007f, 1, 64);
                 setBlock(x, layers - 1, z, GRASS_BLOCK);
                 for (int y = layers - 4, c = layers - 1; y < c; y++) {
                     setBlock(x, y, z, DIRT);
@@ -141,6 +140,13 @@ public class World {
                 for (int y = 1, c = layers - 4; y < c; y++) {
                     setBlock(x, y, z, STONE);
                 }
+            }
+        }
+        // generate bedrock
+
+        for (int x = 0; x < width; x++) {
+            for (int z = 0; z < depth; z++) {
+                setBlock(x, 0, z, BEDROCK);
             }
         }
     }
@@ -328,6 +334,7 @@ public class World {
                 }
                 case "blocks" -> {
                     reader.beginArray();
+                    Arrays.fill(blocks, AIR.getId());
                     for (int i = 0, l = w * h * d; i < l; i++) {
                         blocks[i] = idMap.get(reader.nextInt());
                     }

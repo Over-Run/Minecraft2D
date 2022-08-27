@@ -109,7 +109,7 @@ public class DefaultedRegistry<T> extends MutableRegistry<T> {
         entries.add(entry);
         entry2rawId.put(entry, rawId);
         if (rawId > nextId) {
-            nextId = rawId;
+            nextId = rawId + 1;
         }
         return entry;
     }

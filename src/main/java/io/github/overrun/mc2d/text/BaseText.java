@@ -24,24 +24,45 @@
 
 package io.github.overrun.mc2d.text;
 
+import io.github.overrun.mc2d.util.Language;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringJoiner;
+
 /**
  * @author squid233
  * @since 2021/01/29
  */
 public abstract class BaseText implements IText {
+    protected static final Map<String, StyledText> FORMATTED_MAP = new HashMap<>();
+    protected static final Map<String, StyledText> TRANSLATABLE_MAP = new HashMap<>();
+    protected static final Map<String, StyledText> FORMAT_TRANSLATABLE_MAP = new HashMap<>();
     protected final String text;
+    protected final boolean translatable;
+    protected final boolean formatted;
 
-    public BaseText(String text) {
+    protected BaseText(String text, boolean translatable, boolean formatted) {
         this.text = text;
+        this.translatable = translatable;
+        this.formatted = formatted;
     }
 
     @Override
-    public String asString() {
+    public String asString(Object... args) {
+        if (translatable) {
+            if (formatted) return String.format(Language.getByKey(text), args);
+            return Language.getByKey(text);
+        }
+        if (formatted) return String.format(text, args);
         return text;
     }
 
     @Override
     public String toString() {
-        return "BaseText{text=" + text + "}";
+        return new StringJoiner(", ", BaseText.class.getSimpleName() + "[", "]")
+            .add("text='" + text + "'")
+            .add("translatable=" + translatable)
+            .toString();
     }
 }

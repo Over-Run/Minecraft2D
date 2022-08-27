@@ -69,10 +69,10 @@ public final class Language {
             } catch (Throwable t) {
                 logger.error("Catching", t);
             }
-            for (String modid : ModLoader.getMods().keySet()) {
+            for (String namespace : ModLoader.getMods().keySet()) {
                 try (InputStream is = Objects.requireNonNull(
-                    ModLoader.getLoader(modid).getResourceAsStream(
-                        "assets/" + modid + "/lang/" + entry.getKey() + ".lang"
+                    ModLoader.getLoader(namespace).getResourceAsStream(
+                        "assets/" + namespace + "/lang/" + entry.getKey() + ".lang"
                     ));
                      Reader r = new InputStreamReader(is, StandardCharsets.UTF_8)
                 ) {

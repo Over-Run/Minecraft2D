@@ -24,29 +24,32 @@
 
 package io.github.overrun.mc2d.mod;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
+import java.util.Objects;
 
 /**
  * @author squid233
  * @since 2021/01/27
  */
 public final class ModLoader {
-    private static final Map<String, ModInitializer> MODS = new LinkedHashMap<>();
-    private static final Map<String, ClassLoader> MOD_LOADERS = new LinkedHashMap<>();
-    private static final Map<String, String> MODS_NAME = new LinkedHashMap<>();
-    private static final Map<String, String> MODS_VERSION = new LinkedHashMap<>();
+    private static final Gson GSON = new GsonBuilder()
+        .registerTypeAdapter(ModInfoFile.class, new ModInfoFile.Serializer())
+        .create();
+    private static final Map<String, ModInstance> INSTANCES = new LinkedHashMap<>();
     private static final Logger logger = LoggerFactory.getLogger("Minecraft2D ModLoader");
 
     /**
@@ -67,59 +70,37 @@ public final class ModLoader {
                 var isModFile = file.isFile() &&
                                 (filename.endsWith(".jar") || filename.endsWith(".zip"));
                 if (isModFile) {
-                    String modid = null, name, version, main;
+                    String namespace = null, name, version, main;
                     try {
                         var loader = new URLClassLoader(new URL[]{file.toURI().toURL()}, Thread.currentThread().getContextClassLoader());
-                        var is = loader.getResourceAsStream("mc2d.mod.prop");
+                        var is = loader.getResourceAsStream("mc2d.mod.json");
                         if (is != null) {
-                            try (is) {
-                                var prop = new Properties(4);
-                                prop.load(is);
-                                modid = prop.getProperty("modid");
-                                if (modid == null) {
-                                    throw new RuntimeException("Mod ID is null; this is not allowed!");
+                            try (var reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                                var modInfoFile = GSON.fromJson(reader, ModInfoFile.class);
+                                namespace = modInfoFile.getNamespace();
+                                if (namespace == null) {
+                                    throw new RuntimeException("Mod namespace is null; this is not allowed!");
                                 }
-                                name = prop.getProperty("name", modid);
-                                version = prop.getProperty("version", "0.0.0");
-                                main = prop.getProperty("main");
+                                name = Objects.requireNonNull(modInfoFile.getName(), namespace);
+                                version = Objects.requireNonNull(modInfoFile.getVersion(), "0.0.0");
+                                main = modInfoFile.getMain();
                                 try {
-                                    var clazz = Class.forName(main, true, loader);
-                                    MOD_LOADERS.put(modid, loader);
-                                    MODS_NAME.put(modid, name);
-                                    MODS_VERSION.put(modid, version);
+                                    var clazz = loader.loadClass(main);
+                                    var modInitializer = (ModInitializer) clazz.getDeclaredConstructor().newInstance();
+                                    var instance = new ModInstance(modInitializer, loader, name, version);
+                                    INSTANCES.put(namespace, instance);
                                     try {
-                                        var modInitializer = (ModInitializer) clazz.getDeclaredConstructor().newInstance();
-                                        MODS.put(modid, modInitializer);
-                                        try {
-                                            for (Field field : clazz.getFields()) {
-                                                if (field.getDeclaredAnnotation(Mod.Instance.class) != null) {
-                                                    field.set(modInitializer, modInitializer);
-                                                }
-                                                if (field.getDeclaredAnnotation(Mod.Modid.class) != null) {
-                                                    field.set(modInitializer, modid);
-                                                }
-                                                if (field.getDeclaredAnnotation(Mod.Name.class) != null) {
-                                                    field.set(modInitializer, name);
-                                                }
-                                                if (field.getDeclaredAnnotation(Mod.Version.class) != null) {
-                                                    field.set(modInitializer, version);
-                                                }
+                                        for (Field field : clazz.getDeclaredFields()) {
+                                            if (field.getDeclaredAnnotation(Mod.Instance.class) != null) {
+                                                field.set(modInitializer, instance);
                                             }
-                                            clazz.getDeclaredConstructor().setAccessible(false);
-                                        } catch (SecurityException | IllegalArgumentException | IllegalAccessException |
-                                                 NoSuchMethodException ignored) {
                                         }
-                                    } catch (InstantiationException | IllegalAccessException |
-                                             InvocationTargetException | NoSuchMethodException | SecurityException e) {
-                                        try {
-                                            clazz.getMethod(main.split("@", 2)[1]).invoke(null);
-                                        } catch (ArrayIndexOutOfBoundsException | NoSuchMethodException ee) {
-                                            var field = clazz.getField(main.split("#", 2)[1]);
-                                            field.getType().getMethod("onInitialize").invoke(field.get(null));
-                                        }
+                                        clazz.getDeclaredConstructor().setAccessible(false);
+                                    } catch (SecurityException | IllegalArgumentException | IllegalAccessException |
+                                             NoSuchMethodException ignored) {
                                     }
                                 } catch (Exception e) {
-                                    throw new RuntimeException("Could not execute entrypoint due to errors, provided by '" + modid + "'!");
+                                    throw new RuntimeException("Could not execute entrypoint due to errors, provided by '" + namespace + "'!", e);
                                 }
                             } catch (IOException e) {
                                 logger.error("Catching", e);
@@ -128,18 +109,16 @@ public final class ModLoader {
                     } catch (MalformedURLException e) {
                         logger.warn("Error while loading mod", e);
                     }
-                    if (modid == null || modid.isEmpty() || modid.isBlank()) {
-                        throw new RuntimeException("Mod ID is null or empty; this is not allowed!");
+                    if (namespace == null || namespace.isEmpty() || namespace.isBlank()) {
+                        throw new RuntimeException("Mod namespace is null or empty; this is not allowed!");
                     }
                     try {
-                        if (!MODS.isEmpty()) {
-                            for (var initializer : MODS.values()) {
-                                logger.info("Loading mod {}@{}!", getName(modid), getVersion(modid));
-                                initializer.onInitialize();
-                            }
+                        for (var instance : INSTANCES.values()) {
+                            logger.info("Loading mod {}@{}!", instance.name(), instance.version());
+                            instance.initializer().onInitialize();
                         }
                     } catch (Throwable t) {
-                        throw new RuntimeException("Could not execute entrypoint due to errors, provided by '" + modid + "'!");
+                        throw new RuntimeException("Could not execute entrypoint due to errors, provided by '" + namespace + "'!", t);
                     }
                 }
             }
@@ -147,27 +126,27 @@ public final class ModLoader {
     }
 
     /**
-     * Get the mod's {@link ClassLoader}.
+     * Get the {@link ClassLoader} of the mod.
      *
-     * @param modid The mod identifier.
+     * @param namespace The namespace of the mod.
      * @return The ClassLoader.
      */
-    public static ClassLoader getLoader(String modid) {
-        return MOD_LOADERS.get(modid);
+    public static URLClassLoader getLoader(String namespace) {
+        return INSTANCES.get(namespace).classLoader();
     }
 
     /**
      * Get the mod's friendly name.
      *
-     * @param modid The mod identifier.
+     * @param namespace The namespace of the mod.
      * @return The mod's friendly name.
      */
-    public static String getName(String modid) {
-        return MODS_NAME.get(modid);
+    public static String getName(String namespace) {
+        return INSTANCES.get(namespace).name();
     }
 
-    public static String getVersion(String modid) {
-        return MODS_VERSION.get(modid);
+    public static String getVersion(String namespace) {
+        return INSTANCES.get(namespace).version();
     }
 
     /**
@@ -176,10 +155,10 @@ public final class ModLoader {
      * @return Mod count.
      */
     public static int getModCount() {
-        return MODS.size();
+        return INSTANCES.size();
     }
 
-    public static Map<String, ModInitializer> getMods() {
-        return Map.copyOf(MODS);
+    public static Map<String, ModInstance> getMods() {
+        return INSTANCES;
     }
 }

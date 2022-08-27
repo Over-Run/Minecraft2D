@@ -74,7 +74,7 @@ public class BlockModelMgr {
         for (var tex : textures) {
             infoList.add(new SpriteInfo(
                 function.apply(tex),
-                id.isVanilla() ? IFileProvider.ofCaller() : IFileProvider.of(ModLoader.getLoader(tex.getNamespace())),
+                tex.isVanilla() ? IFileProvider.ofCaller() : IFileProvider.of(ModLoader.getLoader(tex.getNamespace())),
                 16,
                 16)
             );

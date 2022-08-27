@@ -40,11 +40,11 @@ public final class CreativeTabScreenHandler extends ScreenHandler {
         this.inventory = inventory;
         // content
         for (int i = 0; i < 45; i++) {
-            addSlot(new Slot(inventory, Slot.CONTAINER_ID0 + i, 9 + i % 9 * 18, 18 + i / 9 * 18));
+            addSlot(new Slot(inventory, Slot.CONTAINER_ID0 + i, 8 + i % 9 * 18, 17 + i / 9 * 18));
         }
         // hot-bar
         for (int i = 0; i < 10; i++) {
-            addSlot(new Slot(playerInventory, Slot.HOT_BAR_ID0 + i, 9 + i * 18, 112));
+            addSlot(new Slot(playerInventory, Slot.HOT_BAR_ID0 + i, 8 + i * 18, 111));
         }
     }
 

@@ -73,10 +73,6 @@ public final class TextRenderer {
         glVertex2d(x1, y);
     }
 
-    public void drawWithShadow(int x, int y, IText text) {
-        draw(x, y, text, true);
-    }
-
     public void draw(int x, int y, String text, int bgColor, int fgColor, boolean shadow) {
         final char[] chars = text.toCharArray();
         int currX = x;
@@ -93,13 +89,21 @@ public final class TextRenderer {
         glEnd();
     }
 
-    public void draw(int x, int y, IText text, boolean shadow) {
+    public void draw(int x, int y, IText text, boolean shadow, Object... args) {
         var color = text.getStyle().getColor();
-        draw(x, y, text.asString(), color.bgColor(), color.fgColor(), shadow);
+        draw(x, y, text.asString(args), color.bgColor(), color.fgColor(), shadow);
     }
 
-    public void draw(int x, int y, IText text) {
-        draw(x, y, text, false);
+    public void drawWithShadow(int x, int y, IText text, Object... args) {
+        draw(x, y, text, true, args);
+    }
+
+    public void draw(int x, int y, IText text, Object... args) {
+        draw(x, y, text, false, args);
+    }
+
+    public void drawAtRight(int x, int y, IText text, boolean shadow, Object... args) {
+        draw(x - drawWidth(text, args), y, text, shadow, args);
     }
 
     public int drawWidth(String text) {
@@ -110,18 +114,21 @@ public final class TextRenderer {
         return width;
     }
 
-    public int drawWidth(IText text) {
-        return drawWidth(text.asString());
+    public int drawWidth(IText text, Object... args) {
+        return drawWidth(text.asString(args));
     }
 
     public int drawWidth(char c) {
-        final double s = client.invGuiScale;
-        if (c > 31 && c < 256) return (int) (8 * s);
-        return (int) (16 * s);
+        if (c > 31 && c < 256)
+            // 8 / 2
+            return 4;
+        // 16 / 2
+        return 8;
     }
 
     public int drawHeight() {
-        return (int) (16 * client.invGuiScale);
+        // 16 / 2
+        return 8;
     }
 
     /**

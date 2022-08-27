@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2022 Overrun Organization
+ * Copyright (c) 2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,36 +24,51 @@
 
 package io.github.overrun.mc2d.text;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.StringJoiner;
 
 /**
+ * A text with {@link Style}.
+ *
  * @author squid233
- * @since 2021/01/29
+ * @since 0.6.0
  */
-public class LiteralText extends BaseText {
+public class StyledText extends BaseText {
     protected Style style;
 
-    public LiteralText(String text) {
-        super(text);
+    protected StyledText(String text, boolean translatable, boolean formatted, Style style) {
+        super(text, translatable, formatted);
+        this.style = style;
+    }
+
+    protected StyledText(String text, boolean translatable, boolean formatted) {
+        this(text, translatable, formatted, null);
     }
 
     @Override
-    public Style getStyle() {
-        return style == null ? style = Style.EMPTY : style;
+    public @NotNull Style getStyle() {
+        return style == null ? Style.EMPTY : style;
     }
 
     @Override
     public IText setStyle(Style style) {
-        LiteralText newText = new LiteralText(text);
+        var newText = new StyledText(text, translatable, formatted);
         newText.style = style;
         return newText;
     }
 
     @Override
+    public IText copy() {
+        return new StyledText(text, translatable, formatted, style);
+    }
+
+    @Override
     public String toString() {
-        return new StringJoiner(", ", LiteralText.class.getSimpleName() + "{", "}")
-                .add("text='" + text + "'")
-                .add("style=" + style)
-                .toString();
+        return new StringJoiner(", ", StyledText.class.getSimpleName() + "[", "]")
+            .add("text='" + text + "'")
+            .add("translatable=" + translatable)
+            .add("style=" + style)
+            .toString();
     }
 }

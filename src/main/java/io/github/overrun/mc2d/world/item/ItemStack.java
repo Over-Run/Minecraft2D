@@ -52,15 +52,15 @@ public final class ItemStack {
         return of(Items.AIR, 0);
     }
 
-    public static ItemStack copyOf(ItemStack stack, int count) {
-        var itemStack = of(stack.getItem(), count);
-        itemStack.setMaxCount(stack.getMaxCount());
-        itemStack.setCount(itemStack.getCount());
-        return itemStack;
+    public ItemStack copy(int count) {
+        var stack = of(getItem(), count);
+        stack.setMaxCount(getMaxCount());
+        stack.setCount(stack.getCount());
+        return stack;
     }
 
-    public static ItemStack copyOf(ItemStack stack) {
-        return copyOf(stack, stack.getCount());
+    public ItemStack copy() {
+        return copy(getCount());
     }
 
     public void set(ItemStack stack) {

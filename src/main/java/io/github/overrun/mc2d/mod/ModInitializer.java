@@ -25,19 +25,14 @@
 package io.github.overrun.mc2d.mod;
 
 /**
- * Mark a class as entrypoint.
- * <h2>Compatible</h2>
- * <ul>
- *     <li>{@code implements}: all versions</li>
- *     <li>{@code public static void entrypoint()}: since 0.6.0</li>
- *     <li>{@code public static ModInitializer entrypoint = () -> {}}:
- *     since 0.6.0</li>
- * </ul>
- * <ol>
- *     <li>package.class[.innerclass]</li>
- *     <li>package.class[.innerclass]@staticMethod</li>
- *     <li>package.class[.innerclass]#STATIC_FIELD</li>
- * </ol>
+ * The mod entrypoint.
+ *
+ * <h2>Example</h2>
+ * <pre>{@code
+ * public class MyMod implements ModInitializer {
+ *     @Override
+ *     public void onInitialize() { }
+ * }}</pre>
  *
  * @author squid233
  * @since 2021/01/27

@@ -24,30 +24,47 @@
 
 package io.github.overrun.mc2d.text;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * @author squid233
  * @since 2021/01/29
  */
 public interface IText {
-    IText EMPTY = of("");
+    IText EMPTY = literal("");
 
-    static IText of(String text) {
-        return new LiteralText(text);
+    static IText literal(String text) {
+        return new StyledText(text, false, false);
+    }
+
+    static IText formatted(String text) {
+        return BaseText.FORMATTED_MAP.computeIfAbsent(text, s -> new StyledText(s, false, true));
+    }
+
+    static IText translatable(String text) {
+        return BaseText.TRANSLATABLE_MAP.computeIfAbsent(text, s -> new StyledText(s, true, false));
+    }
+
+    static IText formatTranslatable(String text) {
+        return BaseText.FORMAT_TRANSLATABLE_MAP.computeIfAbsent(text, s -> new StyledText(s, true, true));
     }
 
     /**
      * Cast to string.
      * <p>May be a translated text.</p>
      *
+     * @param args the arguments for formatting
      * @return The text.
      */
-    String asString();
+    String asString(Object... args);
 
-    default Style getStyle() {
+    default @NotNull Style getStyle() {
         return Style.EMPTY;
     }
 
     IText setStyle(Style style);
+
+    IText copy();
 
     default IText withColor(TextColor color) {
         return setStyle(getStyle().withColor(color));
