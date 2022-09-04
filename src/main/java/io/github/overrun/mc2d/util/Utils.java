@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2022 Overrun Organization
+ * Copyright (c) 2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,29 +22,39 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d;
+package io.github.overrun.mc2d.util;
 
-import io.github.overrun.mc2d.client.GameVersion;
-import io.github.overrun.mc2d.client.Mc2dClient;
-import io.github.overrun.mc2d.util.Options;
-import org.overrun.swgl.core.util.LogFactory9;
-import org.slf4j.Logger;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
+ * The utils.
+ *
  * @author squid233
- * @since 2021/01/07
+ * @since 0.6.0
  */
-public final class Main {
-    // todo: mods and options screen
+public final class Utils {
+    /**
+     * Perform an action with the instance.
+     *
+     * @param t        the instance
+     * @param function the function
+     * @param <T>      the instance type
+     * @param <R>      the return type
+     * @return the value from the function
+     */
+    public static <T, R> R with(T t, Function<T, R> function) {
+        return function.apply(t);
+    }
 
-    private static final Logger logger = LogFactory9.getLogger();
-
-    public static void main(String[] args) {
-        Options.init();
-        logger.info("Loading for game Minecraft2D {}", GameVersion.versionString());
-        try (var client = Mc2dClient.getInstance()) {
-            client.init();
-            client.run();
-        }
+    /**
+     * Perform an action with the instance.
+     *
+     * @param t        the instance
+     * @param consumer the consumer
+     * @param <T>      the instance type
+     */
+    public static <T> void let(T t, Consumer<T> consumer) {
+        consumer.accept(t);
     }
 }

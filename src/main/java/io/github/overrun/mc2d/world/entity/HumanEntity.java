@@ -43,7 +43,7 @@ public class HumanEntity extends Entity {
 
     public HumanEntity(World world) {
         super(world);
-        setPosition(Math.random() * world.width, 70, 1.5);
+        teleport(Math.random() * world.width, 70, 1.5);
     }
 
     @Override

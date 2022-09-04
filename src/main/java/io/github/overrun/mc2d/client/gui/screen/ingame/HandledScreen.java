@@ -79,6 +79,7 @@ public abstract class HandledScreen<T extends ScreenHandler> extends Screen {
      */
     protected abstract void drawBackground(int mouseX, int mouseY);
 
+    // ::(slotId, quickCraftMask, clickType, player)
     protected void onClickSlot(Slot slot, int button) {
     }
 

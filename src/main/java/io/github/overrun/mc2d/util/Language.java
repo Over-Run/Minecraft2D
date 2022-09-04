@@ -67,7 +67,7 @@ public final class Language {
                 prop.load(r);
                 putKv(entry.getKey(), prop);
             } catch (Throwable t) {
-                logger.error("Catching", t);
+                logger.error("Catching loading language file", t);
             }
             for (String namespace : ModLoader.getMods().keySet()) {
                 try (InputStream is = Objects.requireNonNull(

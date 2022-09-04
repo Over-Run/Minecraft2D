@@ -25,7 +25,10 @@
 package io.github.overrun.mc2d.client.gui.screen.world;
 
 import io.github.overrun.mc2d.client.gui.screen.DirtScreen;
+import io.github.overrun.mc2d.client.world.render.WorldRenderer;
 import io.github.overrun.mc2d.text.IText;
+import io.github.overrun.mc2d.world.World;
+import io.github.overrun.mc2d.world.entity.PlayerEntity;
 
 /**
  * @author squid233
@@ -44,6 +47,13 @@ public final class LoadingWorldScreen extends DirtScreen {
     @Override
     public void tick() {
         super.tick();
+        client.world = new World(256, 128);
+        client.player = new PlayerEntity(client.world);
+        if (!client.world.load(client.player)) {
+            client.world.genTerrain();
+        }
+        client.worldRenderer = new WorldRenderer(client, client.world);
+        client.world.addListener(client.worldRenderer);
         onClose();
     }
 

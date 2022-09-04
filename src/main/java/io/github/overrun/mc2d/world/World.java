@@ -24,15 +24,17 @@
 
 package io.github.overrun.mc2d.world;
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import io.github.overrun.mc2d.client.GameVersion;
 import io.github.overrun.mc2d.client.Mc2dClient;
-import io.github.overrun.mc2d.util.Identifier;
+import io.github.overrun.mc2d.util.Utils;
 import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.world.block.BlockType;
 import io.github.overrun.mc2d.world.entity.Entity;
 import io.github.overrun.mc2d.world.entity.HumanEntity;
 import io.github.overrun.mc2d.world.entity.PlayerEntity;
+import io.github.overrun.mc2d.world.ibt.BinaryTag;
+import io.github.overrun.mc2d.world.ibt.IBTType;
+import io.github.overrun.mc2d.world.ibt.IBinaryTag;
 import org.joml.SimplexNoise;
 import org.overrun.swgl.core.phys.p2d.AABRect2f;
 import org.overrun.swgl.core.util.LogFactory9;
@@ -42,7 +44,6 @@ import org.slf4j.Logger;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -55,9 +56,8 @@ import static io.github.overrun.mc2d.world.block.Blocks.*;
  */
 public class World {
     private static final Logger logger = LogFactory9.getLogger();
-    private static final long WORLD_VERSION = 3L;
     public int pickZ = 1;
-    private final Identifier[] blocks;
+    private final BlockType[] blocks;
     public final int width;
     public final int height;
     public final int depth;
@@ -69,8 +69,8 @@ public class World {
         width = w;
         height = h;
         depth = 2;
-        blocks = new Identifier[w * h * depth];
-        Arrays.fill(blocks, AIR.getId());
+        blocks = new BlockType[w * h * depth];
+        Arrays.fill(blocks, AIR);
         for (int i = 0; i < 100; i++) {
             spawnEntity(new HumanEntity(this));
         }
@@ -133,12 +133,12 @@ public class World {
         for (int x = 0; x < width; x++) {
             for (int z = 0; z < depth; z++) {
                 int layers = (int) sumOctaves(16, x, z, 0, 0.5f, 0.007f, 1, 64);
-                setBlock(x, layers - 1, z, GRASS_BLOCK);
+                setBlockStates(x, layers - 1, z, GRASS_BLOCK);
                 for (int y = layers - 4, c = layers - 1; y < c; y++) {
-                    setBlock(x, y, z, DIRT);
+                    setBlockStates(x, y, z, DIRT);
                 }
                 for (int y = 1, c = layers - 4; y < c; y++) {
-                    setBlock(x, y, z, STONE);
+                    setBlockStates(x, y, z, STONE);
                 }
             }
         }
@@ -146,7 +146,7 @@ public class World {
 
         for (int x = 0; x < width; x++) {
             for (int z = 0; z < depth; z++) {
-                setBlock(x, 0, z, BEDROCK);
+                setBlockStates(x, 0, z, BEDROCK);
             }
         }
     }
@@ -188,24 +188,24 @@ public class World {
                z >= getMinZ() && z < getMaxZ();
     }
 
-    public boolean setBlock(int x, int y, int z, BlockType block) {
+    public boolean setBlockStates(int x, int y, int z, BlockType blockStates) {
         if (isInBorder(x, y, z)) {
             final int index = getIndex(x, y, z);
-            if (blocks[index].equals(block.getId())) {
+            if (blocks[index] == blockStates) {
                 return false;
             }
             for (var listener : listeners) {
                 listener.blockChanged(x, y, z);
             }
-            blocks[index] = block.getId();
+            blocks[index] = blockStates;
             return true;
         }
         return false;
     }
 
-    public BlockType getBlock(int x, int y, int z) {
+    public BlockType getBlockStates(int x, int y, int z) {
         if (isInBorder(x, y, z)) {
-            return Registry.BLOCK.getById(blocks[getIndex(x, y, z)]);
+            return blocks[getIndex(x, y, z)];
         }
         return AIR;
     }
@@ -237,7 +237,7 @@ public class World {
 
         for (int x = x0; x < x1; x++) {
             for (int y = y0; y < y1; y++) {
-                var aabb = getBlock(x, y, z).getCollisionShape();
+                var aabb = getBlockStates(x, y, z).getCollisionShape();
                 if (aabb != null) {
                     lst.add(new AABRect2f(aabb.minX() + x,
                         aabb.minY() + y,
@@ -256,15 +256,11 @@ public class World {
         }
         var file = new File("level.dat");
         if (file.exists()) {
-            try (var fis = new FileInputStream(file);
-                 var gis = new GZIPInputStream(fis);
-                 var isr = new InputStreamReader(gis);
-                 var br = new BufferedReader(isr);
-                 var jr = new JsonReader(br)) {
-                deserialize(jr, player);
+            try (var is = new ObjectInputStream(new BufferedInputStream(new GZIPInputStream(new FileInputStream(file))))) {
+                deserialize(BinaryTag.deserialize(is), player);
                 return true;
-            } catch (IOException e) {
-                logger.error("Catching", e);
+            } catch (IOException | ClassNotFoundException e) {
+                logger.error("Catching loading world", e);
                 return false;
             }
         }
@@ -273,75 +269,48 @@ public class World {
 
     public void save(PlayerEntity player) {
         logger.info("Saving world");
-        try (var fos = new FileOutputStream("level.dat");
-             var gos = new GZIPOutputStream(fos);
-             var osw = new OutputStreamWriter(gos);
-             var bw = new BufferedWriter(osw);
-             var jw = new JsonWriter(bw)) {
-            serialize(jw, player);
+        try (var os = new ObjectOutputStream(new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream("level.dat"))))) {
+            var tag = new BinaryTag();
+            serialize(tag, player);
+            tag.serialize(os);
         } catch (IOException e) {
-            logger.error("Catching", e);
+            logger.error("Catching saving world", e);
         }
     }
 
-    public void serialize(JsonWriter writer, PlayerEntity player) throws IOException {
-        writer.beginObject()
-            .name("version").value(WORLD_VERSION)
-            .name("width").value(width)
-            .name("height").value(height)
-            .name("depth").value(depth)
-            .name("player");
-        player.serialize(writer);
-        var idMap = new HashMap<Identifier, Integer>();
-        writer.name("id_map").beginObject();
-        for (var reg : Registry.BLOCK) {
-            var k = Registry.BLOCK.getRawId(reg.getValue());
-            var v = reg.getKey();
-            writer.name(String.valueOf(k)).value(v.toString());
-            idMap.put(v, k);
-        }
-        writer.endObject();
-        writer.name("blocks").beginArray();
-        for (var block : blocks) {
-            writer.value(idMap.get(block));
-        }
-        writer.endArray().endObject();
-    }
-
-    public void deserialize(JsonReader reader, PlayerEntity player) throws IOException {
-        var idMap = new HashMap<Integer, Identifier>();
-        int w = 0, h = 0, d = 0;
-        reader.beginObject();
-        while (reader.hasNext()) {
-            switch (reader.nextName()) {
-                case "version" -> {
-                    var v = reader.nextLong();
-                    if (WORLD_VERSION != v) {
-                        throw new RuntimeException("Doesn't compatible with version " + v + ". Current is " + WORLD_VERSION);
-                    }
-                }
-                case "width" -> w = reader.nextInt();
-                case "height" -> h = reader.nextInt();
-                case "depth" -> d = reader.nextInt();
-                case "player" -> player.deserialize(reader);
-                case "id_map" -> {
-                    reader.beginObject();
-                    while (reader.hasNext()) {
-                        idMap.put(Integer.parseInt(reader.nextName()),
-                            new Identifier(reader.nextString()));
-                    }
-                    reader.endObject();
-                }
-                case "blocks" -> {
-                    reader.beginArray();
-                    Arrays.fill(blocks, AIR.getId());
-                    for (int i = 0, l = w * h * d; i < l; i++) {
-                        blocks[i] = idMap.get(reader.nextInt());
-                    }
-                    reader.endArray();
-                }
+    public void serialize(IBinaryTag tag, PlayerEntity player) throws IOException {
+        tag.set("version", GameVersion.worldVersion());
+        tag.set("width", width);
+        tag.set("height", height);
+        tag.set("depth", depth);
+        Utils.let(new BinaryTag(), t -> {
+            player.save(t);
+            tag.set("player", t);
+        });
+        Utils.let(new int[blocks.length], v -> {
+            for (int i = 0; i < blocks.length; i++) {
+                v[i] = blocks[i].getRawId();
             }
+            tag.set("blocks", v);
+        });
+    }
+
+    public void deserialize(IBinaryTag tag, PlayerEntity player) throws IOException {
+        long v = tag.get(IBTType.LONG, "version");
+        if (GameVersion.worldVersion() != v) {
+            throw new RuntimeException("Doesn't compatible with version " + v + ". Current is " + GameVersion.worldVersion());
         }
-        reader.endObject();
+        final int w = tag.get(IBTType.INT, "width");
+        final int h = tag.get(IBTType.INT, "height");
+        final int d = tag.get(IBTType.INT, "depth");
+        if (player.worldFixer != null) {
+            player.worldFixer.adapt("version", tag.getGeneric("player.version"));
+        }
+        player.load(tag.get(IBTType.TAG, "player"));
+        Arrays.fill(blocks, AIR);
+        int[] rawBlocks = tag.get(IBTType.INT_ARRAY, "blocks");
+        for (int i = 0, sz = w * h * d; i < sz; i++) {
+            blocks[i] = Registry.BLOCK.getByRawId(rawBlocks[i]);
+        }
     }
 }

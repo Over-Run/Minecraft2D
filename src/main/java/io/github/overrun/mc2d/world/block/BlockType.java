@@ -75,7 +75,7 @@ public class BlockType implements ItemConvertible {
     }
 
     public boolean shouldRender(World world, int x, int y, int z) {
-        return z == 1 || (world.getBlock(x, y, 1).isTexTransparency());
+        return z == 1 || (world.getBlockStates(x, y, 1).isTexTransparency());
     }
 
     public void render(Tesselator t, int x, int y, int z) {

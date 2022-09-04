@@ -24,17 +24,14 @@
 
 package io.github.overrun.mc2d.world.entity;
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.model.PlayerEntityModel;
 import io.github.overrun.mc2d.screen.inv.PlayerInventory;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.world.World;
+import io.github.overrun.mc2d.world.ibt.IBinaryTag;
 import io.github.overrun.mc2d.world.item.ItemStack;
-
-import java.io.IOException;
 
 import static io.github.overrun.mc2d.client.Keyboard.isKeyPress;
 import static org.lwjgl.glfw.GLFW.*;
@@ -55,7 +52,16 @@ public class PlayerEntity extends Entity {
 
     public PlayerEntity(World world) {
         super(world);
-        setPosition(Math.random() * world.width, world.height + 10, 1.5);
+        worldFixer = (name, value) -> {
+            if ("version".equals(name)) {
+                long v = (long) value.value();
+                if (v != PLAYER_VERSION) {
+                    throw new RuntimeException("Doesn't compatible with version " + v + ". Current is " + PLAYER_VERSION);
+                }
+            }
+            return value;
+        };
+        teleport(Math.random() * world.width, world.height + 10, 1.5);
     }
 
     public void setItemMainHand(ItemStack item) {
@@ -113,45 +119,16 @@ public class PlayerEntity extends Entity {
 
     public void render(float delta, int mouseX, int mouseY) {
         var client = Mc2dClient.getInstance();
-        double x = client.window.getWidth() * .5;
-        double y = client.window.getHeight() * .5;
-
         client.getTextureManager().bindTexture(TEXTURE);
         glPushMatrix();
-        glLoadIdentity();
-        // Move to center
-        glTranslated(x, y, 0);
-        glScalef(32, 32, 1);
+        glTranslated(lerpPos.x(), lerpPos.y(), 0);
         model.render(delta, facingRight, animation);
         glPopMatrix();
     }
 
-    public void serialize(JsonWriter writer) throws IOException {
-        writer.beginObject()
-            .name("version").value(PLAYER_VERSION)
-            .name("x").value(position.x)
-            .name("y").value(position.y)
-            .name("z").value(position.z)
-            .endObject();
-    }
-
-    public void deserialize(JsonReader reader) throws IOException {
-        double x = position.x, y = position.y, z = position.z;
-        reader.beginObject();
-        while (reader.hasNext()) {
-            switch (reader.nextName()) {
-                case "version" -> {
-                    var v = reader.nextLong();
-                    if (PLAYER_VERSION != v) {
-                        throw new RuntimeException("Doesn't compatible with version " + v + ". Current is " + PLAYER_VERSION);
-                    }
-                }
-                case "x" -> x = reader.nextDouble();
-                case "y" -> y = reader.nextDouble();
-                case "z" -> z = reader.nextDouble();
-            }
-        }
-        reader.endObject();
-        setPosition(x, y, z);
+    @Override
+    public IBinaryTag save(IBinaryTag tag) {
+        tag.set("version", PLAYER_VERSION);
+        return super.save(tag);
     }
 }

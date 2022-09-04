@@ -86,7 +86,7 @@ public class ClientChunk extends Chunk {
         t.begin();
         for (int x = x0; x < x1; x++) {
             for (int y = y0; y < y1; y++) {
-                var b = world.getBlock(x, y, layer);
+                var b = world.getBlockStates(x, y, layer);
                 if (b.shouldRender(world, x, y, layer)) {
                     b.render(t, x, y, layer);
                 }

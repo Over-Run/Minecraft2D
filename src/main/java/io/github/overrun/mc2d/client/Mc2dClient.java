@@ -75,8 +75,7 @@ import static org.lwjgl.opengl.GL11.*;
 public final class Mc2dClient implements Runnable, AutoCloseable {
     private static final Logger logger = LogFactory9.getLogger();
     private static Mc2dClient instance;
-    public static final String VERSION = "0.6.0";
-    public static final IText VERSION_TEXT = IText.literal("Minecraft2D " + VERSION);
+    public static final IText VERSION_TEXT = IText.literal("Minecraft2D " + GameVersion.versionString());
     private static final IText JAVA_TXT = IText.formatTranslatable("text.debug.java");
     private static final long maxMemory;
     private static final String maxMemoryStr;
@@ -401,7 +400,7 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
                 }
                 case GLFW_KEY_G -> {
                     var entity = new HumanEntity(world);
-                    entity.setPosition(player.position.x(), player.position.y(), player.position.z());
+                    entity.teleport(player.position.x(), player.position.y(), player.position.z());
                     entity.prevPos.set(entity.position);
                     world.spawnEntity(entity);
                 }
@@ -417,7 +416,7 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
             //todo:remove
             if (screen == null && Keyboard.isKeyPress(GLFW_KEY_G)) {
                 var entity = new HumanEntity(world);
-                entity.setPosition(player.position.x(), player.position.y(), player.position.z());
+                entity.teleport(player.position.x(), player.position.y(), player.position.z());
                 entity.prevPos.set(entity.position);
                 world.spawnEntity(entity);
             }
@@ -498,6 +497,8 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
 
     @Override
     public void close() {
+        logger.info("Stopping!");
+
         if (world != null) {
             world.save(player);
         }
@@ -509,11 +510,10 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
             try {
                 instances.classLoader().close();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Catching closing mod", e);
             }
         }
 
-        logger.info("Stopping!");
         window.destroy();
         glfwTerminate();
         var cb = glfwSetErrorCallback(null);

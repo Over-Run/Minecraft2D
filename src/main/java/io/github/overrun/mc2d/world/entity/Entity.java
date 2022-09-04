@@ -24,7 +24,10 @@
 
 package io.github.overrun.mc2d.world.entity;
 
+import io.github.overrun.mc2d.world.IWorldFixer;
 import io.github.overrun.mc2d.world.World;
+import io.github.overrun.mc2d.world.ibt.IBTType;
+import io.github.overrun.mc2d.world.ibt.IBinaryTag;
 import org.joml.Vector3d;
 import org.overrun.swgl.core.phys.p2d.AABRect2f;
 import org.overrun.swgl.core.util.math.Numbers;
@@ -46,15 +49,23 @@ public class Entity {
     protected float bbWidth = 0.6f;
     protected float bbHeight = 1.8f;
     public World world;
+    public IWorldFixer worldFixer;
 
     public Entity(World world) {
         this.world = world;
+        resetPosition(0, 0, 0);
     }
 
-    public void setPosition(double x, double y, double z) {
+    public void resetPosition(double x, double y, double z) {
         position.set(x, y, z);
         float hw = bbWidth * 0.5f;
         box = new AABRect2f((float) (x - hw), (float) y, (float) (x + hw), (float) (y + bbHeight));
+    }
+
+    public void teleport(double x, double y, double z) {
+        position.set(x, y, z);
+        float hw = bbWidth * 0.5f;
+        box.set((float) (x - hw), (float) y, (float) (x + hw), (float) (y + bbHeight));
     }
 
     public void remove() {
@@ -93,5 +104,32 @@ public class Entity {
             box.minY(),
             position.z()
         );
+    }
+
+    /**
+     * Sets the tag to serialize.
+     *
+     * @param tag the tag
+     * @return the tag with new properties
+     */
+    public IBinaryTag save(IBinaryTag tag) {
+        tag.set("position", new double[]{position.x(), position.y(), position.z()});
+        tag.set("velocity", new double[]{velocity.x(), velocity.y(), velocity.z()});
+        tag.set("onGround", (byte) (onGround ? 1 : 0));
+        return tag;
+    }
+
+    /**
+     * Load properties from the tag.
+     *
+     * @param tag the tag
+     */
+    public void load(IBinaryTag tag) {
+        double[] pos = tag.get(IBTType.DOUBLE_ARRAY, "position");
+        teleport(pos[0], pos[1], pos[2]);
+        prevPos.set(pos);
+        double[] vel = tag.get(IBTType.DOUBLE_ARRAY, "velocity");
+        velocity.set(vel);
+        onGround = tag.get(IBTType.BYTE, "onGround") != 0;
     }
 }

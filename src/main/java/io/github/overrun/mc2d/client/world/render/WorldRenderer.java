@@ -151,7 +151,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
              y <= my; y++) {
             for (int x = Math.max(world.getMinX(), ox - rx), mx = Math.min(world.getMaxX(), ox + rx);
                  x <= mx; x++) {
-                var block = world.getBlock(x, y, world.pickZ);
+                var block = world.getBlockStates(x, y, world.pickZ);
                 var shape = block.getRayCastingShape();
                 if (shape == null) {
                     continue;
@@ -208,11 +208,11 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
                 if (client.mouse.isBtnDown(GLFW_MOUSE_BUTTON_RIGHT)) {
                     var stack = client.player.getItemMainHand();
                     if (!stack.isEmpty() && stack.getItem() instanceof BlockItemType blockItemType) {
-                        world.setBlock(x, y, z, blockItemType.getBlock());
+                        world.setBlockStates(x, y, z, blockItemType.getBlock());
                     }
                 }
             } else if (client.mouse.isBtnDown(GLFW_MOUSE_BUTTON_LEFT)) {
-                world.setBlock(x, y, z, Blocks.AIR);
+                world.setBlockStates(x, y, z, Blocks.AIR);
             }
         }
     }

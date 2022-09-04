@@ -59,7 +59,7 @@ public final class Options {
         try (var os = new FileOutputStream(FILE)) {
             OPTIONS.store(os, null);
         } catch (IOException e) {
-            logger.error("Catching", e);
+            logger.error("Catching saving options", e);
         }
     }
 
@@ -74,7 +74,7 @@ public final class Options {
             OPTIONS.load(r);
             save();
         } catch (IOException e) {
-            logger.error("Catching", e);
+            logger.error("Catching loading options", e);
         }
     }
 

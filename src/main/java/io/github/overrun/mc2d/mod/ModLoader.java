@@ -103,7 +103,7 @@ public final class ModLoader {
                                     throw new RuntimeException("Could not execute entrypoint due to errors, provided by '" + namespace + "'!", e);
                                 }
                             } catch (IOException e) {
-                                logger.error("Catching", e);
+                                logger.error("Catching loading mod", e);
                             }
                         }
                     } catch (MalformedURLException e) {
