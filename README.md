@@ -11,7 +11,7 @@ This game is also on [itch.io](https://squid233.itch.io/minecraft2d).
 ## Runtime Environment
 
 - Java: 17+
-- OpenGL: 1.1+
+- OpenGL: 1.5+
 
 ## Downloading
 
@@ -40,7 +40,6 @@ Since 0.6.0, game is distributed with the [Application Plugin](https://docs.grad
 ## Jvm Arguments
 
 - `-Dmc2d.log.disableAnsi=<default true|false>`: disable or enable ansi escaping (color, etc.)
-- `-Dmc2d.vsync=<default true|false>`: enable or disable v-sync
 
 ## Links
 

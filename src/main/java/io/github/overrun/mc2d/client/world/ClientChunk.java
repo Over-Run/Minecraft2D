@@ -24,22 +24,25 @@
 
 package io.github.overrun.mc2d.client.world;
 
-import io.github.overrun.mc2d.client.render.Tesselator;
+import io.github.overrun.mc2d.client.render.VertexLayouts;
 import io.github.overrun.mc2d.world.Chunk;
 import io.github.overrun.mc2d.world.World;
 import io.github.overrun.mc2d.world.entity.player.PlayerEntity;
+import org.overrun.swgl.core.gl.GLFixedBatch;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
 
 /**
  * @author squid233
  * @since 0.6.0
  */
 public class ClientChunk extends Chunk {
+    private static final int LAYERS = 2;
     private final World world;
     private final double x, y;
     private final int x0, y0, x1, y1;
-    private final int lists;
+    private final GLFixedBatch[] batches = new GLFixedBatch[LAYERS];
+    private final int[] vbo = new int[LAYERS];
     private boolean isDirty = true;
     private boolean built = false;
 
@@ -53,7 +56,7 @@ public class ClientChunk extends Chunk {
         this.y1 = y1;
         x = (x0 + x1) * 0.5;
         y = (y0 + y1) * 0.5;
-        lists = glGenLists(2);
+        glGenBuffers(vbo);
     }
 
     public static long pos2Long(int x, int y) {
@@ -81,19 +84,23 @@ public class ClientChunk extends Chunk {
     }
 
     private void rebuild(int layer) {
-        glNewList(lists + layer, GL_COMPILE);
-        final var t = Tesselator.getInstance();
-        t.begin();
+        GLFixedBatch batch;
+        if ((batch = batches[layer]) == null) {
+            batch = new GLFixedBatch(512 * 1024, 0);
+            batches[layer] = batch;
+        }
+        batch.begin(VertexLayouts.T2F_C3UB_V3F);
         for (int x = x0; x < x1; x++) {
             for (int y = y0; y < y1; y++) {
                 var b = world.getBlockStates(x, y, layer);
                 if (b.shouldRender(world, x, y, layer)) {
-                    b.render(t, x, y, layer);
+                    b.render(batch, x, y, layer);
                 }
             }
         }
-        t.flush(GL_QUADS);
-        glEndList();
+        batch.end();
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[layer]);
+        glBufferData(GL_ARRAY_BUFFER, batch.getBuffer(), GL_DYNAMIC_DRAW);
     }
 
     public void rebuild() {
@@ -101,11 +108,16 @@ public class ClientChunk extends Chunk {
         built = true;
         rebuild(0);
         rebuild(1);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     public void render(int layer) {
         if (built) {
-            glCallList(lists + layer);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[layer]);
+            glTexCoordPointer(2, GL_FLOAT, 3 + (5 << 2), 0L);
+            glColorPointer(3, GL_UNSIGNED_BYTE, 3 + (5 << 2), 2 << 2);
+            glVertexPointer(3, GL_FLOAT, 3 + (5 << 2), 3 + (2 << 2));
+            glDrawArrays(GL_QUADS, 0, batches[layer].getVertexCount());
         }
     }
 
@@ -114,6 +126,9 @@ public class ClientChunk extends Chunk {
     }
 
     public void free() {
-        glDeleteLists(lists, 2);
+        glDeleteBuffers(vbo);
+        for (int i = 0; i < LAYERS; i++) {
+            batches[i].close();
+        }
     }
 }

@@ -232,7 +232,7 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
         glVendor = glGetString(GL_VENDOR);
         glRenderer = glGetString(GL_RENDERER);
         glVersion = glGetString(GL_VERSION);
-        glfwSwapInterval(Boolean.parseBoolean(System.getProperty("mc2d.vsync", "true")) ? 1 : 0);
+        glfwSwapInterval(options.getB(Options.VSYNC, true) ? 1 : 0);
         window.show();
 
         textRenderer = new TextRenderer(this);

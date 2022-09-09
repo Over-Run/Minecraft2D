@@ -25,15 +25,15 @@
 package io.github.overrun.mc2d.world.block;
 
 import io.github.overrun.mc2d.client.model.BlockModelMgr;
-import io.github.overrun.mc2d.client.render.Tesselator;
 import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.util.shape.VoxelShapes;
 import io.github.overrun.mc2d.world.World;
-import io.github.overrun.mc2d.world.item.ItemType;
 import io.github.overrun.mc2d.world.item.ItemConvertible;
+import io.github.overrun.mc2d.world.item.ItemType;
 import io.github.overrun.mc2d.world.item.Items;
 import org.jetbrains.annotations.Nullable;
+import org.overrun.swgl.core.gl.GLFixedBatch;
 import org.overrun.swgl.core.phys.p2d.AABRect2f;
 
 import java.util.HashMap;
@@ -78,7 +78,7 @@ public class BlockType implements ItemConvertible {
         return z == 1 || (world.getBlockStates(x, y, 1).isTexTransparency());
     }
 
-    public void render(Tesselator t, int x, int y, int z) {
+    public void render(GLFixedBatch t, int x, int y, int z) {
         var path = BlockModelMgr.blockTexture(getTexture());
         var atlas = BlockModelMgr.getBlockAtlas();
         float u0 = atlas.getU0n(path);
@@ -90,10 +90,10 @@ public class BlockType implements ItemConvertible {
         } else {
             t.color(1.0f, 1.0f, 1.0f);
         }
-        t.tex(u0, v0).vertex(x, y + 1, z);
-        t.tex(u0, v1).vertex(x, y, z);
-        t.tex(u1, v1).vertex(x + 1, y, z);
-        t.tex(u1, v0).vertex(x + 1, y + 1, z);
+        t.texCoord(u0, v0).vertex(x, y + 1, z).emit();
+        t.texCoord(u0, v1).vertex(x, y, z).emit();
+        t.texCoord(u1, v1).vertex(x + 1, y, z).emit();
+        t.texCoord(u1, v0).vertex(x + 1, y + 1, z).emit();
     }
 
     @Deprecated

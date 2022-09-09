@@ -39,28 +39,42 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
 public final class Options {
     private static final Logger logger = LogFactory9.getLogger();
     private static final File FILE = new File("options.txt");
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Keybindings
+    ///////////////////////////////////////////////////////////////////////////
+
     public static final String KEY_ITEM_GROUP = "key.itemGroup";
+
     public static final String LANG = "lang";
     public static final String GUI_SCALE = "guiScale";
+    public static final String VSYNC = "vsync";
+
     public final Properties options = new Properties();
 
     public Options() {
         if (!FILE.exists()) {
-            put(KEY_ITEM_GROUP, GLFW_KEY_E);
-            put(LANG, "en_us");
-            put(GUI_SCALE, 2.0);
+            init();
             save();
         }
         try (var r = new BufferedInputStream(new FileInputStream(FILE))) {
             options.load(r);
+            init();
             save();
         } catch (IOException e) {
             logger.error("Catching loading options", e);
         }
     }
 
-    private void put(String key, Object value) {
-        options.put(key, String.valueOf(value));
+    private void init() {
+        putIfAbsent(KEY_ITEM_GROUP, GLFW_KEY_E);
+        putIfAbsent(LANG, "en_us");
+        putIfAbsent(GUI_SCALE, 2.0);
+        putIfAbsent(VSYNC, true);
+    }
+
+    private void putIfAbsent(String key, Object value) {
+        options.putIfAbsent(key, String.valueOf(value));
     }
 
     public void save() {

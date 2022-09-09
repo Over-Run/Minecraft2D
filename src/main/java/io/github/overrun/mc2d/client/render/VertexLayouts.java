@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2022 Overrun Organization
+ * Copyright (c) 2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,46 +22,17 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world.block;
+package io.github.overrun.mc2d.client.render;
 
-import io.github.overrun.mc2d.util.Identifier;
-import io.github.overrun.mc2d.util.shape.VoxelShapes;
-import org.jetbrains.annotations.Nullable;
-import org.overrun.swgl.core.gl.GLFixedBatch;
-import org.overrun.swgl.core.phys.p2d.AABRect2f;
+import org.overrun.swgl.core.model.VertexFormat;
+import org.overrun.swgl.core.model.VertexLayout;
 
 /**
+ * The extent of {@link org.overrun.swgl.core.model.BuiltinVertexLayouts swgl layouts}.
+ *
  * @author squid233
- * @since 2021/01/27
+ * @since 0.6.0
  */
-public class AirBlockType extends BlockType {
-    public AirBlockType(BlockSettings settings) {
-        super(settings);
-    }
-
-    @Override
-    @Nullable
-    public AABRect2f getOutlineShape() {
-        return VoxelShapes.fullSquare();
-    }
-
-    @Override
-    @Nullable
-    public AABRect2f getCollisionShape() {
-        return VoxelShapes.empty();
-    }
-
-    @Override
-    public boolean isTexTransparency() {
-        return true;
-    }
-
-    @Override
-    public void render(GLFixedBatch t, int x, int y, int z) {
-    }
-
-    @Override
-    public Identifier getTexture() {
-        return null;
-    }
+public class VertexLayouts {
+    public static final VertexLayout T2F_C3UB_V3F = new VertexLayout(VertexFormat.T2F, VertexFormat.C3UB, VertexFormat.V3F);
 }

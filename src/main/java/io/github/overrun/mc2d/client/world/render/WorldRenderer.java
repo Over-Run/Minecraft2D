@@ -47,7 +47,7 @@ import java.util.function.Consumer;
 import static io.github.overrun.mc2d.world.Chunk.CHUNK_SIZE;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
-import static org.lwjgl.opengl.GL11.glColor3f;
+import static org.lwjgl.opengl.GL15.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 
 /**
@@ -135,7 +135,16 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
 
     public void render(int z) {
         client.getTextureManager().bindTexture(BlockModelMgr.BLOCK_ATLAS);
+
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glEnableClientState(GL_COLOR_ARRAY);
+        glEnableClientState(GL_VERTEX_ARRAY);
         forVisibleChunk(c -> c.render(z));
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        glDisableClientState(GL_COLOR_ARRAY);
+        glDisableClientState(GL_VERTEX_ARRAY);
+
         client.getTextureManager().bindTexture(0);
     }
 
