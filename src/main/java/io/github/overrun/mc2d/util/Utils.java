@@ -52,6 +52,19 @@ public final class Utils {
      *
      * @param t        the instance
      * @param consumer the consumer
+     * @param <T>      the instance and return type
+     * @return the value from the function
+     */
+    public static <T> T also(T t, Consumer<T> consumer) {
+        consumer.accept(t);
+        return t;
+    }
+
+    /**
+     * Perform an action in a closure with the instance.
+     *
+     * @param t        the instance
+     * @param consumer the consumer
      * @param <T>      the instance type
      */
     public static <T> void let(T t, Consumer<T> consumer) {

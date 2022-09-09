@@ -29,17 +29,52 @@ import io.github.overrun.mc2d.util.Identifier;
 import java.util.Map.Entry;
 
 /**
+ * The base registry.
+ *
+ * @param <T> the registry entry
  * @author squid233
  * @since 2021/01/27
  */
 public abstract class BaseRegistry<T> implements Iterable<Entry<Identifier, T>> {
+    /**
+     * Gets the identifier of the given entry.
+     *
+     * @param entry the entry
+     * @return the identifier
+     */
     public abstract Identifier getId(T entry);
 
+    /**
+     * Gets the entry by the given identifier.
+     *
+     * @param id the identifier
+     * @return the entry
+     */
     public abstract T getById(Identifier id);
 
+    /**
+     * Gets the raw identifier of the given entry.
+     *
+     * @param entry the entry
+     * @return the raw id number
+     */
     public abstract int getRawId(T entry);
 
+    /**
+     * Gets the entry by the given raw identifier.
+     *
+     * @param rawId the raw id number
+     * @return the entry
+     */
     public abstract T getByRawId(int rawId);
 
-    public abstract T register(Identifier id, T entry);
+    /**
+     * Register an entry.
+     *
+     * @param id    the identifier of the entry
+     * @param entry the entry
+     * @param <R>   the entry instance type
+     * @return the entry
+     */
+    public abstract <R extends T> R register(Identifier id, R entry);
 }

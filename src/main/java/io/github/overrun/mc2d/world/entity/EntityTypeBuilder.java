@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020-2022 Overrun Organization
+ * Copyright (c) 2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,34 +22,29 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.screen;
+package io.github.overrun.mc2d.world.entity;
 
-import io.github.overrun.mc2d.screen.inv.IInventory;
-import io.github.overrun.mc2d.screen.inv.PlayerInventory;
-import io.github.overrun.mc2d.screen.slot.Slot;
-import io.github.overrun.mc2d.world.entity.PlayerEntity;
+import io.github.overrun.mc2d.world.IWorldFixer;
+import org.jetbrains.annotations.Nullable;
 
 /**
+ * The entity type builder.
+ *
+ * @param <T> the entity instance type
  * @author squid233
- * @since 2021/01/25
+ * @since 0.6.0
  */
-public final class CreativeTabScreenHandler extends ScreenHandler {
-    public final IInventory inventory;
+public class EntityTypeBuilder<T extends Entity> {
+    private final EntityType.Factory<T> factory;
 
-    public CreativeTabScreenHandler(PlayerInventory playerInventory, IInventory inventory) {
-        this.inventory = inventory;
-        // content
-        for (int i = 0; i < 45; i++) {
-            addSlot(new Slot(inventory, Slot.CONTAINER_ID0 + i, 8 + i % 9 * 18, 17 + i / 9 * 18));
-        }
-        // hot-bar
-        for (int i = 0; i < 10; i++) {
-            addSlot(new Slot(playerInventory, Slot.HOT_BAR_ID0 + i, 8 + i * 18, 111));
-        }
+    public EntityTypeBuilder(EntityType.Factory<T> factory) {
+        this.factory = factory;
     }
 
-    @Override
-    public boolean canUse(PlayerEntity player) {
-        return inventory.canPlayerUse(player);
+    public EntityType<T> build(@Nullable IWorldFixer worldFixer) {
+        if (factory == null) {
+            throw new IllegalStateException("Entity type factory is null!");
+        }
+        return new EntityType<>(factory, worldFixer);
     }
 }

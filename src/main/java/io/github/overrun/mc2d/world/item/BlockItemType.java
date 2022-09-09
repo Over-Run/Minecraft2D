@@ -34,7 +34,8 @@ import io.github.overrun.mc2d.world.block.BlockType;
 public class BlockItemType extends ItemType {
     private final BlockType block;
 
-    public BlockItemType(BlockType block) {
+    public BlockItemType(ItemSettings settings, BlockType block) {
+        super(settings);
         this.block = block;
         BlockType.BLOCK_ITEMS.put(block, this);
     }

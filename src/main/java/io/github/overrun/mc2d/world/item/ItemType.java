@@ -32,8 +32,20 @@ import io.github.overrun.mc2d.util.registry.Registry;
  * @since 2021/01/27
  */
 public class ItemType implements ItemConvertible {
+    final ItemSettings settings;
+
+    public ItemType(ItemSettings settings) {
+        this.settings = settings;
+    }
+
+    public ItemGroup getGroup() {
+        return settings.group;
+    }
+
+    @Deprecated
     public Identifier getTexture() {
-        return getId();
+        var id = getId();
+        return new Identifier(id.getNamespace(), "item/" + id.getPath());
     }
 
     public final int getRawId() {

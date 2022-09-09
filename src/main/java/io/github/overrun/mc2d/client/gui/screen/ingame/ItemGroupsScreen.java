@@ -26,7 +26,7 @@ package io.github.overrun.mc2d.client.gui.screen.ingame;
 
 import io.github.overrun.mc2d.client.Keyboard;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
-import io.github.overrun.mc2d.screen.CreativeTabScreenHandler;
+import io.github.overrun.mc2d.screen.ItemGroupsScreenHandler;
 import io.github.overrun.mc2d.screen.inv.PlayerInventory;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.text.IText;
@@ -39,13 +39,13 @@ import static org.lwjgl.glfw.GLFW.*;
  * @author squid233
  * @since 2021/01/23
  */
-public final class CreativeTabScreen extends HandledScreen<CreativeTabScreenHandler> {
+public final class ItemGroupsScreen extends HandledScreen<ItemGroupsScreenHandler> {
     private static final Identifier TEXTURE = new Identifier("textures/gui/tab_items.png");
     private final Screen parent;
     private final ItemStack stack = ItemStack.ofEmpty();
 
-    public CreativeTabScreen(CreativeTabScreenHandler handler, PlayerInventory playerInventory, Screen parent) {
-        super(handler, playerInventory, IText.translatable("itemGroup.name.creativeTab"));
+    public ItemGroupsScreen(ItemGroupsScreenHandler handler, PlayerInventory playerInventory, Screen parent) {
+        super(handler, playerInventory, IText.translatable("itemGroup.mc2d"));
         this.parent = parent;
     }
 

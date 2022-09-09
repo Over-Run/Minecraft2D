@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 import static io.github.overrun.mc2d.world.ibt.IBTType.*;
 
 /**
- * The binary tags.
+ * The default implementation of IBT.
  *
  * @author squid233
  * @since 0.6.0

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2022 Overrun Organization
+ * Copyright (c) 2020-2022 Overrun Organization
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,30 +22,34 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world;
+package io.github.overrun.mc2d.screen;
 
-import io.github.overrun.mc2d.world.block.BlockType;
-import org.jetbrains.annotations.Nullable;
+import io.github.overrun.mc2d.screen.inv.IInventory;
+import io.github.overrun.mc2d.screen.inv.PlayerInventory;
+import io.github.overrun.mc2d.screen.slot.Slot;
+import io.github.overrun.mc2d.world.entity.player.PlayerEntity;
 
 /**
  * @author squid233
- * @since 0.6.0
+ * @since 2021/01/25
  */
-public class HitResult {
-    @Nullable
-    public BlockType block;
-    public int x, y, z;
-    public boolean miss;
+public final class ItemGroupsScreenHandler extends ScreenHandler {
+    public final IInventory inventory;
 
-    public HitResult(@Nullable BlockType block, int x, int y, int z, boolean miss) {
-        this.block = block;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.miss = miss;
+    public ItemGroupsScreenHandler(PlayerInventory playerInventory, IInventory inventory) {
+        this.inventory = inventory;
+        // content
+        for (int i = 0; i < 45; i++) {
+            addSlot(new Slot(inventory, Slot.CONTAINER_ID0 + i, 8 + i % 9 * 18, 17 + i / 9 * 18));
+        }
+        // hot-bar
+        for (int i = 0; i < 10; i++) {
+            addSlot(new Slot(playerInventory, Slot.HOT_BAR_ID0 + i, 8 + i * 18, 111));
+        }
     }
 
-    public HitResult(BlockType block, int x, int y, int z) {
-        this(block, x, y, z, false);
+    @Override
+    public boolean canUse(PlayerEntity player) {
+        return inventory.canPlayerUse(player);
     }
 }

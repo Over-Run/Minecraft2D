@@ -25,9 +25,9 @@
 package io.github.overrun.mc2d.screen.inv;
 
 import io.github.overrun.mc2d.screen.slot.Slot;
-import io.github.overrun.mc2d.util.registry.Registry;
-import io.github.overrun.mc2d.world.entity.PlayerEntity;
+import io.github.overrun.mc2d.world.entity.player.PlayerEntity;
 import io.github.overrun.mc2d.world.item.ItemConvertible;
+import io.github.overrun.mc2d.world.item.ItemGroup;
 import io.github.overrun.mc2d.world.item.ItemStack;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -36,13 +36,14 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  * @author squid233
  * @since 0.6.0
  */
-public class CreativeTabInventory implements IInventory {
+public class ItemGroupsInventory implements IInventory {
     private final Int2ObjectMap<ItemStack> stacks = new Int2ObjectOpenHashMap<>();
 
     @Override
     public Int2ObjectMap<ItemStack> getItems() {
+        stacks.clear();
         for (int i = 0; i < size(); i++) {
-            stacks.put(Slot.CONTAINER_ID0 + i, ItemStack.of(Registry.ITEM.getByRawId(i + 1)));
+            stacks.put(Slot.CONTAINER_ID0 + i, ItemGroup.BUILDING_BLOCKS.getStacks().get(i));
         }
         return stacks;
     }
@@ -59,12 +60,18 @@ public class CreativeTabInventory implements IInventory {
 
     @Override
     public int indexOf(ItemConvertible item) {
-        return Slot.CONTAINER_ID0 + item.asItem().getRawId() - 1;
+        for (int i = 0; i < size(); i++) {
+            if (ItemGroup.BUILDING_BLOCKS.getStacks().get(i).getItem() == item.asItem()) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override
     public ItemStack getStack(int slot) {
-        return ItemStack.of(Registry.ITEM.getByRawId(slot - Slot.CONTAINER_ID0 + 1));
+        getItems();
+        return stacks.get(slot);
     }
 
     @Override
@@ -79,7 +86,6 @@ public class CreativeTabInventory implements IInventory {
 
     @Override
     public void setStack(int slot, ItemStack stack) {
-        // todo: Settings::tab
     }
 
     @Override

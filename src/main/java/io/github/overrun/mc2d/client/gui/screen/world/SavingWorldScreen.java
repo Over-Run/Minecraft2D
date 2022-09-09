@@ -41,7 +41,7 @@ public final class SavingWorldScreen extends DirtScreen {
     public void tick() {
         super.tick();
         if (client.world != null) {
-            client.world.save(client.player);
+            client.world.save();
         }
         onClose();
     }

@@ -26,7 +26,7 @@ package io.github.overrun.mc2d.client;
 
 import io.github.overrun.mc2d.client.gui.screen.Screen;
 import io.github.overrun.mc2d.client.gui.screen.TitleScreen;
-import io.github.overrun.mc2d.client.gui.screen.ingame.CreativeTabScreen;
+import io.github.overrun.mc2d.client.gui.screen.ingame.ItemGroupsScreen;
 import io.github.overrun.mc2d.client.gui.screen.ingame.PauseScreen;
 import io.github.overrun.mc2d.client.gui.widget.AbstractButtonWidget;
 import io.github.overrun.mc2d.client.model.BlockModelMgr;
@@ -34,17 +34,19 @@ import io.github.overrun.mc2d.client.render.ItemRenderer;
 import io.github.overrun.mc2d.client.world.render.WorldRenderer;
 import io.github.overrun.mc2d.event.KeyCallback;
 import io.github.overrun.mc2d.mod.ModLoader;
-import io.github.overrun.mc2d.screen.CreativeTabScreenHandler;
-import io.github.overrun.mc2d.screen.inv.CreativeTabInventory;
+import io.github.overrun.mc2d.screen.ItemGroupsScreenHandler;
+import io.github.overrun.mc2d.screen.inv.ItemGroupsInventory;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.text.IText;
 import io.github.overrun.mc2d.util.Language;
 import io.github.overrun.mc2d.util.Options;
 import io.github.overrun.mc2d.world.World;
 import io.github.overrun.mc2d.world.block.Blocks;
+import io.github.overrun.mc2d.world.entity.EntityTypes;
 import io.github.overrun.mc2d.world.entity.HumanEntity;
-import io.github.overrun.mc2d.world.entity.PlayerEntity;
+import io.github.overrun.mc2d.world.entity.player.PlayerEntity;
 import io.github.overrun.mc2d.world.item.BlockItemType;
+import io.github.overrun.mc2d.world.item.ItemGroup;
 import io.github.overrun.mc2d.world.item.ItemStack;
 import io.github.overrun.mc2d.world.item.Items;
 import org.jetbrains.annotations.Nullable;
@@ -89,6 +91,7 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
     public final TextRenderer textRenderer;
     private final TextureManager textureManager;
     public final ItemRenderer itemRenderer;
+    public final Options options;
     public Window window;
     public Mouse mouse;
     public Screen screen = null;
@@ -98,8 +101,7 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
     public PlayerEntity player = null;
     public int fps = 0;
     public boolean debugging = false;
-    public double guiScale = Options.getD(Options.GUI_SCALE, 2.0);
-    public double invGuiScale = 1 / guiScale;
+    public double guiScale, invGuiScale;
 
     static {
         maxMemory = Runtime.getRuntime().maxMemory();
@@ -107,6 +109,8 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
     }
 
     private Mc2dClient() {
+        options = new Options();
+
         GLFWErrorCallback.create((error, description) ->
             logger.error("GLFW Error {}: {}", error, GLFWErrorCallback.getDescription(description))
         ).set();
@@ -159,7 +163,9 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
                 if (screen != null) {
                     screen.mousePressed(mouse.getIntLastX(), mouse.getIntLastY(), button);
                 } else if (world != null) {
-                    if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
+                    if (button == GLFW_MOUSE_BUTTON_MIDDLE &&
+                        !worldRenderer.hitResult.miss &&
+                        !worldRenderer.hitResult.block.isAir()) {
                         int id = Slot.HOT_BAR_ID0 + player.hotBarNum;
                         var invStack = player.inventory.getStack(id);
                         // has item on main-hand
@@ -173,7 +179,7 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
                                 } else {
                                     player.hotBarNum = invSelect - Slot.HOT_BAR_ID0;
                                 }
-                            } else /* is creaative mode */ {
+                            } else /* is creative mode */ {
                                 for (int i = 0; i < 10; i++) {
                                     if (player.inventory.getStack(Slot.HOT_BAR_ID0 + i).isEmpty()) {
                                         player.inventory.setStack(Slot.HOT_BAR_ID0 + i, ItemStack.of(worldRenderer.hitResult.block));
@@ -202,7 +208,7 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
         });
         glfwSetWindowCloseCallback(window.getHandle(), handle -> {
             if (world != null) {
-                world.save(player);
+                world.save();
             }
         });
         window.setFBResizeCb((handle, width, height) -> onResize(width, height));
@@ -232,6 +238,9 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
         textRenderer = new TextRenderer(this);
         textureManager = new TextureManager();
         itemRenderer = new ItemRenderer(this);
+
+        guiScale = options.getD(Options.GUI_SCALE, 2.0);
+        invGuiScale = 1 / guiScale;
     }
 
     public void init() {
@@ -239,10 +248,14 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
 
         Blocks.register();
         Items.register();
+        for (var e : ItemGroup.ITEM_GROUP) {
+            e.getValue().addStacks();
+        }
+        EntityTypes.register();
         ModLoader.loadMods();
         BlockModelMgr.loadAtlas();
         Language.init();
-        Language.currentLang = Options.get("lang", "en_us");
+        Language.currentLang = options.get("lang", "en_us");
         logger.info("Backend library: LWJGL version {}", Version.getVersion());
         GLClear.clearColor(.4f, .6f, .9f, 1);
         GLStateMgr.enableTexture2D();
@@ -262,6 +275,7 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
             screen.init(this,
                 (int) Math.ceil(window.getWidth() * invGuiScale),
                 (int) Math.ceil(window.getHeight() * invGuiScale));
+            screen.onOpen();
         }
     }
 
@@ -377,7 +391,7 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
                     openScreen(new PauseScreen(null, world.timer.timescale));
                     world.timer.timescale = 0.0;
                 }
-                case GLFW_KEY_ENTER -> world.save(player);
+                case GLFW_KEY_ENTER -> world.save();
                 case GLFW_KEY_1 -> player.hotBarNum = 0;
                 case GLFW_KEY_2 -> player.hotBarNum = 1;
                 case GLFW_KEY_3 -> player.hotBarNum = 2;
@@ -399,14 +413,13 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
                     }
                 }
                 case GLFW_KEY_G -> {
-                    var entity = new HumanEntity(world);
+                    var entity = world.spawnEntity(EntityTypes.HUMAN);
                     entity.teleport(player.position.x(), player.position.y(), player.position.z());
                     entity.prevPos.set(entity.position);
-                    world.spawnEntity(entity);
                 }
             }
-            if (key == Options.getI(Options.KEY_CREATIVE_TAB, GLFW_KEY_E)) {
-                openScreen(new CreativeTabScreen(new CreativeTabScreenHandler(player.inventory, new CreativeTabInventory()), player.inventory, null));
+            if (key == options.getI(Options.KEY_ITEM_GROUP, GLFW_KEY_E)) {
+                openScreen(new ItemGroupsScreen(new ItemGroupsScreenHandler(player.inventory, new ItemGroupsInventory()), player.inventory, null));
             }
         }
     }
@@ -414,11 +427,12 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
     public void update() {
         if (world != null) {
             //todo:remove
-            if (screen == null && Keyboard.isKeyPress(GLFW_KEY_G)) {
-                var entity = new HumanEntity(world);
-                entity.teleport(player.position.x(), player.position.y(), player.position.z());
-                entity.prevPos.set(entity.position);
-                world.spawnEntity(entity);
+            if (screen == null) {
+                if (Keyboard.isKeyPress(GLFW_KEY_G)) {
+                    var entity = world.spawnEntity(EntityTypes.HUMAN);
+                    entity.teleport(player.position.x(), player.position.y(), player.position.z());
+                    entity.prevPos.set(entity.position);
+                }
             }
             world.update();
 
@@ -500,7 +514,7 @@ public final class Mc2dClient implements Runnable, AutoCloseable {
         logger.info("Stopping!");
 
         if (world != null) {
-            world.save(player);
+            world.save();
         }
         textureManager.close();
         PlayerEntity.model.close();

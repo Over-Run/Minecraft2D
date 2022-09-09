@@ -34,15 +34,15 @@ import io.github.overrun.mc2d.util.registry.Registry;
  * @since 2021/01/27
  */
 public final class Items {
-    public static final ItemType AIR = register(0, "air", Blocks.AIR);
-    public static final ItemType STONE = register(1, "stone", Blocks.STONE);
-    public static final ItemType GRASS_BLOCK = register(2, "grass_block", Blocks.GRASS_BLOCK);
-    public static final ItemType DIRT = register(3, "dirt", Blocks.DIRT);
-    public static final ItemType COBBLESTONE = register(4, "cobblestone", Blocks.COBBLESTONE);
-    public static final ItemType BEDROCK = register(5, "bedrock", Blocks.BEDROCK);
-    public static final ItemType OAK_LOG = register(6, "oak_log", Blocks.OAK_LOG);
-    public static final ItemType OAK_LEAVES = register(12, "oak_leaves", Blocks.OAK_LEAVES);
-    public static final ItemType OAK_PLANKS = register(18, "oak_planks", Blocks.OAK_PLANKS);
+    public static final ItemType AIR = register(0, "air", ItemSettings.of(), Blocks.AIR);
+    public static final ItemType STONE = register(1, "stone", ItemSettings.of().group(ItemGroup.BUILDING_BLOCKS), Blocks.STONE);
+    public static final ItemType GRASS_BLOCK = register(2, "grass_block", ItemSettings.of().group(ItemGroup.BUILDING_BLOCKS), Blocks.GRASS_BLOCK);
+    public static final ItemType DIRT = register(3, "dirt", ItemSettings.of().group(ItemGroup.BUILDING_BLOCKS), Blocks.DIRT);
+    public static final ItemType COBBLESTONE = register(4, "cobblestone", ItemSettings.of().group(ItemGroup.BUILDING_BLOCKS), Blocks.COBBLESTONE);
+    public static final ItemType BEDROCK = register(5, "bedrock", ItemSettings.of().group(ItemGroup.BUILDING_BLOCKS), Blocks.BEDROCK);
+    public static final ItemType OAK_LOG = register(6, "oak_log", ItemSettings.of().group(ItemGroup.BUILDING_BLOCKS), Blocks.OAK_LOG);
+    public static final ItemType OAK_LEAVES = register(12, "oak_leaves", ItemSettings.of().group(ItemGroup.BUILDING_BLOCKS), Blocks.OAK_LEAVES);
+    public static final ItemType OAK_PLANKS = register(18, "oak_planks", ItemSettings.of().group(ItemGroup.BUILDING_BLOCKS), Blocks.OAK_PLANKS);
 
     public static void register() {
     }
@@ -51,7 +51,7 @@ public final class Items {
         return Registry.ITEM.set(rawId, new Identifier(id), item);
     }
 
-    private static ItemType register(int rawId, String id, BlockType block) {
-        return register(rawId, id, new BlockItemType(block));
+    private static ItemType register(int rawId, String id, ItemSettings settings, BlockType block) {
+        return register(rawId, id, new BlockItemType(settings, block));
     }
 }

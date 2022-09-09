@@ -22,30 +22,36 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world;
-
-import io.github.overrun.mc2d.world.block.BlockType;
-import org.jetbrains.annotations.Nullable;
+package io.github.overrun.mc2d.world.item;
 
 /**
+ * The item settings.
+ *
  * @author squid233
  * @since 0.6.0
  */
-public class HitResult {
-    @Nullable
-    public BlockType block;
-    public int x, y, z;
-    public boolean miss;
+public class ItemSettings {
+    ItemGroup group;
 
-    public HitResult(@Nullable BlockType block, int x, int y, int z, boolean miss) {
-        this.block = block;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.miss = miss;
+    private ItemSettings() {
     }
 
-    public HitResult(BlockType block, int x, int y, int z) {
-        this(block, x, y, z, false);
+    public static ItemSettings of() {
+        return new ItemSettings();
+    }
+
+    public static ItemSettings copyOf(ItemSettings settings) {
+        var s = new ItemSettings();
+        s.group = settings.group;
+        return s;
+    }
+
+    public static ItemSettings copyOf(ItemType itemType) {
+        return copyOf(itemType.settings);
+    }
+
+    public ItemSettings group(ItemGroup group) {
+        this.group = group;
+        return this;
     }
 }

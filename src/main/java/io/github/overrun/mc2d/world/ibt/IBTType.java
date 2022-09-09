@@ -56,6 +56,7 @@ public sealed class IBTType {
             case 9 -> ARRAY;
             case 10 -> INT_ARRAY;
             case 11 -> DOUBLE_ARRAY;
+            case 12 -> TAG_ARRAY;
             default ->
                 throw new IllegalArgumentException("serialFlag is an invalid number; got: " + serialFlag + ", expected 1 to 11");
         };
@@ -202,6 +203,18 @@ public sealed class IBTType {
         }
     }
 
+    /**
+     * Tag array type.
+     *
+     * @author squid233
+     * @since 0.6.0
+     */
+    public static final class OfTagArray extends IBTType {
+        private OfTagArray() {
+            super(12);
+        }
+    }
+
     public static final OfByte BYTE = new OfByte();
     public static final OfShort SHORT = new OfShort();
     public static final OfInt INT = new OfInt();
@@ -213,4 +226,5 @@ public sealed class IBTType {
     public static final OfArray ARRAY = new OfArray();
     public static final OfIntArray INT_ARRAY = new OfIntArray();
     public static final OfDoubleArray DOUBLE_ARRAY = new OfDoubleArray();
+    public static final OfTagArray TAG_ARRAY = new OfTagArray();
 }

@@ -26,6 +26,8 @@ package io.github.overrun.mc2d.world.item;
 
 import org.joml.Math;
 
+import java.util.Objects;
+
 /**
  * @author squid233
  * @since 0.6.0
@@ -111,5 +113,18 @@ public final class ItemStack {
 
     public boolean isEmpty() {
         return count < 1 || item == Items.AIR;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ItemStack stack = (ItemStack) o;
+        return getCount() == stack.getCount() && getMaxCount() == stack.getMaxCount() && Objects.equals(getItem(), stack.getItem());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getItem(), getCount(), getMaxCount());
     }
 }

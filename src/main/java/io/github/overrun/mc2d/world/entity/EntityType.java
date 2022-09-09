@@ -22,30 +22,45 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world;
+package io.github.overrun.mc2d.world.entity;
 
-import io.github.overrun.mc2d.world.block.BlockType;
+import io.github.overrun.mc2d.world.IWorldFixer;
+import io.github.overrun.mc2d.world.World;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * The entity type.
+ *
+ * @param <T> the entity instance type
  * @author squid233
  * @since 0.6.0
  */
-public class HitResult {
-    @Nullable
-    public BlockType block;
-    public int x, y, z;
-    public boolean miss;
+public class EntityType<T extends Entity> {
+    private final Factory<T> entityFactory;
+    private final @Nullable IWorldFixer worldFixer;
 
-    public HitResult(@Nullable BlockType block, int x, int y, int z, boolean miss) {
-        this.block = block;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.miss = miss;
+    EntityType(Factory<T> entityFactory,
+               @Nullable IWorldFixer worldFixer) {
+        this.entityFactory = entityFactory;
+        this.worldFixer = worldFixer;
     }
 
-    public HitResult(BlockType block, int x, int y, int z) {
-        this(block, x, y, z, false);
+    /**
+     * The entity type factory.
+     *
+     * @param <T> the entity instance type
+     * @author squid233
+     * @since 0.6.0
+     */
+    public interface Factory<T extends Entity> {
+        T create(World world, EntityType<T> entityType);
+    }
+
+    public T createEntity(World world) {
+        return entityFactory.create(world, this);
+    }
+
+    public @Nullable IWorldFixer worldFixer() {
+        return worldFixer;
     }
 }

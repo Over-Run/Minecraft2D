@@ -38,6 +38,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 /**
+ * The game version info.
+ *
  * @author squid233
  * @since 0.6.0
  */
@@ -50,6 +52,10 @@ public final class GameVersion {
     private long worldVersion = 0L;
     private int protocolVersion = 0;
 
+    /**
+     * @author squid233
+     * @since 0.6.0
+     */
     private static final class Serializer extends TypeAdapter<GameVersion> {
         @Override
         public void write(JsonWriter out, GameVersion value) {

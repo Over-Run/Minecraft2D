@@ -26,17 +26,29 @@ package io.github.overrun.mc2d.util.registry;
 
 import io.github.overrun.mc2d.world.block.BlockType;
 import io.github.overrun.mc2d.world.block.Blocks;
+import io.github.overrun.mc2d.world.entity.EntityType;
 import io.github.overrun.mc2d.world.item.ItemType;
 import io.github.overrun.mc2d.world.item.Items;
 import io.github.overrun.mc2d.util.Identifier;
+
+import java.util.function.Supplier;
 
 /**
  * @author squid233
  * @since 2021/01/27
  */
 public final class Registry {
-    public static final DefaultedRegistry<BlockType> BLOCK = new DefaultedRegistry<>(() -> Blocks.AIR);
-    public static final DefaultedRegistry<ItemType> ITEM = new DefaultedRegistry<>(() -> Items.AIR);
+    public static final DefaultedRegistry<BlockType> BLOCK = of(() -> Blocks.AIR);
+    public static final DefaultedRegistry<ItemType> ITEM = of(() -> Items.AIR);
+    public static final MappedRegistry<EntityType<?>> ENTITY = of();
+
+    public static <T> DefaultedRegistry<T> of(Supplier<T> defaultEntry) {
+        return new DefaultedRegistry<>(defaultEntry);
+    }
+
+    public static <T> MappedRegistry<T> of() {
+        return new MappedRegistry<>();
+    }
 
     public static <T> T register(BaseRegistry<T> registry, Identifier id, T entry) {
         return registry.register(id, entry);

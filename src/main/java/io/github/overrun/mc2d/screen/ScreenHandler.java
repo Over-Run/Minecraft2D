@@ -25,7 +25,7 @@
 package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.screen.slot.Slot;
-import io.github.overrun.mc2d.world.entity.PlayerEntity;
+import io.github.overrun.mc2d.world.entity.player.PlayerEntity;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
@@ -39,9 +39,8 @@ public abstract class ScreenHandler {
     public ScreenHandler() {
     }
 
-    public Slot addSlot(Slot slot) {
+    public void addSlot(Slot slot) {
         slots.put(slot.id(), slot);
-        return slot;
     }
 
     public Slot getSlot(int id) {

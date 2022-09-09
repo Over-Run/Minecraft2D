@@ -76,6 +76,12 @@ public record IBTValue(IBTType type, Object value) {
             for (var v : arr) {
                 out.writeDouble(v);
             }
+        } else if (type == TAG_ARRAY) {
+            var arr = (IBinaryTag[]) value;
+            out.writeInt(arr.length);
+            for (var v : arr) {
+                v.serialize(out);
+            }
         } else {
             out.writeObject(value);
         }
@@ -131,6 +137,14 @@ public record IBTValue(IBTType type, Object value) {
             }
             return new IBTValue(type, arr);
         }
+        if (type == TAG_ARRAY) {
+            int len = in.readInt();
+            IBinaryTag[] arr = new IBinaryTag[len];
+            for (int i = 0; i < arr.length; i++) {
+                arr[i] = BinaryTag.deserialize(in);
+            }
+            return new IBTValue(type, arr);
+        }
         return new IBTValue(type, in.readObject());
     }
 
@@ -176,6 +190,9 @@ public record IBTValue(IBTType type, Object value) {
         }
         if (type == DOUBLE_ARRAY) {
             return Arrays.toString((double[]) value);
+        }
+        if (type == TAG_ARRAY) {
+            return Arrays.toString((IBinaryTag[]) value);
         }
         return type + " -> " + value;
     }

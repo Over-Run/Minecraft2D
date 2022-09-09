@@ -31,6 +31,7 @@ import java.util.function.Function;
 /**
  * Lightweight event system.
  *
+ * @param <T> The event type.
  * @author squid233
  * @since 2021/01/26
  */

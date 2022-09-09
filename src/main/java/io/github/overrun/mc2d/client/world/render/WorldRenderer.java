@@ -223,7 +223,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         double ry = client.window.getHeight() * .5 * inv32;
         double ox = client.player.lerpPos.x;
         double oy = client.player.lerpPos.y;
-        for (var entity : world.entities) {
+        for (var entity : world.entities.values()) {
             if (entity instanceof HumanEntity human) {
                 if (entity.box.minX() > ox + rx ||
                     entity.box.minY() > oy + ry ||

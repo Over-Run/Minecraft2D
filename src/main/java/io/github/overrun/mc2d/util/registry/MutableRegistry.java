@@ -27,13 +27,34 @@ package io.github.overrun.mc2d.util.registry;
 import io.github.overrun.mc2d.util.Identifier;
 
 /**
+ * The mutable registry.
+ *
+ * @param <T> the registry entry
  * @author squid233
  * @since 2021/01/27
  */
 public abstract class MutableRegistry<T> extends BaseRegistry<T> {
-    public abstract T add(Identifier id, T entry);
+    /**
+     * Add an entry.
+     *
+     * @param id    the identifier of the entry
+     * @param entry entry
+     * @param <R>   the entry instance type
+     * @return the entry
+     * @implNote Default implementation used {@link #register(Identifier, T)}
+     */
+    public abstract <R extends T> R add(Identifier id, R entry);
 
-    public abstract T set(int rawId, Identifier id, T entry);
+    /**
+     * Set an entry with the given raw identifier and identifier.
+     *
+     * @param rawId the raw id number
+     * @param id    the identifier
+     * @param entry the entry
+     * @param <R>   the entry instance type
+     * @return the entry
+     */
+    public abstract <R extends T> R set(int rawId, Identifier id, R entry);
 
     public abstract void remove(T entry);
 }

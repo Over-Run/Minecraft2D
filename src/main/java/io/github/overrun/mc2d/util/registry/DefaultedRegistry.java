@@ -25,33 +25,22 @@
 package io.github.overrun.mc2d.util.registry;
 
 import io.github.overrun.mc2d.util.Identifier;
-import io.github.overrun.mc2d.util.collect.DefaultedList;
-import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
 /**
+ * The mapped registry with defaulted entry.
+ *
+ * @param <T> the registry entry
  * @author squid233
  * @since 2021/01/27
  */
-public class DefaultedRegistry<T> extends MutableRegistry<T> {
-    private final Map<T, Identifier> entry2id = new HashMap<>();
-    private final Map<Identifier, T> id2entry = new HashMap<>();
-    private final Object2IntMap<T> entry2rawId = new Object2IntArrayMap<>();
-    private final List<T> entries;
+public class DefaultedRegistry<T> extends MappedRegistry<T> {
     private final Supplier<T> defaultSupplier;
     private T defaultEntry;
-    private int nextId = 0;
 
     public DefaultedRegistry(Supplier<T> defaultEntry) {
         defaultSupplier = defaultEntry;
-        entries = new DefaultedList<>(defaultEntry);
     }
 
     public T getDefaultEntry() {
@@ -61,70 +50,15 @@ public class DefaultedRegistry<T> extends MutableRegistry<T> {
         return defaultEntry;
     }
 
-    public int size() {
-        return entries.size();
-    }
-
-    public List<T> entries() {
-        return List.copyOf(entries);
-    }
-
-    @Override
-    public Identifier getId(T entry) {
-        return entry2id.get(entry);
-    }
-
     @Override
     public T getById(Identifier id) {
-        return id2entry.getOrDefault(id, getDefaultEntry());
-    }
-
-    @Override
-    public int getRawId(T entry) {
-        return entry2rawId.getInt(entry);
+        T e;
+        return ((e = super.getById(id)) != null || id2entry.containsKey(id)) ? e : getDefaultEntry();
     }
 
     @Override
     public T getByRawId(int rawId) {
-        return entries.size() > rawId ? entries.get(rawId) : getDefaultEntry();
-    }
-
-    @Override
-    public T register(Identifier id, T entry) {
-        return add(id, entry);
-    }
-
-    @Override
-    public T add(Identifier id, T entry) {
-        return set(nextId++, id, entry);
-    }
-
-    @Override
-    public T set(int rawId, Identifier id, T entry) {
-        if (id2entry.containsKey(id)) {
-            throw new IllegalArgumentException("Registry entry is present!");
-        }
-        id2entry.put(id, entry);
-        entry2id.put(entry, id);
-        entries.add(entry);
-        entry2rawId.put(entry, rawId);
-        if (rawId > nextId) {
-            nextId = rawId + 1;
-        }
-        return entry;
-    }
-
-    @Override
-    public void remove(T entry) {
-        id2entry.remove(entry2id.get(entry));
-        entry2id.remove(entry);
-        entries.remove(entry);
-        entry2rawId.removeInt(entry);
-    }
-
-    @NotNull
-    @Override
-    public Iterator<Map.Entry<Identifier, T>> iterator() {
-        return id2entry.entrySet().iterator();
+        T e;
+        return ((e = super.getByRawId(rawId)) != null || entries.containsKey(rawId)) ? e : getDefaultEntry();
     }
 }

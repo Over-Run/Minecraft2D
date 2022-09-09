@@ -27,6 +27,7 @@ package io.github.overrun.mc2d.world.entity;
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.model.PlayerEntityModel;
 import io.github.overrun.mc2d.world.World;
+import io.github.overrun.mc2d.world.entity.player.PlayerEntity;
 import org.joml.Math;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -41,8 +42,8 @@ public class HumanEntity extends Entity {
     public static final PlayerEntityModel model = new PlayerEntityModel();
     private boolean facingRight;
 
-    public HumanEntity(World world) {
-        super(world);
+    public HumanEntity(World world, EntityType<? extends HumanEntity> entityType) {
+        super(world, entityType);
         teleport(Math.random() * world.width, 70, 1.5);
     }
 

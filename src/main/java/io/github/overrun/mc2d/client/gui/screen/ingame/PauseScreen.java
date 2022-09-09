@@ -24,6 +24,7 @@
 
 package io.github.overrun.mc2d.client.gui.screen.ingame;
 
+import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
 import io.github.overrun.mc2d.client.gui.screen.world.SavingWorldScreen;
 import io.github.overrun.mc2d.client.gui.widget.ButtonWidget;
@@ -46,11 +47,8 @@ public final class PauseScreen extends Screen {
     }
 
     @Override
-    public void init() {
-        super.init();
-        if (client.world != null) {
-            client.world.save(client.player);
-        }
+    public void init(Mc2dClient client, int width, int height) {
+        super.init(client, width, height);
         addButton(new ButtonWidget(width / 2 - 150,
             80,
             300,
@@ -63,6 +61,14 @@ public final class PauseScreen extends Screen {
             20,
             IText.translatable("text.screen.save_and_back"),
             b -> client.openScreen(new SavingWorldScreen())));
+    }
+
+    @Override
+    public void onOpen() {
+        super.onOpen();
+        if (client.world != null) {
+            client.world.save();
+        }
     }
 
     @Override

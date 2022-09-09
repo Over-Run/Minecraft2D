@@ -22,16 +22,21 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world.entity;
+package io.github.overrun.mc2d.world.entity.player;
 
 import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.model.PlayerEntityModel;
 import io.github.overrun.mc2d.screen.inv.PlayerInventory;
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.util.Identifier;
+import io.github.overrun.mc2d.world.IWorldFixer;
 import io.github.overrun.mc2d.world.World;
+import io.github.overrun.mc2d.world.entity.Entity;
+import io.github.overrun.mc2d.world.entity.EntityType;
 import io.github.overrun.mc2d.world.ibt.IBinaryTag;
 import io.github.overrun.mc2d.world.item.ItemStack;
+
+import java.util.UUID;
 
 import static io.github.overrun.mc2d.client.Keyboard.isKeyPress;
 import static org.lwjgl.glfw.GLFW.*;
@@ -44,24 +49,29 @@ import static org.lwjgl.opengl.GL11.*;
 public class PlayerEntity extends Entity {
     public static final Identifier TEXTURE = new Identifier("textures/entity/player.png");
     private static final long PLAYER_VERSION = 2L;
+    public static final IWorldFixer WORLD_FIXER = (name, value) -> {
+        if ("version".equals(name)) {
+            long v = (long) value.value();
+            if (v != PLAYER_VERSION) {
+                throw new RuntimeException("Doesn't compatible with version " + v + ". Current is " + PLAYER_VERSION);
+            }
+        }
+        return value;
+    };
     public static final PlayerEntityModel model = new PlayerEntityModel();
     public int hotBarNum = 0;
     public final PlayerInventory inventory = new PlayerInventory(this);
     public boolean facingRight = true;
     private int animation = 0;
 
-    public PlayerEntity(World world) {
-        super(world);
-        worldFixer = (name, value) -> {
-            if ("version".equals(name)) {
-                long v = (long) value.value();
-                if (v != PLAYER_VERSION) {
-                    throw new RuntimeException("Doesn't compatible with version " + v + ". Current is " + PLAYER_VERSION);
-                }
-            }
-            return value;
-        };
+    public PlayerEntity(World world, EntityType<? extends PlayerEntity> entityType) {
+        super(world, entityType);
         teleport(Math.random() * world.width, world.height + 10, 1.5);
+    }
+
+    public static UUID generateUUID(String name) {
+        // TODO: 2022/9/6 Generate UUID from username
+        return UUID.fromString("00000000-0000-0000-0000-000000000000");
     }
 
     public void setItemMainHand(ItemStack item) {

@@ -25,16 +25,18 @@
 package io.github.overrun.mc2d.world;
 
 import io.github.overrun.mc2d.client.GameVersion;
-import io.github.overrun.mc2d.client.Mc2dClient;
+import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.Utils;
 import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.world.block.BlockType;
 import io.github.overrun.mc2d.world.entity.Entity;
-import io.github.overrun.mc2d.world.entity.HumanEntity;
-import io.github.overrun.mc2d.world.entity.PlayerEntity;
+import io.github.overrun.mc2d.world.entity.EntityType;
+import io.github.overrun.mc2d.world.entity.EntityTypes;
+import io.github.overrun.mc2d.world.entity.player.PlayerEntity;
 import io.github.overrun.mc2d.world.ibt.BinaryTag;
-import io.github.overrun.mc2d.world.ibt.IBTType;
 import io.github.overrun.mc2d.world.ibt.IBinaryTag;
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
+import org.jetbrains.annotations.Nullable;
 import org.joml.SimplexNoise;
 import org.overrun.swgl.core.phys.p2d.AABRect2f;
 import org.overrun.swgl.core.util.LogFactory9;
@@ -42,13 +44,12 @@ import org.overrun.swgl.core.util.timing.Timer;
 import org.slf4j.Logger;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import static io.github.overrun.mc2d.world.block.Blocks.*;
+import static io.github.overrun.mc2d.world.ibt.IBTType.*;
 
 /**
  * @author squid233
@@ -63,7 +64,7 @@ public class World {
     public final int depth;
     public final Timer timer = new Timer(20);
     private final List<IWorldListener> listeners = new ArrayList<>();
-    public final List<Entity> entities = new ArrayList<>();
+    public final Map<UUID, Entity> entities = new HashMap<>();
 
     public World(int w, int h) {
         width = w;
@@ -71,8 +72,8 @@ public class World {
         depth = 2;
         blocks = new BlockType[w * h * depth];
         Arrays.fill(blocks, AIR);
-        for (int i = 0; i < 100; i++) {
-            spawnEntity(new HumanEntity(this));
+        for (int i = 0; i < 10; i++) {
+            spawnEntity(EntityTypes.HUMAN);
         }
     }
 
@@ -159,25 +160,30 @@ public class World {
         listeners.remove(listener);
     }
 
-    public void spawnEntity(Entity entity) {
-        entities.add(entity);
+    public @Nullable Entity getEntity(UUID uuid) {
+        return entities.get(uuid);
+    }
+
+    public <T extends Entity> T spawnEntity(EntityType<T> entityType) {
+        var entity = entityType.createEntity(this);
+        entities.put(entity.uuid(), entity);
+        return entity;
     }
 
     public void update() {
         timer.update();
-        var player = Mc2dClient.getInstance().player;
         for (int i = 0; i < timer.ticks; i++) {
-            player.tick();
             tick();
         }
     }
 
     public void tick() {
-        for (int i = entities.size() - 1; i >= 0; i--) {
-            var entity = entities.get(i);
+        var it = entities.values().iterator();
+        while (it.hasNext()) {
+            var entity = it.next();
             entity.tick();
             if (entity.removed) {
-                entities.remove(i);
+                it.remove();
             }
         }
     }
@@ -249,7 +255,7 @@ public class World {
         return lst;
     }
 
-    public boolean load(PlayerEntity player) {
+    public boolean load() {
         logger.info("Loading world");
         for (var listener : listeners) {
             listener.allChanged();
@@ -257,7 +263,7 @@ public class World {
         var file = new File("level.dat");
         if (file.exists()) {
             try (var is = new ObjectInputStream(new BufferedInputStream(new GZIPInputStream(new FileInputStream(file))))) {
-                deserialize(BinaryTag.deserialize(is), player);
+                deserialize(BinaryTag.deserialize(is));
                 return true;
             } catch (IOException | ClassNotFoundException e) {
                 logger.error("Catching loading world", e);
@@ -267,25 +273,38 @@ public class World {
         return false;
     }
 
-    public void save(PlayerEntity player) {
+    public void save() {
         logger.info("Saving world");
         try (var os = new ObjectOutputStream(new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream("level.dat"))))) {
             var tag = new BinaryTag();
-            serialize(tag, player);
+            serialize(tag);
             tag.serialize(os);
         } catch (IOException e) {
             logger.error("Catching saving world", e);
         }
     }
 
-    public void serialize(IBinaryTag tag, PlayerEntity player) throws IOException {
+    public void serialize(IBinaryTag tag) throws IOException {
         tag.set("version", GameVersion.worldVersion());
         tag.set("width", width);
         tag.set("height", height);
         tag.set("depth", depth);
+        Utils.let(new BinaryTag[entities.size()], t -> {
+            for (int i = 0; i < t.length; i++) {
+                t[i] = new BinaryTag();
+            }
+            int i = 0;
+            for (var entity : entities.values()) {
+                entity.save(t[i]);
+                i++;
+            }
+            tag.set("entities", t);
+        });
         Utils.let(new BinaryTag(), t -> {
-            player.save(t);
-            tag.set("player", t);
+            for (var e : Registry.BLOCK) {
+                t.set(e.getKey().toString(), e.getValue().getRawId());
+            }
+            tag.set("blocksMap", t);
         });
         Utils.let(new int[blocks.length], v -> {
             for (int i = 0; i < blocks.length; i++) {
@@ -295,22 +314,43 @@ public class World {
         });
     }
 
-    public void deserialize(IBinaryTag tag, PlayerEntity player) throws IOException {
-        long v = tag.get(IBTType.LONG, "version");
+    public void deserialize(IBinaryTag tag) throws IOException {
+        long v = tag.get(LONG, "version");
         if (GameVersion.worldVersion() != v) {
             throw new RuntimeException("Doesn't compatible with version " + v + ". Current is " + GameVersion.worldVersion());
         }
-        final int w = tag.get(IBTType.INT, "width");
-        final int h = tag.get(IBTType.INT, "height");
-        final int d = tag.get(IBTType.INT, "depth");
-        if (player.worldFixer != null) {
-            player.worldFixer.adapt("version", tag.getGeneric("player.version"));
-        }
-        player.load(tag.get(IBTType.TAG, "player"));
+        final int w = tag.get(INT, "width");
+        final int h = tag.get(INT, "height");
+        final int d = tag.get(INT, "depth");
+        Utils.let(tag.get(TAG_ARRAY, "entities"), entities -> {
+            for (var t : entities) {
+                var type = Registry.ENTITY.getById(new Identifier(t.get(STRING, "type")));
+                if (type != null) {
+                    var entity = type.createEntity(this);
+                    var uuid = UUID.fromString(t.get(STRING, "uuid"));
+                    entity.setUUID(uuid);
+                    this.entities.put(uuid, entity);
+                    if (entity instanceof PlayerEntity) {
+                        // TODO: Adapt every entity and add player to entities
+                        var fixer = type.worldFixer();
+                        if (fixer != null) {
+                            fixer.adapt("version", t.getGeneric("version"));
+                        }
+                    }
+                    entity.load(t);
+                }
+            }
+        });
+        var blocksMap = new Int2ObjectLinkedOpenHashMap<Identifier>();
+        Utils.let(tag.get(TAG, "blocksMap"), t -> {
+            for (var e : t.getMappings().entrySet()) {
+                blocksMap.put((int) e.getValue().value(), new Identifier(e.getKey()));
+            }
+        });
         Arrays.fill(blocks, AIR);
-        int[] rawBlocks = tag.get(IBTType.INT_ARRAY, "blocks");
+        int[] rawBlocks = tag.get(INT_ARRAY, "blocks");
         for (int i = 0, sz = w * h * d; i < sz; i++) {
-            blocks[i] = Registry.BLOCK.getByRawId(rawBlocks[i]);
+            blocks[i] = Registry.BLOCK.getById(blocksMap.get(rawBlocks[i]));
         }
     }
 }

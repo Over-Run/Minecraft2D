@@ -26,7 +26,6 @@ package io.github.overrun.mc2d;
 
 import io.github.overrun.mc2d.client.GameVersion;
 import io.github.overrun.mc2d.client.Mc2dClient;
-import io.github.overrun.mc2d.util.Options;
 import org.overrun.swgl.core.util.LogFactory9;
 import org.slf4j.Logger;
 
@@ -40,7 +39,6 @@ public final class Main {
     private static final Logger logger = LogFactory9.getLogger();
 
     public static void main(String[] args) {
-        Options.init();
         logger.info("Loading for game Minecraft2D {}", GameVersion.versionString());
         try (var client = Mc2dClient.getInstance()) {
             client.init();

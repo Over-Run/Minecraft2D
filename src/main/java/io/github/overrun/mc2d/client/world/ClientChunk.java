@@ -27,7 +27,7 @@ package io.github.overrun.mc2d.client.world;
 import io.github.overrun.mc2d.client.render.Tesselator;
 import io.github.overrun.mc2d.world.Chunk;
 import io.github.overrun.mc2d.world.World;
-import io.github.overrun.mc2d.world.entity.PlayerEntity;
+import io.github.overrun.mc2d.world.entity.player.PlayerEntity;
 
 import static org.lwjgl.opengl.GL11.*;
 

@@ -22,30 +22,26 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world;
+package io.github.overrun.mc2d.world.entity;
 
-import io.github.overrun.mc2d.world.block.BlockType;
-import org.jetbrains.annotations.Nullable;
+import io.github.overrun.mc2d.util.Identifier;
+import io.github.overrun.mc2d.util.registry.Registry;
+import io.github.overrun.mc2d.world.entity.player.PlayerEntity;
 
 /**
+ * The builtin entity types.
+ *
  * @author squid233
  * @since 0.6.0
  */
-public class HitResult {
-    @Nullable
-    public BlockType block;
-    public int x, y, z;
-    public boolean miss;
+public class EntityTypes {
+    public static final EntityType<PlayerEntity> PLAYER = register(1, "player", new EntityTypeBuilder<>(PlayerEntity::new).build(PlayerEntity.WORLD_FIXER));
+    public static final EntityType<HumanEntity> HUMAN = register(2, "human", new EntityTypeBuilder<>(HumanEntity::new).build(null));
 
-    public HitResult(@Nullable BlockType block, int x, int y, int z, boolean miss) {
-        this.block = block;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.miss = miss;
+    public static void register() {
     }
 
-    public HitResult(BlockType block, int x, int y, int z) {
-        this(block, x, y, z, false);
+    private static <T extends EntityType<?>> T register(int rawId, String id, T t) {
+        return Registry.ENTITY.set(rawId, new Identifier(id), t);
     }
 }

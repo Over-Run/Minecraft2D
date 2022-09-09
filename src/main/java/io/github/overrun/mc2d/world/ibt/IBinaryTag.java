@@ -122,6 +122,10 @@ public interface IBinaryTag {
         return (double[]) getGeneric(path).value();
     }
 
+    default IBinaryTag[] get(OfTagArray type, String path) {
+        return (IBinaryTag[]) getGeneric(path).value();
+    }
+
     default byte getAtIndex(OfByte type, String path, int index) {
         return (byte) getGeneric(path, index).value();
     }
@@ -259,6 +263,10 @@ public interface IBinaryTag {
 
     default void set(String path, double[] value) {
         setGeneric(path, new IBTValue(DOUBLE_ARRAY, value));
+    }
+
+    default void set(String path, IBinaryTag[] value) {
+        setGeneric(path, new IBTValue(TAG_ARRAY, value));
     }
 
     default void setAtIndex(String path, int index, byte value) {

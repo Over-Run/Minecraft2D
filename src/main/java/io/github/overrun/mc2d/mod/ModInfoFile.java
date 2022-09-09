@@ -31,6 +31,8 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 
 /**
+ * The mod info file format.
+ *
  * @author squid233
  * @since 0.6.0
  */
@@ -40,9 +42,15 @@ public class ModInfoFile {
     private String version;
     private String main;
 
+    /**
+     * The mod info file json serializer.
+     *
+     * @author squid233
+     * @since 0.6.0
+     */
     public static final class Serializer extends TypeAdapter<ModInfoFile> {
         @Override
-        public void write(JsonWriter out, ModInfoFile value) throws IOException {
+        public void write(JsonWriter out, ModInfoFile value) {
             throw new UnsupportedOperationException();
         }
 

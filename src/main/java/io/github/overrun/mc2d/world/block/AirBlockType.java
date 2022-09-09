@@ -47,12 +47,6 @@ public class AirBlockType extends BlockType {
 
     @Override
     @Nullable
-    public AABRect2f getRayCastingShape() {
-        return VoxelShapes.fullSquare();
-    }
-
-    @Override
-    @Nullable
     public AABRect2f getCollisionShape() {
         return VoxelShapes.empty();
     }

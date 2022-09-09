@@ -24,7 +24,7 @@
 
 package io.github.overrun.mc2d.screen.inv;
 
-import io.github.overrun.mc2d.world.entity.PlayerEntity;
+import io.github.overrun.mc2d.world.entity.player.PlayerEntity;
 import io.github.overrun.mc2d.world.item.ItemConvertible;
 import io.github.overrun.mc2d.world.item.ItemStack;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;

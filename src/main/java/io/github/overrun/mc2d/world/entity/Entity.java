@@ -24,13 +24,17 @@
 
 package io.github.overrun.mc2d.world.entity;
 
-import io.github.overrun.mc2d.world.IWorldFixer;
+import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.world.World;
 import io.github.overrun.mc2d.world.ibt.IBTType;
 import io.github.overrun.mc2d.world.ibt.IBinaryTag;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.overrun.swgl.core.phys.p2d.AABRect2f;
 import org.overrun.swgl.core.util.math.Numbers;
+
+import java.util.UUID;
 
 /**
  * The base entity.
@@ -39,21 +43,41 @@ import org.overrun.swgl.core.util.math.Numbers;
  * @since 0.6.0
  */
 public class Entity {
+    public final World world;
+    public final EntityType<?> entityType;
     public final Vector3d prevPos = new Vector3d();
     public final Vector3d position = new Vector3d();
     public final Vector3d lerpPos = new Vector3d();
     public final Vector3d velocity = new Vector3d();
+    protected UUID uuid;
+    private @Nullable String displayName;
     public AABRect2f box;
     public boolean onGround = false;
     public boolean removed = false;
     protected float bbWidth = 0.6f;
     protected float bbHeight = 1.8f;
-    public World world;
-    public IWorldFixer worldFixer;
 
-    public Entity(World world) {
+    public Entity(World world, EntityType<? extends Entity> entityType) {
         this.world = world;
+        this.entityType = entityType;
+        uuid = UUID.randomUUID();
         resetPosition(0, 0, 0);
+    }
+
+    public UUID uuid() {
+        return uuid;
+    }
+
+    public void setUUID(@NotNull UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public String displayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(@Nullable String displayName) {
+        this.displayName = displayName;
     }
 
     public void resetPosition(double x, double y, double z) {
@@ -113,6 +137,8 @@ public class Entity {
      * @return the tag with new properties
      */
     public IBinaryTag save(IBinaryTag tag) {
+        tag.set("type", Registry.ENTITY.getId(entityType).toString());
+        tag.set("uuid", uuid.toString());
         tag.set("position", new double[]{position.x(), position.y(), position.z()});
         tag.set("velocity", new double[]{velocity.x(), velocity.y(), velocity.z()});
         tag.set("onGround", (byte) (onGround ? 1 : 0));

@@ -27,34 +27,48 @@ package io.github.overrun.mc2d.client.gui.screen.world;
 import io.github.overrun.mc2d.client.gui.screen.DirtScreen;
 import io.github.overrun.mc2d.client.world.render.WorldRenderer;
 import io.github.overrun.mc2d.text.IText;
+import io.github.overrun.mc2d.util.Utils;
 import io.github.overrun.mc2d.world.World;
-import io.github.overrun.mc2d.world.entity.PlayerEntity;
+import io.github.overrun.mc2d.world.entity.EntityTypes;
+import io.github.overrun.mc2d.world.entity.player.PlayerEntity;
+import org.overrun.swgl.core.util.LogFactory9;
+import org.slf4j.Logger;
 
 /**
  * @author squid233
  * @since 2021/01/26
  */
 public final class LoadingWorldScreen extends DirtScreen {
+    private static final Logger logger = LogFactory9.getLogger();
+
     public LoadingWorldScreen() {
         super(IText.translatable("text.screen.world.loading"));
     }
 
     @Override
-    public void init() {
-        super.init();
-    }
-
-    @Override
     public void tick() {
         super.tick();
-        client.world = new World(256, 128);
-        client.player = new PlayerEntity(client.world);
-        if (!client.world.load(client.player)) {
-            client.world.genTerrain();
+        try {
+            client.world = new World(256, 128);
+            if (!client.world.load()) {
+                client.world.genTerrain();
+            } else {
+                client.player = (PlayerEntity) client.world.getEntity(PlayerEntity.generateUUID("Player0"));
+            }
+            // TODO: 2022/9/6 Username
+            if (client.player == null) {
+                client.player = Utils.also(client.world.spawnEntity(EntityTypes.PLAYER), e ->
+                    e.setUUID(PlayerEntity.generateUUID("Player0"))
+                );
+            }
+            client.player.setDisplayName("Player0");
+            client.worldRenderer = new WorldRenderer(client, client.world);
+            client.world.addListener(client.worldRenderer);
+            onClose();
+        } catch (Exception e) {
+            client.world = null;
+            logger.error("Exception occurred loading world!", e);
         }
-        client.worldRenderer = new WorldRenderer(client, client.world);
-        client.world.addListener(client.worldRenderer);
-        onClose();
     }
 
     @Override

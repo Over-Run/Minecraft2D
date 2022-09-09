@@ -22,30 +22,12 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world;
-
-import io.github.overrun.mc2d.world.block.BlockType;
-import org.jetbrains.annotations.Nullable;
+package io.github.overrun.mc2d.util.registry;
 
 /**
  * @author squid233
  * @since 0.6.0
  */
-public class HitResult {
-    @Nullable
-    public BlockType block;
-    public int x, y, z;
-    public boolean miss;
-
-    public HitResult(@Nullable BlockType block, int x, int y, int z, boolean miss) {
-        this.block = block;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.miss = miss;
-    }
-
-    public HitResult(BlockType block, int x, int y, int z) {
-        this(block, x, y, z, false);
-    }
+public class ScreenHandlerRegistry {
+    // TODO: 2022/9/7
 }

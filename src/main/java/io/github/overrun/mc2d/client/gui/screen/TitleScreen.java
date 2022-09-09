@@ -46,8 +46,8 @@ public final class TitleScreen extends Screen {
     }
 
     @Override
-    public void init() {
-        super.init();
+    public void init(Mc2dClient client, int width, int height) {
+        super.init(client, width, height);
         addButton(new ButtonWidget((width - 200) / 2,
             (height - 20) / 2 - 25,
             200,

@@ -62,10 +62,9 @@ public abstract class Screen extends AbstractParentElement implements TickableEl
         this.height = height;
         buttons.clear();
         children.clear();
-        init();
     }
 
-    protected void init() {
+    public void onOpen() {
     }
 
     @Override

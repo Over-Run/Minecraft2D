@@ -22,30 +22,43 @@
  * SOFTWARE.
  */
 
-package io.github.overrun.mc2d.world;
+package io.github.overrun.mc2d.world.item;
 
-import io.github.overrun.mc2d.world.block.BlockType;
-import org.jetbrains.annotations.Nullable;
+import io.github.overrun.mc2d.util.Identifier;
+import io.github.overrun.mc2d.util.collect.DefaultedList;
+import io.github.overrun.mc2d.util.registry.MappedRegistry;
+import io.github.overrun.mc2d.util.registry.Registry;
 
 /**
+ * The item group.
+ *
  * @author squid233
  * @since 0.6.0
  */
-public class HitResult {
-    @Nullable
-    public BlockType block;
-    public int x, y, z;
-    public boolean miss;
+public class ItemGroup {
+    public static final MappedRegistry<ItemGroup> ITEM_GROUP = Registry.of();
+    public static final ItemGroup BUILDING_BLOCKS = register(new Identifier("building_blocks"), new ItemGroup());
 
-    public HitResult(@Nullable BlockType block, int x, int y, int z, boolean miss) {
-        this.block = block;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.miss = miss;
+    private final DefaultedList<ItemStack> stacks = new DefaultedList<>(ItemStack::ofEmpty);
+
+    public static ItemGroup register(Identifier id, ItemGroup group) {
+        return Registry.register(ITEM_GROUP, id, group);
     }
 
-    public HitResult(BlockType block, int x, int y, int z) {
-        this(block, x, y, z, false);
+    public void addStack(ItemStack stack) {
+        stacks.add(stack);
+    }
+
+    public void addStacks() {
+        for (var e : Registry.ITEM) {
+            var item = e.getValue();
+            if (item.getGroup() == this) {
+                addStack(ItemStack.of(e.getValue()));
+            }
+        }
+    }
+
+    public DefaultedList<ItemStack> getStacks() {
+        return stacks;
     }
 }

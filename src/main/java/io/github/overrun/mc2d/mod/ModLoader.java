@@ -114,7 +114,7 @@ public final class ModLoader {
                     }
                     try {
                         for (var instance : INSTANCES.values()) {
-                            logger.info("Loading mod {}@{}!", instance.name(), instance.version());
+                            logger.info("Loading mod {} {}!", instance.name(), instance.version());
                             instance.initializer().onInitialize();
                         }
                     } catch (Throwable t) {

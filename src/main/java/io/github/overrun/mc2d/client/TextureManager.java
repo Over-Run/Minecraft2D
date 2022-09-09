@@ -64,7 +64,7 @@ public final class TextureManager implements AutoCloseable {
         GLStateMgr.bindTexture2D(texId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mode);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mode);
-        String path = "assets/" + id.getNamespace() + "/" + id.getPath();
+        String path = id.toAssetsPath();
         var img = read(path,
             id.isVanilla()
                 ? ClassLoader.getSystemClassLoader()

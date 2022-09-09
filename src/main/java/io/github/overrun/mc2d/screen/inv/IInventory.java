@@ -24,7 +24,7 @@
 
 package io.github.overrun.mc2d.screen.inv;
 
-import io.github.overrun.mc2d.world.entity.PlayerEntity;
+import io.github.overrun.mc2d.world.entity.player.PlayerEntity;
 import io.github.overrun.mc2d.world.item.ItemConvertible;
 import io.github.overrun.mc2d.world.item.ItemStack;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -43,10 +43,10 @@ public interface IInventory {
     boolean isEmpty();
 
     /**
-     * Gets the first index of the given item, or -1 if not found.
+     * Gets the first slot index of the given item, or -1 if not found.
      *
      * @param item the item
-     * @return the index or -1
+     * @return the slot index or -1
      */
     int indexOf(ItemConvertible item);
 

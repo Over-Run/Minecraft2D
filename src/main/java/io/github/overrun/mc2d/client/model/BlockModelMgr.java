@@ -35,6 +35,7 @@ import org.overrun.swgl.core.asset.tex.TextureAtlas;
 import org.overrun.swgl.core.io.IFileProvider;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.function.Function;
 
@@ -45,6 +46,8 @@ import static org.lwjgl.opengl.GL11C.*;
  * @since 0.6.0
  */
 public class BlockModelMgr {
+    private static final Comparator<SpriteInfo> COMPARATOR =
+        Comparator.comparingInt((SpriteInfo info) -> -info.height()).thenComparingInt(info -> -info.width());
     public static final Identifier BLOCK_ATLAS = new Identifier("textures/block-atlas");
     private static TextureAtlas blockAtlas;
 
@@ -52,7 +55,7 @@ public class BlockModelMgr {
 //    private static TextureAtlas itemAtlas;
 
     public static String blockTexture(Identifier id) {
-        return "assets/" + id.getNamespace() + "/" + "textures/block/" + id.getPath() + ".png";
+        return "assets/" + id.getNamespace() + "/textures/" + id.getPath() + ".png";
     }
 
 //    public static String itemTexture(Identifier id) {
@@ -79,6 +82,7 @@ public class BlockModelMgr {
                 16)
             );
         }
+        infoList.sort(COMPARATOR);
         atlas.extraParam(target -> {
             glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

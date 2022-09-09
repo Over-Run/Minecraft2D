@@ -58,7 +58,7 @@ public class BlockType implements ItemConvertible {
 
     @Nullable
     public AABRect2f getRayCastingShape() {
-        return getCollisionShape();
+        return getOutlineShape();
     }
 
     @Nullable
@@ -96,8 +96,10 @@ public class BlockType implements ItemConvertible {
         t.tex(u1, v0).vertex(x + 1, y + 1, z);
     }
 
+    @Deprecated
     public Identifier getTexture() {
-        return getId();
+        var id = getId();
+        return new Identifier(id.getNamespace(), "block/" + id.getPath());
     }
 
     public final int getRawId() {

@@ -24,6 +24,7 @@
 
 package io.github.overrun.mc2d.client.gui.screen.ingame;
 
+import io.github.overrun.mc2d.client.Mc2dClient;
 import io.github.overrun.mc2d.client.TextureManager;
 import io.github.overrun.mc2d.client.gui.DrawableHelper;
 import io.github.overrun.mc2d.client.gui.screen.Screen;
@@ -37,6 +38,9 @@ import io.github.overrun.mc2d.util.Identifier;
 import org.overrun.swgl.core.gl.GLStateMgr;
 
 /**
+ * The screen with a screen handler.
+ *
+ * @param <T> the screen handler type
  * @author squid233
  * @since 2021/01/25
  */
@@ -79,13 +83,13 @@ public abstract class HandledScreen<T extends ScreenHandler> extends Screen {
      */
     protected abstract void drawBackground(int mouseX, int mouseY);
 
-    // ::(slotId, quickCraftMask, clickType, player)
+    // TODO: ::(slotId, transferMask, clickType, player)
     protected void onClickSlot(Slot slot, int button) {
     }
 
     @Override
-    public void init() {
-        super.init();
+    public void init(Mc2dClient client, int width, int height) {
+        super.init(client, width, height);
         x = (width - backgroundWidth) / 2;
         y = (height - backgroundHeight) / 2;
     }

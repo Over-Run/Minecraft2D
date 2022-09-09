@@ -61,14 +61,18 @@ public class Identifier {
         return path;
     }
 
+    public String toAssetsPath() {
+        return "assets/" + getNamespace() + "/" + getPath();
+    }
+
     public boolean isVanilla() {
         return DEFAULT.equals(namespace);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         Identifier that = (Identifier) o;
         return Objects.equals(getNamespace(), that.getNamespace()) && Objects.equals(getPath(), that.getPath());
     }

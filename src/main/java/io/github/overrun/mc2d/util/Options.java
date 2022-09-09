@@ -27,10 +27,7 @@ package io.github.overrun.mc2d.util;
 import org.overrun.swgl.core.util.LogFactory9;
 import org.slf4j.Logger;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Properties;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
@@ -40,67 +37,56 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
  * @since 2021/01/23
  */
 public final class Options {
-    public static final Properties OPTIONS = new Properties();
+    private static final Logger logger = LogFactory9.getLogger();
     private static final File FILE = new File("options.txt");
-    public static final String KEY_CREATIVE_TAB = "key.creativeTab";
+    public static final String KEY_ITEM_GROUP = "key.itemGroup";
     public static final String LANG = "lang";
     public static final String GUI_SCALE = "guiScale";
-    private static final Logger logger = LogFactory9.getLogger();
+    public final Properties options = new Properties();
 
-    private static void put(String key, int value) {
-        OPTIONS.put(key, String.valueOf(value));
-    }
-
-    private static void put(String key, double value) {
-        OPTIONS.put(key, String.valueOf(value));
-    }
-
-    public static void save() {
-        try (var os = new FileOutputStream(FILE)) {
-            OPTIONS.store(os, null);
-        } catch (IOException e) {
-            logger.error("Catching saving options", e);
-        }
-    }
-
-    public static void init() {
+    public Options() {
         if (!FILE.exists()) {
-            put(KEY_CREATIVE_TAB, GLFW_KEY_E);
-            OPTIONS.put(LANG, "en_us");
+            put(KEY_ITEM_GROUP, GLFW_KEY_E);
+            put(LANG, "en_us");
             put(GUI_SCALE, 2.0);
             save();
         }
-        try (var r = new FileReader(FILE)) {
-            OPTIONS.load(r);
+        try (var r = new BufferedInputStream(new FileInputStream(FILE))) {
+            options.load(r);
             save();
         } catch (IOException e) {
             logger.error("Catching loading options", e);
         }
     }
 
-    public static boolean getB(String key, String def) {
-        return OPTIONS.containsKey(key)
-            ? Boolean.parseBoolean(OPTIONS.getProperty(key))
-            : Boolean.parseBoolean(def);
+    private void put(String key, Object value) {
+        options.put(key, String.valueOf(value));
     }
 
-    public static int getI(String key, int def) {
-        var value = OPTIONS.getProperty(key);
-        if (value == null) {
-            return def;
+    public void save() {
+        try (var os = new BufferedOutputStream(new FileOutputStream(FILE))) {
+            options.store(os, null);
+        } catch (IOException e) {
+            logger.error("Catching saving options", e);
         }
-        return Integer.parseInt(value);
     }
 
-    public static double getD(String key, double def) {
-        var value = OPTIONS.getProperty(key);
-        if (value == null) {
-            return def;
-        }
-        return Double.parseDouble(value);
+    public boolean getB(String key, boolean def) {
+        var value = options.getProperty(key);
+        return value == null ? def : Boolean.parseBoolean(value);
     }
 
-    public static String get(String key, String def) {
-        return OPTIONS.getProperty(key, def);
+    public int getI(String key, int def) {
+        var value = options.getProperty(key);
+        return value == null ? def : Integer.parseInt(value);
+    }
+
+    public double getD(String key, double def) {
+        var value = options.getProperty(key);
+        return value == null ? def : Double.parseDouble(value);
+    }
+
+    public String get(String key, String def) {
+        return options.getProperty(key, def);
     }
 }
