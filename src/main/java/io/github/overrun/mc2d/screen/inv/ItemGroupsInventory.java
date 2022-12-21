@@ -29,18 +29,19 @@ import io.github.overrun.mc2d.world.entity.player.PlayerEntity;
 import io.github.overrun.mc2d.world.item.ItemConvertible;
 import io.github.overrun.mc2d.world.item.ItemGroup;
 import io.github.overrun.mc2d.world.item.ItemStack;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author squid233
  * @since 0.6.0
  */
 public class ItemGroupsInventory implements IInventory {
-    private final Int2ObjectMap<ItemStack> stacks = new Int2ObjectOpenHashMap<>();
+    private final Map<Integer, ItemStack> stacks = new HashMap<>();
 
     @Override
-    public Int2ObjectMap<ItemStack> getItems() {
+    public Map<Integer, ItemStack> getItems() {
         stacks.clear();
         for (int i = 0; i < size(); i++) {
             stacks.put(Slot.CONTAINER_ID0 + i, ItemGroup.BUILDING_BLOCKS.getStacks().get(i));

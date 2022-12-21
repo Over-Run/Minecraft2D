@@ -25,20 +25,19 @@
 package io.github.overrun.mc2d.screen.inv;
 
 import io.github.overrun.mc2d.world.item.ItemStack;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
-import java.util.function.IntFunction;
+import java.util.Map;
 
 /**
  * @author squid233
  * @since 0.6.0
  */
 public final class Inventories {
-    public static ItemStack splitStack(IntFunction<ItemStack> map,
+    public static ItemStack splitStack(Map<Integer, ItemStack> map,
                                        int slot,
                                        int count) {
         if (count < 1) return ItemStack.ofEmpty();
-        var stack = map.apply(slot);
+        var stack = map.get(slot);
         if (stack.isEmpty()) return ItemStack.ofEmpty();
         var copy = stack.copy();
         copy.setCount(count);
@@ -50,7 +49,7 @@ public final class Inventories {
         return copy;
     }
 
-    public static ItemStack removeStack(Int2ObjectMap<ItemStack> map,
+    public static ItemStack removeStack(Map<Integer, ItemStack> map,
                                         int slot) {
         var stack = map.get(slot);
         var copy = stack.copy();

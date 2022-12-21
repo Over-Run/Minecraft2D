@@ -40,7 +40,11 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class HumanEntity extends Entity {
     public static final PlayerEntityModel model = new PlayerEntityModel();
+    private static final int KEEP_FACING_TICKS = 20;
     private boolean facingRight;
+    private int animation = 0;
+    private boolean keepFacing = false;
+    private int currentFacingTicks = 0;
 
     public HumanEntity(World world, EntityType<? extends HumanEntity> entityType) {
         super(world, entityType);
@@ -50,9 +54,18 @@ public class HumanEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
+        animation++;
         double xa = Math.random() * 2 - 1;
-        xa = xa > 0.0 ? 1.0 : (xa < 0.0 ? -1.0 : 0.0);
-        facingRight = xa >= 0;
+        if (keepFacing) {
+            xa = facingRight ? 1.0 : -1.0;
+            currentFacingTicks++;
+            if (currentFacingTicks >= KEEP_FACING_TICKS) keepFacing = false;
+        } else {
+            currentFacingTicks = 0;
+            xa = xa > 0.0 ? 1.0 : -1.0;
+            facingRight = xa >= 0;
+            keepFacing = true;
+        }
         if (onGround && Math.random() > 0.5) {
             velocity.y = 0.5;
         }
@@ -75,7 +88,7 @@ public class HumanEntity extends Entity {
         glTranslated(Math.lerp(prevPos.x(), position.x(), delta),
             Math.lerp(prevPos.y(), position.y(), delta),
             Math.lerp(prevPos.z(), position.z(), delta));
-        model.render(delta, facingRight, 0);
+        model.render(delta, facingRight, animation);
         glPopMatrix();
     }
 }

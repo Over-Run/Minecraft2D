@@ -29,8 +29,8 @@ package io.github.overrun.mc2d.client.model;
  * @since 0.6.0
  */
 public class Vertex {
-    private float x, y, z;
-    private float u, v;
+    private final float x, y, z;
+    private final float u, v;
 
     public Vertex(float x, float y, float z, float u, float v) {
         this.x = x;
@@ -41,9 +41,7 @@ public class Vertex {
     }
 
     public Vertex(float x, float y, float z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this(x, y, z, 0f, 0f);
     }
 
     public Vertex(Vertex vertex) {

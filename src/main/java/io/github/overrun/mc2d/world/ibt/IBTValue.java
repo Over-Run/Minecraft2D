@@ -117,7 +117,7 @@ public record IBTValue(IBTType type, Object value) {
             int len = in.readInt();
             IBTValue[] arr = new IBTValue[len];
             for (int i = 0; i < arr.length; i++) {
-                arr[i] = IBTValue.deserialize(in);
+                arr[i] = deserialize(in);
             }
             return new IBTValue(type, arr);
         }

@@ -35,7 +35,6 @@ import io.github.overrun.mc2d.world.entity.EntityTypes;
 import io.github.overrun.mc2d.world.entity.player.PlayerEntity;
 import io.github.overrun.mc2d.world.ibt.BinaryTag;
 import io.github.overrun.mc2d.world.ibt.IBinaryTag;
-import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import org.jetbrains.annotations.Nullable;
 import org.joml.SimplexNoise;
 import org.overrun.swgl.core.phys.p2d.AABRect2f;
@@ -341,7 +340,7 @@ public class World {
                 }
             }
         });
-        var blocksMap = new Int2ObjectLinkedOpenHashMap<Identifier>();
+        var blocksMap = new LinkedHashMap<Integer, Identifier>();
         Utils.let(tag.get(TAG, "blocksMap"), t -> {
             for (var e : t.getMappings().entrySet()) {
                 blocksMap.put((int) e.getValue().value(), new Identifier(e.getKey()));

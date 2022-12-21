@@ -58,7 +58,7 @@ public sealed class IBTType {
             case 11 -> DOUBLE_ARRAY;
             case 12 -> TAG_ARRAY;
             default ->
-                throw new IllegalArgumentException("serialFlag is an invalid number; got: " + serialFlag + ", expected 1 to 11");
+                throw new IllegalArgumentException("serialFlag is an invalid number; got: " + serialFlag + ", expected 1 to 12");
         };
     }
 

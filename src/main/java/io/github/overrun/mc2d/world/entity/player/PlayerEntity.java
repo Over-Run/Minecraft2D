@@ -96,7 +96,7 @@ public class PlayerEntity extends Entity {
             ++xa;
             facingRight = true;
         }
-        if (moveL || moveR) {
+        if (moveL ^ moveR) {
             animation++;
         } else {
             if (animation > 4) animation %= 4;

@@ -27,7 +27,8 @@ package io.github.overrun.mc2d.screen.inv;
 import io.github.overrun.mc2d.world.entity.player.PlayerEntity;
 import io.github.overrun.mc2d.world.item.ItemConvertible;
 import io.github.overrun.mc2d.world.item.ItemStack;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+
+import java.util.Map;
 
 /**
  * The inventory.
@@ -36,7 +37,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
  * @since 0.6.0
  */
 public interface IInventory {
-    Int2ObjectMap<ItemStack> getItems();
+    Map<Integer, ItemStack> getItems();
 
     int size();
 

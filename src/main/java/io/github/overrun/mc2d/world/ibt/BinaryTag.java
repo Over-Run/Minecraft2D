@@ -52,8 +52,10 @@ public class BinaryTag implements IBinaryTag {
         for (var e : getMappings().entrySet()) {
             var k = e.getKey();
             var v = e.getValue();
-            out.writeUTF(k);
-            v.serialize(out);
+            if (k != null && v != null) {
+                out.writeUTF(k);
+                v.serialize(out);
+            }
         }
     }
 

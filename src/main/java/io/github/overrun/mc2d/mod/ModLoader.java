@@ -64,7 +64,7 @@ public final class ModLoader {
             dir.mkdir();
         }
         var files = dir.listFiles();
-        if (files != null && files.length > 0) {
+        if (files != null) {
             for (var file : files) {
                 var filename = file.getName();
                 var isModFile = file.isFile() &&

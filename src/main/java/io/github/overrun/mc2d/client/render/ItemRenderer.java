@@ -59,8 +59,8 @@ public class ItemRenderer {
             atlas.getWidth(tex),
             atlas.getHeight(tex),
             16, 16,
-            atlas.width(),
-            atlas.height());
+            atlas.getWidth(),
+            atlas.getHeight());
         if (stack.getCount() > 1) {
             var text = String.valueOf(stack.getCount());
             textRenderer.draw((int) (x + 16 - textRenderer.drawWidth(text)),

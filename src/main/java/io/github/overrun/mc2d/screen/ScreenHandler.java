@@ -26,15 +26,16 @@ package io.github.overrun.mc2d.screen;
 
 import io.github.overrun.mc2d.screen.slot.Slot;
 import io.github.overrun.mc2d.world.entity.player.PlayerEntity;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author squid233
  * @since 2021/01/25
  */
 public abstract class ScreenHandler {
-    public final Int2ObjectMap<Slot> slots = new Int2ObjectOpenHashMap<>();
+    public final Map<Integer, Slot> slots = new HashMap<>();
 
     public ScreenHandler() {
     }

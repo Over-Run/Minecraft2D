@@ -26,8 +26,6 @@ package io.github.overrun.mc2d.client;
 
 import io.github.overrun.mc2d.mod.ModLoader;
 import io.github.overrun.mc2d.util.Identifier;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.overrun.swgl.core.gl.GLStateMgr;
@@ -35,6 +33,8 @@ import org.overrun.swgl.core.util.LogFactory9;
 import org.slf4j.Logger;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.github.overrun.mc2d.util.ImageReader.read;
 import static org.lwjgl.opengl.GL11.*;
@@ -46,7 +46,7 @@ import static org.lwjgl.stb.STBImage.*;
  */
 public final class TextureManager implements AutoCloseable {
     private static final Logger logger = LogFactory9.getLogger();
-    private final Object2IntMap<Identifier> idMap = new Object2IntOpenHashMap<>(16);
+    private final Map<Identifier, Integer> idMap = new HashMap<>(16);
 
     public int loadTexture(Identifier id) {
         return loadTexture(id, GL_NEAREST);
@@ -58,7 +58,7 @@ public final class TextureManager implements AutoCloseable {
 
     public int loadTexture(Identifier id, int mode) {
         if (idMap.containsKey(id)) {
-            return idMap.getInt(id);
+            return idMap.get(id);
         }
         int texId = glGenTextures();
         GLStateMgr.bindTexture2D(texId);

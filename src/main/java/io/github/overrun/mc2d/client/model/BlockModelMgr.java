@@ -30,8 +30,9 @@ import io.github.overrun.mc2d.util.Identifier;
 import io.github.overrun.mc2d.util.registry.BaseRegistry;
 import io.github.overrun.mc2d.util.registry.Registry;
 import io.github.overrun.mc2d.world.block.BlockType;
-import org.overrun.swgl.core.asset.tex.SpriteInfo;
-import org.overrun.swgl.core.asset.tex.TextureAtlas;
+import org.overrun.swgl.core.asset.tex.TextureParam;
+import org.overrun.swgl.core.asset.tex.atlas.SpriteInfo;
+import org.overrun.swgl.core.asset.tex.atlas.TextureAtlas;
 import org.overrun.swgl.core.io.IFileProvider;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.function.Function;
 
-import static org.lwjgl.opengl.GL11C.*;
+import static org.lwjgl.opengl.GL11C.GL_NEAREST;
 
 /**
  * @author squid233
@@ -83,12 +84,9 @@ public class BlockModelMgr {
             );
         }
         infoList.sort(COMPARATOR);
-        atlas.extraParam(target -> {
-            glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        });
+        atlas.extraParam(new TextureParam().minFilter(GL_NEAREST).magFilter(GL_NEAREST));
         atlas.load(infoList);
-        Mc2dClient.getInstance().getTextureManager().addTexture(id, atlas.textureId());
+        Mc2dClient.getInstance().getTextureManager().addTexture(id, atlas.getId());
         return atlas;
     }
 

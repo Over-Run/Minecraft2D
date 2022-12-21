@@ -35,13 +35,9 @@ import io.github.overrun.mc2d.world.block.BlockType;
 import io.github.overrun.mc2d.world.block.Blocks;
 import io.github.overrun.mc2d.world.entity.HumanEntity;
 import io.github.overrun.mc2d.world.item.BlockItemType;
-import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import org.joml.Intersectiond;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static io.github.overrun.mc2d.world.Chunk.CHUNK_SIZE;
@@ -60,7 +56,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     private final World world;
     public final HitResult hitResult = new HitResult(null, 0, 0, 0, true);
     private final int xChunks, yChunks;
-    private final Long2ObjectMap<ClientChunk> chunkMap = new Long2ObjectArrayMap<>();
+    private final Map<Long, ClientChunk> chunkMap = new HashMap<>();
     private final List<ClientChunk> dirtyChunks = new ArrayList<>();
 
     public WorldRenderer(Mc2dClient client, World world) {

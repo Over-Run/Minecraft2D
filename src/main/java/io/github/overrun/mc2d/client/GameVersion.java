@@ -53,6 +53,8 @@ public final class GameVersion {
     private int protocolVersion = 0;
 
     /**
+     * The serializer.
+     *
      * @author squid233
      * @since 0.6.0
      */
@@ -86,7 +88,7 @@ public final class GameVersion {
             StandardCharsets.UTF_8)) {
             version = GSON.fromJson(reader, GameVersion.class);
         } catch (Exception e) {
-            logger.error("Catching reading game version", e);
+            logger.error("Error reading game version", e);
             version = new GameVersion();
         }
         INSTANCE = version;

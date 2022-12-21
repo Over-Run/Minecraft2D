@@ -25,10 +25,6 @@
 package io.github.overrun.mc2d.util.registry;
 
 import io.github.overrun.mc2d.util.Identifier;
-import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -45,8 +41,8 @@ import java.util.Map;
 public class MappedRegistry<T> extends MutableRegistry<T> {
     protected final Map<T, Identifier> entry2id = new LinkedHashMap<>();
     protected final Map<Identifier, T> id2entry = new LinkedHashMap<>();
-    protected final Object2IntMap<T> entry2rawId = new Object2IntLinkedOpenHashMap<>();
-    protected final Int2ObjectMap<T> entries = new Int2ObjectLinkedOpenHashMap<>();
+    protected final Map<T, Integer> entry2rawId = new LinkedHashMap<>();
+    protected final Map<Integer, T> entries = new LinkedHashMap<>();
     protected int nextId = 0;
 
     public int size() {
@@ -65,7 +61,7 @@ public class MappedRegistry<T> extends MutableRegistry<T> {
 
     @Override
     public int getRawId(T entry) {
-        return entry2rawId.getInt(entry);
+        return entry2rawId.get(entry);
     }
 
     @Override
@@ -102,8 +98,8 @@ public class MappedRegistry<T> extends MutableRegistry<T> {
     public void remove(T entry) {
         id2entry.remove(entry2id.get(entry));
         entry2id.remove(entry);
-        entries.remove(entry2rawId.getInt(entry));
-        entry2rawId.removeInt(entry);
+        entries.remove(entry2rawId.get(entry));
+        entry2rawId.remove(entry);
     }
 
     @NotNull

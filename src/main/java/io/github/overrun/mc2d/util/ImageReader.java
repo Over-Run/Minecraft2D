@@ -52,9 +52,9 @@ public final class ImageReader {
             if (is == null) {
                 return null;
             }
-            return IFileProvider.of(loader).res2BBWithRE(path, 8192);
-        } catch (Throwable t) {
-            logger.error("Catching reading image buffer", t);
+            return IFileProvider.of(loader).resToBuffer(path, 8192);
+        } catch (Exception e) {
+            logger.error("Catching reading image buffer", e);
             return null;
         }
     }

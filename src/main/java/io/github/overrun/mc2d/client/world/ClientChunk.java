@@ -128,7 +128,9 @@ public class ClientChunk extends Chunk {
     public void free() {
         glDeleteBuffers(vbo);
         for (int i = 0; i < LAYERS; i++) {
-            batches[i].close();
+            if (batches[i] != null) {
+                batches[i].close();
+            }
         }
     }
 }
